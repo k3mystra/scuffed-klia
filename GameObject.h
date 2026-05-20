@@ -4,30 +4,36 @@
 
 class GameObject {
     public:
-        glm::mat4 globalTransform;
-        glm::mat4 localTransform;
+        GameObject();
+
+        glm::vec3 getPosition() const;
+        void setPosition(const glm::vec3& newPosition);
+
+        glm::vec3 getRotation() const;
+        void setRotation(const glm::vec3& newRotation);
+
+        glm::vec3 getScale() const;
+        void setScale(const glm::vec3& newScale);
+
+        glm::vec3 getLocalPosition() const;
+        void setLocalPosition(const glm::vec3& newLocalPosition);
+
+        glm::vec3 getLocalRotation() const;
+        void setLocalRotation(const glm::vec3& newLocalRotation);
+
+        glm::vec3 getLocalScale() const;
+        void setLocalScale(const glm::vec3& newLocalScale);
+
+    private:
+        bool isDirty;
+        
+        glm::mat4 transform;
         glm::vec3 position;
         glm::vec3 rotation;
         glm::vec3 scale;
 
-        GameObject();
+        glm::mat4 localTransform;
+        glm::vec3 localPosition;
+        glm::vec3 localRotation;
+        glm::vec3 localScale;
 };
-
-
-GameObject::GameObject() {
-    globalTransform = glm::mat4 (
-                    1.0f, 0.0f, 0.0f, 0.0f,
-                    0.0f, 1.0f, 0.0f, 0.0f,
-                    0.0f, 0.0f, 1.0f, 0.0f,
-                    0.0f, 0.0f, 0.0f, 1.0f
-                    );
-    localTransform = glm::mat4 (
-                    1.0f, 0.0f, 0.0f, 0.0f,
-                    0.0f, 1.0f, 0.0f, 0.0f,
-                    0.0f, 0.0f, 1.0f, 0.0f,
-                    0.0f, 0.0f, 0.0f, 1.0f
-                    );
-    position = glm::vec3(0.0f, 0.0f, 0.0f);
-    rotation = glm::vec3(0.0f, 0.0f, 0.0f);
-    scale = glm::vec3(1.0f, 1.0f, 1.0f);
-}
