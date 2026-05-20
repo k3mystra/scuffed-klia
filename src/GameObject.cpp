@@ -64,6 +64,11 @@ void GameObject::setLocalScale(const glm::vec3& s) {
     isDirty = true;
 }
 
+glm::mat4 GameObject::getTransform() const { return transform; }
+glm::mat4 GameObject::getInvTransform() const { return invTransform; }
+glm::mat4 GameObject::getLocalTransform() const { return localTransform; }
+glm::mat4 GameObject::getLocalInvTransform() const { return localInvTransform; }
+
 void GameObject::recalcTransform() {
     transform = glm::mat4 (
         1.0f, 0.0f, 0.0f, 0.0f,
