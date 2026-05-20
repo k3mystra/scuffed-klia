@@ -5,6 +5,7 @@
 class GameObject {
 public:
   GameObject();
+  void recalcTransform();
 
   glm::vec3 getPosition() const;
   void setPosition(const glm::vec3 &newPosition);
@@ -28,11 +29,13 @@ private:
   bool isDirty;
 
   glm::mat4 transform;
+  glm::mat4 invTransform;
   glm::vec3 position;
   glm::vec3 rotation;
   glm::vec3 scale;
 
   glm::mat4 localTransform;
+  glm::mat4 localInvTransform;
   glm::vec3 localPosition;
   glm::vec3 localRotation;
   glm::vec3 localScale;
