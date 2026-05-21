@@ -80,6 +80,8 @@ int main (int argc, char *argv[]) {
     if (glewInit() != GLEW_OK)
         return -1;
 
+    // OpenGL Functions to enable
+    glEnable(GL_DEPTH_TEST);
     // Compile shaders and link to make a 'program' to run on a GPU
     unsigned int vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
     unsigned int fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
@@ -155,6 +157,17 @@ int main (int argc, char *argv[]) {
 
     glfwTerminate();
     return 0;
+}
+
+string readFile(const char* filePath) {
+    ifstream file(filePath);
+    if (!file.is_open()) {
+        cerr << "Failed to open file: " << filePath << endl;
+        return "";
+    }
+    stringstream buffer;
+    buffer << file.rdbuf();
+    return buffer.str();
 }
 
 unsigned int compileShader(unsigned int shaderType, const char *source) {
