@@ -25,6 +25,11 @@ public:
   glm::vec3 getLocalScale() const;
   void setLocalScale(const glm::vec3 &newLocalScale);
 
+  glm::mat4 getTransform() const;
+  glm::mat4 getInvTransform() const;
+  glm::mat4 getLocalTransform() const;
+  glm::mat4 getLocalInvTransform() const;
+
 private:
   bool isDirty;
 
