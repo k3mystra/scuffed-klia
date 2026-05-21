@@ -76,7 +76,7 @@ void GameObject::recalcTransform() {
         0.0f, 0.0f, 1.0f, 0.0f,
         0.0f, 0.0f, 0.0f, 1.0f
     );
-    transform = glm::mat4(1.0f);
+
     transform = glm::translate(transform, position);
     transform = glm::rotate(transform, glm::radians(rotation.z), glm::vec3(0, 0, 1));
     transform = glm::rotate(transform, glm::radians(rotation.y), glm::vec3(0, 1, 0));
