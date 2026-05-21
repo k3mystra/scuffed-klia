@@ -4,8 +4,7 @@
 
 Camera::Camera()
     : GameObject(),
-    // 45 degree in radian, for FOV in Y-axis
-    fov(1.0/4.0 * glm::pi<float>()),
+    fov(45),
     aspectRatio(16.0f/9.0f),
     nearPlane(0.5f),
     farPlane(100.0f) {
