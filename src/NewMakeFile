@@ -1,6 +1,3 @@
-#Not this one
-#Im trying to get one that work on both linux and windows
-
 CC = g++
 CFLAGS = -g -Wall
 BUILD_FOLDER := build
@@ -18,7 +15,7 @@ else
     LDFLAGS = -lGL -lGLEW -lglfw
     MKDIR = mkdir -p $(BUILD_FOLDER)
     RM = rm -rf
-endef
+endif
 
 # 2. AUTOMATIC FILE DETECTION
 SOURCES := $(wildcard *.cpp)
