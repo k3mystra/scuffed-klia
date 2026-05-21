@@ -1,6 +1,8 @@
+#ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4244)
 #pragma warning(disable : 4267)
+#endif
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -29,7 +31,7 @@ const char *vertexShaderSource =
 "void main()\n"
 "{\n"
 // Output of vertex shader is gl_Position
-" gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);\n"
+" gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
 "}\0";
 
 const char *fragmentShaderSource =
