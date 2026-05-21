@@ -1,34 +1,47 @@
 CC = g++
 CFLAGS = -g -Wall
-LDFLAGS = -lGL -lGLEW -lglfw
-
-
-# bin: main.cpp
-# 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
-
-
-.DEFAULT_GOAL := main.exe
-.PHONY: main.exe
-
 BUILD_FOLDER := build
+.DEFAULT_GOAL := main.exe
+.PHONY: main.exe debug clean
 
+# 1. DETECT OPERATING SYSTEM
+ifeq ($(OS),Windows_NT)
+    # Windows (MinGW / MSYS2) configuration
+    LDFLAGS = -lglew32 -lglfw3 -lopengl32 -lgdi32
+    MKDIR = if not exist $(BUILD_FOLDER) mkdir $(BUILD_FOLDER)
+    RM_DIR = rmdir /s /q
+    RM_FILE = del /q /f
+else
+    # Linux / macOS configuration
+    LDFLAGS = -lGL -lGLEW -lglfw
+    MKDIR = mkdir -p $(BUILD_FOLDER)
+    RM_DIR = rm -rf
+    RM_FILE = rm -f
+endif
+
+# 2. AUTOMATIC FILE DETECTION
 SOURCES := $(wildcard *.cpp)
-# For each name in SOURCES (notdir removes the folder name, basename removes the file extension), append .o
 OBJECTS := $(foreach x, $(basename $(notdir $(SOURCES))), $(BUILD_FOLDER)/$(x).o)
-
 LIBS :=
 
-$(BUILD_FOLDER)/%.o: %.cpp
-	g++ $(CFLAGS) $< -c -o $@
+# 3. COMPILATION RULES
+# Order-only dependency ensures the build folder is safely created first
+$(BUILD_FOLDER)/%.o: %.cpp | $(BUILD_FOLDER)
+	$(CC) $(CFLAGS) -c $< -o $@
 
+# Safe linker order: $(OBJECTS) comes BEFORE $(LDFLAGS)
 main.exe: $(OBJECTS)
-	g++ $(LDFLAGS) $(foreach x, $(LIBS), -I $x) $(OBJECTS) -o main.exe
-
-# @ before a command to not print the command itself
-debug:
-	@echo $(LIBS)
-	@echo $(SOURCES)
-	@echo $(OBJECTS)
+	$(CC) $(foreach x, $(LIBS), -I $x) $(OBJECTS) -o main.exe $(LDFLAGS)
 
 $(BUILD_FOLDER):
-	mkdir $(BUILD_FOLDER)
+	$(MKDIR)
+
+debug:
+	@echo "OS Detected: $(OS)"
+	@echo "Sources: $(SOURCES)"
+	@echo "Objects: $(OBJECTS)"
+	@echo "Flags: $(LDFLAGS)"
+
+clean:
+	$(RM_DIR) $(BUILD_FOLDER)
+	$(RM_FILE) main.exe

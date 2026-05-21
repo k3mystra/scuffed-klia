@@ -1,0 +1,38 @@
+#this is for windows
+CC = g++
+CFLAGS = -g -Wall
+#The LDFLAGS are changed because the previous one is for linux.
+LDFLAGS = -lglew32 -lglfw3 -lopengl32 -lgdi32
+
+
+# bin: main.cpp
+# 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+
+.DEFAULT_GOAL := main.exe
+.PHONY: main.exe
+
+BUILD_FOLDER := build
+
+SOURCES := $(wildcard *.cpp)
+# For each name in SOURCES (notdir removes the folder name, basename removes the file extension), append .o
+OBJECTS := $(foreach x, $(basename $(notdir $(SOURCES))), $(BUILD_FOLDER)/$(x).o)
+
+LIBS :=
+
+$(BUILD_FOLDER)/%.o: %.cpp
+	g++ $(CFLAGS) $< -c -o $@
+
+#The $(LDFLAGS) are at the end instead of the start
+
+main.exe: $(OBJECTS)
+	g++ $(foreach x, $(LIBS), -I $x) $(OBJECTS) -o main.exe $(LDFLAGS)
+
+# @ before a command to not print the command itself
+debug:
+	@echo $(LIBS)
+	@echo $(SOURCES)
+	@echo $(OBJECTS)
+
+$(BUILD_FOLDER):
+	mkdir $(BUILD_FOLDER)
