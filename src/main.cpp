@@ -12,6 +12,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 #include "MeshObject.h"
 #include "Camera.h"
@@ -21,33 +24,7 @@ using namespace std;
 const int WINDOW_WIDTH = 640;
 const int WINDOW_HEIGHT = 360;
 
-const char *vertexShaderSource =
-"#version 330 core\n"
-// Get vertex attributes (for now, just the position)
-// location 0 means we want to pick the 0th vertex attribute
-// as defined in a glVertexAttribPointer() call
-"layout (location = 0) in vec3 pos;\n"
-"uniform mat4 projection;"
-"uniform mat4 view;"
-"uniform mat4 model;"
-"void main()\n"
-"{\n"
-// Output of vertex shader is gl_Position
-" gl_Position = projection * view * model * vec4(pos, 1.0);\n"
-"}\0";
-
-const char *fragmentShaderSource =
-"#version 330 core\n"
-"out vec4 color;\n"
-"const vec3 colors[3] = vec3[](vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 1.0));\n"
-"void main()\n"
-"{\n"
-" vec3 choice;\n"
-" choice = colors[gl_PrimitiveID % 3];\n"
-" color = vec4(choice, 1.0);\n"
-"}\n\0";
-
-
+string readFile(const char* filePath);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 unsigned int compileShader(unsigned int shaderType, const char *source);
@@ -82,9 +59,12 @@ int main (int argc, char *argv[]) {
 
     // OpenGL Functions to enable
     glEnable(GL_DEPTH_TEST);
+
     // Compile shaders and link to make a 'program' to run on a GPU
-    unsigned int vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
-    unsigned int fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
+    string vertexShaderString = readFile("vertex_shader.glsl");
+    string fragmentShaderString = readFile("fragment_shader.glsl");
+    unsigned int vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderString.c_str());
+    unsigned int fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderString.c_str());
     unsigned int program = glCreateProgram();
     glAttachShader(program, vertexShader);
     glAttachShader(program, fragmentShader);
@@ -131,12 +111,12 @@ int main (int argc, char *argv[]) {
     while(!glfwWindowShouldClose(window))
     {
         // Set to wireframe before full-face rendering done
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         processInput(window);
 
         // Clear the buffer before next render
         glClearColor(0, 0, 0, 0);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(program);
 
