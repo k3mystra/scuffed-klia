@@ -6,47 +6,52 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <cmath>
 #include <cstdlib>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <iomanip>
 #include <iostream>
 #include <vector>
 
-#include "GameObject.h"
+#include "MeshObject.h"
+#include "Camera.h"
 
 using namespace std;
 
-const int WINDOW_WIDTH = 1000;
-const int WINDOW_HEIGHT = 700;
+const int WINDOW_WIDTH = 640;
+const int WINDOW_HEIGHT = 360;
 
 const char *vertexShaderSource =
 "#version 330 core\n"
 // Get vertex attributes (for now, just the position)
 // location 0 means we want to pick the 0th vertex attribute
 // as defined in a glVertexAttribPointer() call
-"layout (location = 0) in vec3 aPos;\n"
+"layout (location = 0) in vec3 pos;\n"
+"uniform mat4 projection;"
+"uniform mat4 view;"
+"uniform mat4 model;"
 "void main()\n"
 "{\n"
 // Output of vertex shader is gl_Position
-" gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+" gl_Position = projection * view * model * vec4(pos, 1.0);\n"
 "}\0";
 
 const char *fragmentShaderSource =
 "#version 330 core\n"
-"out vec4 FragColor;\n"
-"uniform vec3 objectColor;\n"
+"out vec4 color;\n"
+"const vec3 colors[3] = vec3[](vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 1.0));\n"
 "void main()\n"
 "{\n"
-" FragColor = vec4(objectColor, 1.0);\n"
+" vec3 choice;\n"
+" choice = colors[gl_PrimitiveID % 3];\n"
+" color = vec4(choice, 1.0);\n"
 "}\n\0";
 
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 unsigned int compileShader(unsigned int shaderType, const char *source);
+MeshObject generate3dObject();
 
 
 int main (int argc, char *argv[]) {
@@ -56,6 +61,7 @@ int main (int argc, char *argv[]) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
     GLFWwindow *window = glfwCreateWindow(
             WINDOW_WIDTH, WINDOW_HEIGHT, "Larp Combat", NULL, NULL);
     if (!window) {
@@ -68,7 +74,7 @@ int main (int argc, char *argv[]) {
     // By default already set to screen size, but useful if we resize the windows later
     glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
     // Resize viewport on windows resize
-    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    // glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
     // Init. GLEW to query the driver and actually load OpenGL library
     if (glewInit() != GLEW_OK)
@@ -83,22 +89,66 @@ int main (int argc, char *argv[]) {
     glLinkProgram(program);
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
-    // Tell OpenGL to use the 'program' for the every rendering call
-    glUseProgram(program);
-    
 
+    // Vertex Array Object (VAO) to store vertex attributes layout
+    // for all VBO
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    // ---- Subject to Change ----
+    MeshObject obj = generate3dObject();
+    obj.setPosition(glm::vec3(0.0, 0.0, -3.0));
+    obj.setRotation(glm::vec3(0.0, 20.0, 10.0));
+    // obj.setScale(glm::vec3(0.5));
+    obj.recalcTransform();
+
+    Camera cam = Camera();
+
+    // Put all objects into GPU vertex buffer
+    // Since only 1, we don't use for loop here
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    vector vertices = obj.getVertices();
+    // Dynamic draw so that we can change em fast later
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
+
+    // Indices shit
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    vector indices = obj.getIndices();
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_DRAW);
+    
+    // Setup vertex attributes
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    
     // Main render loop
     while(!glfwWindowShouldClose(window))
     {
+        // Set to wireframe before full-face rendering done
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         processInput(window);
-
 
         // Clear the buffer before next render
         glClearColor(0, 0, 0, 0);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        glUseProgram(program);
 
-        // Render here
+        // Pass necessary params to shader
+        glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, glm::value_ptr(obj.getTransform()));
+        glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(cam.getInvTransform()));
+        glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, glm::value_ptr(cam.getProjectionMatrix()));
+
+        glBindVertexArray(VAO);
+        // Render here, all 36 indices of a cube
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+        // Unbind VAO just in case
+        glBindVertexArray(0);
+
         glfwSwapBuffers(window);
         glfwPollEvents();    
     }
@@ -133,4 +183,20 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 void processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+}
+
+MeshObject generate3dObject() {
+  // For now just cube
+  vector<float> vertices = {0.5, 0.5,  0.5,  -0.5, 0.5,  0.5, -0.5, -0.5,
+                            0.5, 0.5,  -0.5, 0.5,  0.5,  0.5, -0.5, -0.5,
+                            0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5};
+
+  // Index start with 0 here
+  vector<unsigned int> indices = {0, 1, 2, 0, 2, 3, 0, 4, 5, 0, 5, 1, 2, 6, 7, 2, 7, 3, 7, 6, 5, 7, 5, 4, 1, 5, 6, 1, 6, 2, 3, 7, 4, 3, 4, 0};
+
+  MeshObject obj = MeshObject();
+  obj.setVertices(vertices);
+  obj.setIndices(indices);
+
+  return obj;
 }
