@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "MeshObject.h"
 
+#include <glm/ext/vector_float3.hpp>
 #include <vector>
 
 
@@ -36,6 +37,8 @@ MeshObject genCube() {
 
 void Scene::objectSetup() {
     MeshObject cube = genCube();
+    cube.material = Material();
+    cube.material.color = glm::vec3(0.196, 0.5921, 0.6588);
     cube.setPosition(glm::vec3(0.0, 0.0, -3.0));
     cube.setRotation(glm::vec3(0.0, 20.0, 10.0));
     cube.recalcTransform();
