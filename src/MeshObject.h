@@ -3,10 +3,19 @@
 #include "GameObject.h"
 #include <vector>
 
+struct MeshBufferInfo {
+    unsigned int VAO;
+    unsigned int VBO;
+    unsigned int EBO;
+};
+
+
 class MeshObject : public GameObject {
 public:
     MeshObject();
     ~MeshObject();
+
+    MeshBufferInfo bufferInfo;
 
     // Placeholder for mesh data
     const std::vector<float>& getVertices() const;
