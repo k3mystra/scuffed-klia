@@ -26,7 +26,6 @@ const int WINDOW_HEIGHT = 360;
 
 string readFile(const char* filePath);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow *window);
 unsigned int compileShader(unsigned int shaderType, const char *source);
 MeshObject generate3dObject();
 
@@ -112,7 +111,7 @@ int main (int argc, char *argv[]) {
     {
         // Set to wireframe before full-face rendering done
         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        processInput(window);
+        scene.processKeyboardInput(window);
 
         // Clear the buffer before next render
         glClearColor(0, 0, 0, 0);
@@ -170,26 +169,4 @@ unsigned int compileShader(unsigned int shaderType, const char *source) {
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
-}
-
-// Equivalent of _input() in godot
-void processInput(GLFWwindow *window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
-
-MeshObject generate3dObject() {
-  // For now just cube
-  vector<float> vertices = {0.5, 0.5,  0.5,  -0.5, 0.5,  0.5, -0.5, -0.5,
-                            0.5, 0.5,  -0.5, 0.5,  0.5,  0.5, -0.5, -0.5,
-                            0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5};
-
-  // Index start with 0 here
-  vector<unsigned int> indices = {0, 1, 2, 0, 2, 3, 0, 4, 5, 0, 5, 1, 2, 6, 7, 2, 7, 3, 7, 6, 5, 7, 5, 4, 1, 5, 6, 1, 6, 2, 3, 7, 4, 3, 4, 0};
-
-  MeshObject obj = MeshObject();
-  obj.setVertices(vertices);
-  obj.setIndices(indices);
-
-  return obj;
 }
