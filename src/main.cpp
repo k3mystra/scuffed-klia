@@ -123,6 +123,13 @@ int main (int argc, char *argv[]) {
             glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, glm::value_ptr(obj.getTransform()));
             glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(cam.getInvTransform()));
             glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, glm::value_ptr(cam.getProjectionMatrix()));
+            
+            glUniform3f(
+                glGetUniformLocation(program, "matColor"),
+                obj.material.color.r,
+                obj.material.color.g,
+                obj.material.color.b
+            );
 
             glBindVertexArray(obj.bufferInfo.VAO);
 
