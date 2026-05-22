@@ -126,7 +126,7 @@ int main (int argc, char *argv[]) {
 
             glBindVertexArray(obj.bufferInfo.VAO);
 
-            // Render here, all 36 indices of a cube
+            // Render here
             glDrawElements(GL_TRIANGLES, obj.getIndices().size(), GL_UNSIGNED_INT, 0);
             // Unbind VAO just in case
             glBindVertexArray(0);
