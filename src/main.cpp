@@ -18,6 +18,7 @@
 
 #include "MeshObject.h"
 #include "Camera.h"
+#include "Scene.h"
 
 using namespace std;
 
@@ -71,40 +72,37 @@ int main (int argc, char *argv[]) {
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
-    // Vertex Array Object (VAO) to store vertex attributes layout
-    // for all VBO
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
 
     // ---- Subject to Change ----
-    MeshObject obj = generate3dObject();
-    obj.setPosition(glm::vec3(0.0, 0.0, -3.0));
-    obj.setRotation(glm::vec3(0.0, 20.0, 10.0));
-    // obj.setScale(glm::vec3(0.5));
-    obj.recalcTransform();
+    Scene scene = Scene();
+    scene.objectSetup();
+    vector<MeshObject> allObjs = scene.allMeshObject;
+    Camera cam = scene.camera;
 
-    Camera cam = Camera();
-
+    vector<MeshBufferInfo> bufferInfo = vector<MeshBufferInfo>();
     // Put all objects into GPU vertex buffer
-    // Since only 1, we don't use for loop here
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    vector vertices = obj.getVertices();
-    // Dynamic draw so that we can change em fast later
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
+    for (MeshObject &obj : allObjs) {
+        // Vertex Array Object (VAO) to store vertex attributes layout
+        // for all VBO
+        glGenVertexArrays(1, &obj.bufferInfo.VAO);
+        glBindVertexArray(obj.bufferInfo.VAO);
 
-    // Indices shit
-    unsigned int EBO;
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    vector indices = obj.getIndices();
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_DRAW);
-    
-    // Setup vertex attributes
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+        glGenBuffers(1, &obj.bufferInfo.VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, obj.bufferInfo.VBO);
+        vector vertices = obj.getVertices();
+        // Dynamic draw so that we can change em fast later
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
+
+        // Indices shit
+        glGenBuffers(1, &obj.bufferInfo.EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.bufferInfo.EBO);
+        vector indices = obj.getIndices();
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_DRAW);
+
+        // Setup vertex attributes
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+    }
     
     // Main render loop
     while(!glfwWindowShouldClose(window))
@@ -119,16 +117,20 @@ int main (int argc, char *argv[]) {
 
         glUseProgram(program);
 
-        // Pass necessary params to shader
-        glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, glm::value_ptr(obj.getTransform()));
-        glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(cam.getInvTransform()));
-        glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, glm::value_ptr(cam.getProjectionMatrix()));
 
-        glBindVertexArray(VAO);
-        // Render here, all 36 indices of a cube
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-        // Unbind VAO just in case
-        glBindVertexArray(0);
+        for (MeshObject &obj : allObjs) {
+            // Pass necessary params to shader
+            glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, glm::value_ptr(obj.getTransform()));
+            glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(cam.getInvTransform()));
+            glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, glm::value_ptr(cam.getProjectionMatrix()));
+
+            glBindVertexArray(obj.bufferInfo.VAO);
+
+            // Render here, all 36 indices of a cube
+            glDrawElements(GL_TRIANGLES, obj.getIndices().size(), GL_UNSIGNED_INT, 0);
+            // Unbind VAO just in case
+            glBindVertexArray(0);
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();    
