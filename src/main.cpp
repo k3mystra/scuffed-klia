@@ -105,15 +105,33 @@ int main (int argc, char *argv[]) {
     }
 
     
+    float deltaTime, aggregateDeltaTime = 0;
+    float lastFrameTime = 0, currentFrameTime = 0;
+    int frameCount = 0;
     // Main render loop
     while(!glfwWindowShouldClose(window))
     {
+        // Delta time calculations
+        currentFrameTime = glfwGetTime();
+        deltaTime = currentFrameTime - lastFrameTime;
+        lastFrameTime = currentFrameTime;
+
+        frameCount++;
+        aggregateDeltaTime += deltaTime;
+
+        if (frameCount == 50) {
+            cout << "FPS: " << 1.0 / (aggregateDeltaTime / 50.0) << endl;
+            cout << "Delta time: " << aggregateDeltaTime / 50.0 << endl;
+            frameCount = 0;
+            aggregateDeltaTime = 0.0;
+        }
+
         // Set to wireframe before full-face rendering done
         // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         scene.processKeyboardInput(window);
 
         // Clear the buffer before next render
-        glClearColor(0, 0, 0, 0);
+        glClearColor(0, 0, 0, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Clear viewport with different color

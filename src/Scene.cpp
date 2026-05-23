@@ -21,7 +21,7 @@ Scene::Scene() {
     camera = Camera();
     // Kinda orange, going down
     sunLight = SunLight(
-        glm::vec3(-0.1961, -0.7845, -0.5883),
+        glm::vec3(-0.1961, -0.7845, 0.5883),
         glm::vec3(1.0),
         1.2
     );
@@ -152,7 +152,7 @@ void Scene::objectSetup() {
     std::filesystem::path exePath = std::filesystem::current_path();
     std::cout << "Working directory: " << exePath << "\n";
 
-    std::string layoutPath = (exePath / "3DScene\\LarpCombat\\scene_layout.txt").string();
+    std::string layoutPath = (exePath / "3DScene/LarpCombat/scene_layout.txt").string();
     std::cout << "Final path: " << layoutPath << "\n";
     
     auto sceneObjects = loadSceneLayout(layoutPath);
@@ -169,7 +169,8 @@ void Scene::objectSetup() {
         sceneObj.mesh.setRotation(sceneObj.rotation);
         sceneObj.mesh.setScale(sceneObj.scale);
         sceneObj.mesh.recalcTransform();
-        
+
+        sceneObj.mesh.material = Material { .color = glm::vec3(0.09, 0.757, 1)};
         allMeshObject.push_back(sceneObj.mesh);
     }
 }
