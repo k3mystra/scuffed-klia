@@ -58,14 +58,15 @@ struct SceneObject {
     glm::vec3 rotation; // degrees
     glm::vec3 scale;
 };
-void Scene::objectSetup() {
-    MeshObject cube = genCube();
-    cube.material = Material();
-    // cube.material.color = glm::vec3(0.196, 0.5921, 0.6588);
-    cube.material.color = glm::vec3(0.09, 0.757, 1);
-    cube.setPosition(glm::vec3(0.0, 0.0, -3.0));
-    cube.setRotation(glm::vec3(40.0, 20.0, 30.0));
-    cube.recalcTransform();
+
+// void Scene::objectSetup() {
+//     MeshObject cube = genCube();
+//     cube.material = Material();
+//     // cube.material.color = glm::vec3(0.196, 0.5921, 0.6588);
+//     cube.material.color = glm::vec3(0.09, 0.757, 1);
+//     cube.setPosition(glm::vec3(0.0, 0.0, -3.0));
+//     cube.setRotation(glm::vec3(40.0, 20.0, 30.0));
+//     cube.recalcTransform();
 
 void loadObjToMeshObject(const std::string& path, MeshObject& obj) {
     std::ifstream file(path);
