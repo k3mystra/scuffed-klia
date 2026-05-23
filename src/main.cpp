@@ -12,19 +12,15 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <vector>
-#include <fstream>
-#include <sstream>
 #include <string>
 
 #include "MeshObject.h"
 #include "Camera.h"
 #include "Scene.h"
+#include "Shader.h"
 
 using namespace std;
 
-string readFile(const char* filePath);
-void framebufferSizeCallback(GLFWwindow* window, int width, int height);
-unsigned int compileShader(unsigned int shaderType, const char *source);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 struct WindowCallbackData {
@@ -77,29 +73,13 @@ int main (int argc, char *argv[]) {
     // OpenGL Functions to enable
     glEnable(GL_DEPTH_TEST);
 
-    // Compile shaders and link to make a 'program' to run on a GPU
-    string vertexShaderString = readFile("vertex_shader.glsl");
-    string geometryShaderString = readFile("geometry_shader.glsl");
-    string fragmentShaderString = readFile("fragment_shader.glsl");
-    unsigned int vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderString.c_str());
-    unsigned int geometryShader = compileShader(GL_GEOMETRY_SHADER, geometryShaderString.c_str());
-    unsigned int fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderString.c_str());
-    unsigned int program = glCreateProgram();
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, geometryShader);
-    glAttachShader(program, fragmentShader);
-    glLinkProgram(program);
-    glDeleteShader(vertexShader);
-    glDeleteShader(geometryShader);
-    glDeleteShader(fragmentShader);
-
+    Shader mainShader = Shader("vertex_shader.glsl", "geometry_shader.glsl", "fragment_shader.glsl");
 
     // ---- Subject to Change ----
     scene.objectSetup();
     vector<MeshObject> allObjs = scene.allMeshObject;
     Camera cam = scene.camera;
 
-    vector<MeshBufferInfo> bufferInfo = vector<MeshBufferInfo>();
     // Put all objects into GPU vertex buffer
     for (MeshObject &obj : allObjs) {
         // Vertex Array Object (VAO) to store vertex attributes layout
@@ -139,32 +119,33 @@ int main (int argc, char *argv[]) {
         // Clear viewport with different color
         glEnable(GL_SCISSOR_TEST);
         glScissor(data.viewportX, data.viewportY, data.viewportWidth, data.viewportHeight);
-        glClearColor(0.2f, 0.3f, 0.4f, 1.0f);  // Dark blue
+        glClearColor(
+            scene.backgroundColor.r,
+            scene.backgroundColor.g,
+            scene.backgroundColor.b,
+            1.0f
+        );
         glClear(GL_COLOR_BUFFER_BIT);
         glDisable(GL_SCISSOR_TEST);
 
-        glUseProgram(program);
+        mainShader.use();
 
 
         for (MeshObject &obj : allObjs) {
             // Pass vertex shader transformations
-            glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, glm::value_ptr(obj.getTransform()));
-            glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(cam.getInvTransform()));
-            glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, glm::value_ptr(cam.getProjectionMatrix()));
+            mainShader.setMat4("model", obj.getTransform());
+            mainShader.setMat4("view", cam.getInvTransform());
+            mainShader.setMat4("projection", cam.getProjectionMatrix());
 
             // Pass material color
-            glm::vec3 matColor = obj.material.color;
-            glUniform3f(glGetUniformLocation(program, "matColor"), matColor.r, matColor.g, matColor.b);
+            mainShader.setVec3("matColor", obj.material.color);
 
             // Pass ambient light color
-            glm::vec3 ambientLightFinalColor = scene.ambientLight.color;
-            glUniform3f(glGetUniformLocation(program, "ambientLightColor"), ambientLightFinalColor.r, ambientLightFinalColor.g, ambientLightFinalColor.b);
+            mainShader.setVec3("ambientLightColor", scene.ambientLight.color);
 
             // Pass diffuse light color (sunlight only for now)
-            glm::vec3 sunlightColor = scene.sunLight.color * scene.sunLight.intensity;
-            glUniform3f(glGetUniformLocation(program, "sunLightColor"), sunlightColor.r, sunlightColor.g, sunlightColor.b);
-            glm::vec3 sunlightDir = scene.sunLight.direction;
-            glUniform3f(glGetUniformLocation(program, "sunLightDir"), sunlightDir.x, sunlightDir.y, sunlightDir.z);
+            mainShader.setVec3("sunLightColor", scene.sunLight.color * scene.sunLight.intensity);
+            mainShader.setVec3("sunLightDir", scene.sunLight.direction);
 
             glBindVertexArray(obj.bufferInfo.VAO);
 
@@ -180,34 +161,6 @@ int main (int argc, char *argv[]) {
 
     glfwTerminate();
     return 0;
-}
-
-string readFile(const char* filePath) {
-    ifstream file(filePath);
-    if (!file.is_open()) {
-        cerr << "Failed to open file: " << filePath << endl;
-        return "";
-    }
-    stringstream buffer;
-    buffer << file.rdbuf();
-    return buffer.str();
-}
-
-unsigned int compileShader(unsigned int shaderType, const char *source) {
-    unsigned int shader = glCreateShader(shaderType);
-    glShaderSource(shader, 1, &source, NULL);
-    glCompileShader(shader);
-
-    int success;
-    char infoLog[512];
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(shader, 512, NULL, infoLog);
-        cerr << "Shader compilation failed: " << infoLog << std::endl;
-        return 0;
-    }
-
-    return shader;
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
