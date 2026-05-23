@@ -3,8 +3,12 @@
 #include <string>
 #include <vector>
 #include "MeshObject.h"
+#include <glm/ext/vector_float3.hpp>
 
-MeshObject::MeshObject() : GameObject() {}
+MeshObject::MeshObject() : GameObject() {
+    material = Material();
+    material.color = glm::vec3(0.0);
+}
 
 MeshObject::~MeshObject() {}
 

@@ -1,12 +1,17 @@
 #pragma once
 
 #include "GameObject.h"
+#include <glm/ext/vector_float3.hpp>
 #include <vector>
 
 struct MeshBufferInfo {
     unsigned int VAO;
     unsigned int VBO;
     unsigned int EBO;
+};
+
+struct Material {
+    glm::vec3 color;
 };
 
 
@@ -16,6 +21,7 @@ public:
     ~MeshObject();
 
     MeshBufferInfo bufferInfo;
+    Material material;
 
     // Placeholder for mesh data
     const std::vector<float>& getVertices() const;

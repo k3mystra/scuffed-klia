@@ -12,35 +12,39 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <vector>
-#include <fstream>
-#include <sstream>
 #include <string>
 
 #include "MeshObject.h"
 #include "Camera.h"
 #include "Scene.h"
+#include "Shader.h"
 
 using namespace std;
 
-const int WINDOW_WIDTH = 640;
-const int WINDOW_HEIGHT = 360;
-
-string readFile(const char* filePath);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
-unsigned int compileShader(unsigned int shaderType, const char *source);
-MeshObject generate3dObject();
+
+struct WindowCallbackData {
+    float targetAspectRatio;
+    int viewportX;
+    int viewportY;
+    int viewportWidth;
+    int viewportHeight;
+};
 
 
 int main (int argc, char *argv[]) {
+    // Initialize scene
+    Scene scene = Scene();
+
     // Initialize GLFW
     if (!glfwInit())
         return -1;
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    // glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
     GLFWwindow *window = glfwCreateWindow(
-            WINDOW_WIDTH, WINDOW_HEIGHT, "Larp Combat", NULL, NULL);
+            scene.initialWindowWidth, scene.initialWindowHeight, "Larp Combat", NULL, NULL);
     if (!window) {
         cerr << "Failed to create GLFW window" << endl;
         glfwTerminate();
@@ -49,9 +53,18 @@ int main (int argc, char *argv[]) {
     glfwMakeContextCurrent(window);
 
     // By default already set to screen size, but useful if we resize the windows later
-    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+    glViewport(0, 0, scene.initialWindowWidth, scene.initialWindowHeight);
+    // Pass WindowCallbackData for use by any callbacks
+    WindowCallbackData data {
+        .targetAspectRatio = scene.targetAspectRatio,
+        .viewportX = 0,
+        .viewportY = 0,
+        .viewportWidth = scene.initialWindowWidth,
+        .viewportHeight = scene.initialWindowHeight
+    };
+    glfwSetWindowUserPointer(window, &data);
     // Resize viewport on windows resize
-    // glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
     // Init. GLEW to query the driver and actually load OpenGL library
     if (glewInit() != GLEW_OK)
@@ -60,26 +73,13 @@ int main (int argc, char *argv[]) {
     // OpenGL Functions to enable
     glEnable(GL_DEPTH_TEST);
 
-    // Compile shaders and link to make a 'program' to run on a GPU
-    string vertexShaderString = readFile("vertex_shader.glsl");
-    string fragmentShaderString = readFile("fragment_shader.glsl");
-    unsigned int vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderString.c_str());
-    unsigned int fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderString.c_str());
-    unsigned int program = glCreateProgram();
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
-    glLinkProgram(program);
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
+    Shader mainShader = Shader("vertex_shader.glsl", "geometry_shader.glsl", "fragment_shader.glsl");
 
     // ---- Subject to Change ----
-    Scene scene = Scene();
     scene.objectSetup();
     vector<MeshObject> allObjs = scene.allMeshObject;
     Camera cam = scene.camera;
 
-    vector<MeshBufferInfo> bufferInfo = vector<MeshBufferInfo>();
     // Put all objects into GPU vertex buffer
     for (MeshObject &obj : allObjs) {
         // Vertex Array Object (VAO) to store vertex attributes layout
@@ -103,6 +103,7 @@ int main (int argc, char *argv[]) {
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
     }
+
     
     // Main render loop
     while(!glfwWindowShouldClose(window))
@@ -115,14 +116,36 @@ int main (int argc, char *argv[]) {
         glClearColor(0, 0, 0, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUseProgram(program);
+        // Clear viewport with different color
+        glEnable(GL_SCISSOR_TEST);
+        glScissor(data.viewportX, data.viewportY, data.viewportWidth, data.viewportHeight);
+        glClearColor(
+            scene.backgroundColor.r,
+            scene.backgroundColor.g,
+            scene.backgroundColor.b,
+            1.0f
+        );
+        glClear(GL_COLOR_BUFFER_BIT);
+        glDisable(GL_SCISSOR_TEST);
+
+        mainShader.use();
 
 
         for (MeshObject &obj : allObjs) {
-            // Pass necessary params to shader
-            glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, glm::value_ptr(obj.getTransform()));
-            glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(cam.getInvTransform()));
-            glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, glm::value_ptr(cam.getProjectionMatrix()));
+            // Pass vertex shader transformations
+            mainShader.setMat4("model", obj.getTransform());
+            mainShader.setMat4("view", cam.getInvTransform());
+            mainShader.setMat4("projection", cam.getProjectionMatrix());
+
+            // Pass material color
+            mainShader.setVec3("matColor", obj.material.color);
+
+            // Pass ambient light color
+            mainShader.setVec3("ambientLightColor", scene.ambientLight.color);
+
+            // Pass diffuse light color (sunlight only for now)
+            mainShader.setVec3("sunLightColor", scene.sunLight.color * scene.sunLight.intensity);
+            mainShader.setVec3("sunLightDir", scene.sunLight.direction);
 
             glBindVertexArray(obj.bufferInfo.VAO);
 
@@ -140,35 +163,31 @@ int main (int argc, char *argv[]) {
     return 0;
 }
 
-string readFile(const char* filePath) {
-    ifstream file(filePath);
-    if (!file.is_open()) {
-        cerr << "Failed to open file: " << filePath << endl;
-        return "";
+void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
+    WindowCallbackData *data = (WindowCallbackData*)glfwGetWindowUserPointer(window);
+    float targetAspectRatio = data->targetAspectRatio;
+
+    float windowAspect = (float)width / (float)height;
+    
+    int viewportWidth, viewportHeight;
+    int viewportX = 0, viewportY = 0;
+    
+    if (windowAspect > targetAspectRatio) {
+        // Window is wider than target - add bars on sides
+        viewportHeight = height;
+        viewportWidth = (int)(height * targetAspectRatio);
+        viewportX = (width - viewportWidth) / 2;
+    } else {
+        // Window is taller than target - add bars on top/bottom
+        viewportWidth = width;
+        viewportHeight = (int)(width / targetAspectRatio);
+        viewportY = (height - viewportHeight) / 2;
     }
-    stringstream buffer;
-    buffer << file.rdbuf();
-    return buffer.str();
-}
+    
+    data->viewportX = viewportX;
+    data->viewportY = viewportY;
+    data->viewportWidth = viewportWidth;
+    data->viewportHeight = viewportHeight;
 
-unsigned int compileShader(unsigned int shaderType, const char *source) {
-    unsigned int shader = glCreateShader(shaderType);
-    glShaderSource(shader, 1, &source, NULL);
-    glCompileShader(shader);
-
-    int success;
-    char infoLog[512];
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if (!success) {
-        glGetShaderInfoLog(shader, 512, NULL, infoLog);
-        cerr << "Shader compilation failed: " << infoLog << std::endl;
-        return 0;
-    }
-
-    return shader;
-}
-
-void framebufferSizeCallback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
+    glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
 }
