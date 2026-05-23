@@ -62,14 +62,18 @@ int main (int argc, char *argv[]) {
 
     // Compile shaders and link to make a 'program' to run on a GPU
     string vertexShaderString = readFile("vertex_shader.glsl");
+    string geometryShaderString = readFile("geometry_shader.glsl");
     string fragmentShaderString = readFile("fragment_shader.glsl");
     unsigned int vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderString.c_str());
+    unsigned int geometryShader = compileShader(GL_GEOMETRY_SHADER, geometryShaderString.c_str());
     unsigned int fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderString.c_str());
     unsigned int program = glCreateProgram();
     glAttachShader(program, vertexShader);
+    glAttachShader(program, geometryShader);
     glAttachShader(program, fragmentShader);
     glLinkProgram(program);
     glDeleteShader(vertexShader);
+    glDeleteShader(geometryShader);
     glDeleteShader(fragmentShader);
 
 
@@ -103,6 +107,7 @@ int main (int argc, char *argv[]) {
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
     }
+
     
     // Main render loop
     while(!glfwWindowShouldClose(window))
@@ -119,10 +124,24 @@ int main (int argc, char *argv[]) {
 
 
         for (MeshObject &obj : allObjs) {
-            // Pass necessary params to shader
+            // Pass vertex shader transformations
             glUniformMatrix4fv(glGetUniformLocation(program, "model"), 1, GL_FALSE, glm::value_ptr(obj.getTransform()));
             glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(cam.getInvTransform()));
             glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, glm::value_ptr(cam.getProjectionMatrix()));
+
+            // Pass material color
+            glm::vec3 matColor = obj.material.color;
+            glUniform3f(glGetUniformLocation(program, "matColor"), matColor.r, matColor.g, matColor.b);
+
+            // Pass ambient light color
+            glm::vec3 ambientLightFinalColor = scene.ambientLight.color;
+            glUniform3f(glGetUniformLocation(program, "ambientLightColor"), ambientLightFinalColor.r, ambientLightFinalColor.g, ambientLightFinalColor.b);
+
+            // Pass diffuse light color (sunlight only for now)
+            glm::vec3 sunlightColor = scene.sunLight.color * scene.sunLight.intensity;
+            glUniform3f(glGetUniformLocation(program, "sunLightColor"), sunlightColor.r, sunlightColor.g, sunlightColor.b);
+            glm::vec3 sunlightDir = scene.sunLight.direction;
+            glUniform3f(glGetUniformLocation(program, "sunLightDir"), sunlightDir.x, sunlightDir.y, sunlightDir.z);
 
             glBindVertexArray(obj.bufferInfo.VAO);
 
