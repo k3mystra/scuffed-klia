@@ -3,20 +3,25 @@
 #include "MeshObject.h"
 #include "SunLight.h"
 
+#include <GLFW/glfw3.h>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <filesystem>
 #include <iostream>
-
-#include <glm/ext/vector_float3.hpp>
 #include <vector>
-
-
 #include <cerrno>
 #include <cstring>
 
+#define check_bit(mods,bit) (mods & bit) == bit
+
 Scene::Scene() {
+    initialWindowWidth = 1280;
+    initialWindowHeight = 720;
+    targetAspectRatio = 16.0 / 9.0f;
+
+    isCursorLocked = true;
+
     allMeshObject = vector<MeshObject>();
     camera = Camera();
     // Kinda orange, going down
@@ -32,10 +37,31 @@ Scene::Scene() {
 Scene::~Scene() {
 }
 
-void Scene::processKeyboardInput(GLFWwindow *window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+void Scene::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    // Only listen for key press lol
+    if (action != GLFW_PRESS)
+        return;
+
+    // Ctrl + Q
+    if (key == GLFW_KEY_Q && check_bit(mods, GLFW_MOD_CONTROL))
         glfwSetWindowShouldClose(window, true);
+    else if (key == GLFW_KEY_ESCAPE) {
+        if (isCursorLocked) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            isCursorLocked = false;
+        }
+        else {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            isCursorLocked = true;
+        }
+    }
 }
+
+void Scene::cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {}
+
+void Scene::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {}
+
+void Scene::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {}
 
 MeshObject genCube() {
   // For now just cube

@@ -15,9 +15,9 @@ class Scene {
         Scene();
         ~Scene();
 
-        int initialWindowWidth = 640;
-        int initialWindowHeight = 360;
-        float targetAspectRatio = 16.0 / 9.0;
+        int initialWindowWidth;
+        int initialWindowHeight;
+        float targetAspectRatio;
 
         glm::vec3 backgroundColor;
 
@@ -27,6 +27,11 @@ class Scene {
         SunLight sunLight;
         AmbientLight ambientLight;
 
+        bool isCursorLocked;
+
         void objectSetup();
-        void processKeyboardInput(GLFWwindow* window);
+        void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+        void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
+        void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+        void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 };

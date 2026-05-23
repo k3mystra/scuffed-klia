@@ -23,8 +23,6 @@
 
 using namespace std;
 
-void framebufferSizeCallback(GLFWwindow* window, int width, int height);
-
 struct WindowCallbackData {
     float targetAspectRatio;
     int viewportX;
@@ -33,27 +31,14 @@ struct WindowCallbackData {
     int viewportHeight;
 };
 
+GLFWwindow* setupGlfwWindow(WindowCallbackData* data);
+void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+
+// Initialize scene
+Scene scene = Scene();
+
 
 int main (int argc, char *argv[]) {
-    // Initialize scene
-    Scene scene = Scene();
-
-    // Initialize GLFW
-    if (!glfwInit())
-        return -1;
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    // glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-    GLFWwindow *window = glfwCreateWindow(
-            scene.initialWindowWidth, scene.initialWindowHeight, "Larp Combat", NULL, NULL);
-    if (!window) {
-        cerr << "Failed to create GLFW window" << endl;
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-
     // By default already set to screen size, but useful if we resize the windows later
     glViewport(0, 0, scene.initialWindowWidth, scene.initialWindowHeight);
     // Pass WindowCallbackData for use by any callbacks
@@ -64,9 +49,8 @@ int main (int argc, char *argv[]) {
         .viewportWidth = scene.initialWindowWidth,
         .viewportHeight = scene.initialWindowHeight
     };
-    glfwSetWindowUserPointer(window, &data);
-    // Resize viewport on windows resize
-    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+
+    GLFWwindow* window = setupGlfwWindow(&data);
 
     // Init. GLEW to query the driver and actually load OpenGL library
     if (glewInit() != GLEW_OK)
@@ -127,10 +111,6 @@ int main (int argc, char *argv[]) {
             frameCount = 0;
             aggregateDeltaTime = 0.0;
         }
-
-        // Set to wireframe before full-face rendering done
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        scene.processKeyboardInput(window);
 
         // Clear the buffer before next render
         glClearColor(0, 0, 0, 1.0);
@@ -210,4 +190,61 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     data->viewportHeight = viewportHeight;
 
     glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
+}
+
+GLFWwindow* setupGlfwWindow(WindowCallbackData* data) {
+    // Initialize GLFW
+    if (!glfwInit()) {
+        cerr << "GLFW init failed" << endl;
+        exit(1);
+    }
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    GLFWwindow *window = glfwCreateWindow(
+            scene.initialWindowWidth, scene.initialWindowHeight, "Larp Combat", NULL, NULL);
+    if (!window) {
+        cerr << "Failed to create GLFW window" << endl;
+        glfwTerminate();
+        exit(1);
+    }
+    glfwMakeContextCurrent(window);
+
+    
+    glfwSetWindowUserPointer(window, data);
+    // Resize viewport on windows resize
+    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    
+    // Input callbacks setup
+    glfwSetKeyCallback(
+        window,
+        [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+            scene.keyCallback(window, key, scancode, action, mods);
+        }
+    );
+    // Use raw mouse motion if supported
+    if (glfwRawMouseMotionSupported())
+        glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(
+        window,
+        [](GLFWwindow* window, double xpos, double ypos) {
+           scene.cursorPosCallback(window, xpos, ypos);
+        }
+    );
+    glfwSetMouseButtonCallback(
+        window,
+        [](GLFWwindow* window, int button, int action, int mods) {
+             scene.mouseButtonCallback(window, button, action, mods);
+        }
+    );
+    glfwSetScrollCallback(
+        window,
+        [](GLFWwindow* window, double xoffset, double yoffset) {
+            scene.scrollCallback(window, xoffset, yoffset);
+        }
+    );
+
+    return window;
 }
