@@ -1,3 +1,4 @@
+#define GLM_ENABLE_EXPERIMENTAL
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4244)
@@ -13,6 +14,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <glm/gtx/string_cast.hpp>
 
 #include "MeshObject.h"
 #include "Camera.h"

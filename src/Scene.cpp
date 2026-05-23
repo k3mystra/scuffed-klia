@@ -26,6 +26,7 @@ Scene::Scene() {
         1.2
     );
     ambientLight = AmbientLight(glm::vec3(1.0, 1.0, 1.0));
+    backgroundColor = glm::vec3(0.1);
 }
 
 Scene::~Scene() {
