@@ -22,25 +22,33 @@
 
 using namespace std;
 
-const int WINDOW_WIDTH = 640;
-const int WINDOW_HEIGHT = 360;
-
 string readFile(const char* filePath);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 unsigned int compileShader(unsigned int shaderType, const char *source);
-MeshObject generate3dObject();
+void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+
+struct WindowCallbackData {
+    float targetAspectRatio;
+    int viewportX;
+    int viewportY;
+    int viewportWidth;
+    int viewportHeight;
+};
 
 
 int main (int argc, char *argv[]) {
+    // Initialize scene
+    Scene scene = Scene();
+
     // Initialize GLFW
     if (!glfwInit())
         return -1;
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    // glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
     GLFWwindow *window = glfwCreateWindow(
-            WINDOW_WIDTH, WINDOW_HEIGHT, "Larp Combat", NULL, NULL);
+            scene.initialWindowWidth, scene.initialWindowHeight, "Larp Combat", NULL, NULL);
     if (!window) {
         cerr << "Failed to create GLFW window" << endl;
         glfwTerminate();
@@ -49,9 +57,18 @@ int main (int argc, char *argv[]) {
     glfwMakeContextCurrent(window);
 
     // By default already set to screen size, but useful if we resize the windows later
-    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+    glViewport(0, 0, scene.initialWindowWidth, scene.initialWindowHeight);
+    // Pass WindowCallbackData for use by any callbacks
+    WindowCallbackData data {
+        .targetAspectRatio = scene.targetAspectRatio,
+        .viewportX = 0,
+        .viewportY = 0,
+        .viewportWidth = scene.initialWindowWidth,
+        .viewportHeight = scene.initialWindowHeight
+    };
+    glfwSetWindowUserPointer(window, &data);
     // Resize viewport on windows resize
-    // glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
     // Init. GLEW to query the driver and actually load OpenGL library
     if (glewInit() != GLEW_OK)
@@ -78,7 +95,6 @@ int main (int argc, char *argv[]) {
 
 
     // ---- Subject to Change ----
-    Scene scene = Scene();
     scene.objectSetup();
     vector<MeshObject> allObjs = scene.allMeshObject;
     Camera cam = scene.camera;
@@ -119,6 +135,13 @@ int main (int argc, char *argv[]) {
         // Clear the buffer before next render
         glClearColor(0, 0, 0, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Clear viewport with different color
+        glEnable(GL_SCISSOR_TEST);
+        glScissor(data.viewportX, data.viewportY, data.viewportWidth, data.viewportHeight);
+        glClearColor(0.2f, 0.3f, 0.4f, 1.0f);  // Dark blue
+        glClear(GL_COLOR_BUFFER_BIT);
+        glDisable(GL_SCISSOR_TEST);
 
         glUseProgram(program);
 
@@ -187,7 +210,31 @@ unsigned int compileShader(unsigned int shaderType, const char *source) {
     return shader;
 }
 
-void framebufferSizeCallback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
+void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
+    WindowCallbackData *data = (WindowCallbackData*)glfwGetWindowUserPointer(window);
+    float targetAspectRatio = data->targetAspectRatio;
+
+    float windowAspect = (float)width / (float)height;
+    
+    int viewportWidth, viewportHeight;
+    int viewportX = 0, viewportY = 0;
+    
+    if (windowAspect > targetAspectRatio) {
+        // Window is wider than target - add bars on sides
+        viewportHeight = height;
+        viewportWidth = (int)(height * targetAspectRatio);
+        viewportX = (width - viewportWidth) / 2;
+    } else {
+        // Window is taller than target - add bars on top/bottom
+        viewportWidth = width;
+        viewportHeight = (int)(width / targetAspectRatio);
+        viewportY = (height - viewportHeight) / 2;
+    }
+    
+    data->viewportX = viewportX;
+    data->viewportY = viewportY;
+    data->viewportWidth = viewportWidth;
+    data->viewportHeight = viewportHeight;
+
+    glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
 }
