@@ -24,6 +24,8 @@ public:
     const std::vector<unsigned int>& getIndices() const;
     void setIndices(const std::vector<unsigned int>& newIndices);
 
+    // void loadSimpleObj(const std::string& path);
+    
 private:
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
