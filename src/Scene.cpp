@@ -13,8 +13,8 @@ Scene::Scene() {
     // Kinda orange, going down
     sunLight = SunLight(
         glm::vec3(-0.1961, -0.7845, -0.5883),
-        glm::vec3(1, 0.855, 0.561),
-        2
+        glm::vec3(1.0),
+        1.2
     );
     ambientLight = AmbientLight(glm::vec3(1.0, 1.0, 1.0));
 }
