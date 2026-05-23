@@ -15,8 +15,15 @@ class Scene {
         Scene();
         ~Scene();
 
+        int initialWindowWidth = 640;
+        int initialWindowHeight = 360;
+        float targetAspectRatio = 16.0 / 9.0;
+
+        glm::vec3 backgroundColor = glm::vec3(0.3);
+
         vector<MeshObject> allMeshObject;
         Camera camera;
+
         SunLight sunLight;
         AmbientLight ambientLight;
 
