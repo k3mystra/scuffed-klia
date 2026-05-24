@@ -132,6 +132,7 @@ void Scene::process(float deltaTime) {
     glm::vec3 camPos = camera.getPosition();
     glm::vec3 moveVector = camera.getTransform() * glm::vec4(moveInput.x, 0.0, -moveInput.y, 0.0) * cameraMoveSpeed;
     camera.setPosition(camPos + moveVector);
+
 }
 
 Model loadObjFile(const std::string& path) {
@@ -275,4 +276,7 @@ void Scene::objectSetup() {
         sceneObj.model.meshes[0].material = Material { .color = glm::vec3(0.09, 0.757, 1)};
         allModels.push_back(sceneObj.model);
     }
+
+    allModels[1].physicsState.mass = 100;
+    allModels[1].physicsState.forcesApplied = allModels[1].getTransform() * glm::vec4(0.0, 300.0, 0.0, 0.0);
 }

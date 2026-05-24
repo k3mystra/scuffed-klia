@@ -22,6 +22,7 @@
 #include "Shader.h"
 #include "WindowCallbackData.h"
 #include "Input.h"
+#include "Physics.h"
 
 using namespace std;
 
@@ -87,6 +88,7 @@ int main (int argc, char *argv[]) {
     }
     float deltaTime, aggregateDeltaTime = 0;
     float lastFrameTime = 0, currentFrameTime = 0;
+    float phyTimeAccumulator = 0.0;
     int frameCount = 0;
     // Main render loop
     while(!glfwWindowShouldClose(window))
@@ -96,8 +98,8 @@ int main (int argc, char *argv[]) {
         deltaTime = currentFrameTime - lastFrameTime;
         lastFrameTime = currentFrameTime;
 
-        frameCount++;
-        aggregateDeltaTime += deltaTime;
+        // frameCount++;
+        // aggregateDeltaTime += deltaTime;
 
         // if (frameCount == 50) {
         //     cout << "FPS: " << 1.0 / (aggregateDeltaTime / 50.0) << endl;
@@ -107,6 +109,8 @@ int main (int argc, char *argv[]) {
         // }
 
         data.deltaTime = deltaTime;
+
+        phyTimeAccumulator += deltaTime;
 
         // Clear the buffer before next render
         glClearColor(0, 0, 0, 1.0);
@@ -128,13 +132,24 @@ int main (int argc, char *argv[]) {
 
         scene.process(deltaTime);
 
-        for (Model &model : allModels){
-            for (MeshObject &obj : model.meshes) {
-                Camera* cam = &scene.camera;
-                // Recalc transform first
-                cam->recalcTransform();
-                model.recalcTransform();
+        // Physics shit
+        while (phyTimeAccumulator >= PHYSICS_TIMESTEP) {
+            for (Model &model : allModels) {
+                glm::vec3 deltaPos = Physics::updateState(&model.physicsState, PHYSICS_TIMESTEP);
+                model.setPosition(model.getPosition() + deltaPos);
+            }
 
+            phyTimeAccumulator -= PHYSICS_TIMESTEP;
+        }
+
+        for (Model &model : allModels){
+
+            Camera* cam = &scene.camera;
+            // Recalc transform first
+            cam->recalcTransform();
+            model.recalcTransform();
+
+            for (MeshObject &obj : model.meshes) {
                 // Pass vertex shader transformations
                 mainShader.setMat4("model", model.getTransform());
                 mainShader.setMat4("view", cam->getInvTransform());

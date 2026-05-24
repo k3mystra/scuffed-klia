@@ -1,7 +1,10 @@
 #include "Model.h"
 
 
-Model::Model() : GameObject() {};
+Model::Model() : GameObject() {
+    isPhysicsEnabled = true;
+    physicsState = PhysicsState();
+};
 
 void Model::recalcTransform() {
     GameObject::recalcTransform(); // recalc own transform
