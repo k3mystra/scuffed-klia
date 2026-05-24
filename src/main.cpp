@@ -120,8 +120,8 @@ int main (int argc, char *argv[]) {
         aggregateDeltaTime += deltaTime;
 
         if (frameCount == 50) {
-            cout << "FPS: " << 1.0 / (aggregateDeltaTime / 50.0) << endl;
-            cout << "Delta time: " << aggregateDeltaTime / 50.0 << endl;
+            // cout << "FPS: " << 1.0 / (aggregateDeltaTime / 50.0) << endl;
+            // cout << "Delta time: " << aggregateDeltaTime / 50.0 << endl;
             frameCount = 0;
             aggregateDeltaTime = 0.0;
         }

@@ -16,6 +16,9 @@
 #include <cerrno>
 #include <cstring>
 
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "tiny_obj_loader.h"
+
 Scene::Scene() {
     allMeshObject = vector<MeshObject>();
     camera = Camera();
@@ -68,40 +71,50 @@ struct SceneObject {
 //     cube.setRotation(glm::vec3(40.0, 20.0, 30.0));
 //     cube.recalcTransform();
 
-void loadObjToMeshObject(const std::string& path, MeshObject& obj) {
-    std::ifstream file(path);
 
-    if (!file.is_open()) {
-        std::cerr << "Error: Could not open OBJ file: " << path << "\n";
+void loadObjToMeshObject(const std::string& path, MeshObject& obj) {
+    tinyobj::ObjReader reader;
+
+    if (!reader.ParseFromFile(path)) {
+        std::cerr << "Error loading OBJ: " << reader.Error() << "\n";
         return;
     }
 
-    std::string line;
+    if (!reader.Warning().empty()) {
+        std::cout << "OBJ Warning: " << reader.Warning() << "\n";
+    }
+
+    auto& attrib = reader.GetAttrib();
+    auto& shapes = reader.GetShapes();
+
+    // DEBUG
+    std::cout << "File: " << path << "\n";
+    std::cout << "  Vertices: " << attrib.vertices.size() / 3 << "\n";
+    std::cout << "  Shapes:   " << shapes.size() << "\n";
+    for (auto& shape : shapes) {
+        std::cout << "  Shape '" << shape.name << "': " 
+                  << shape.mesh.indices.size() / 3 << " triangles\n";
+    }
+
     std::vector<float> rawVertices;
     std::vector<unsigned int> faceIndices;
 
-    while (std::getline(file, line)) {
-        std::stringstream ss(line);
-        std::string prefix;
-        ss >> prefix;
+    // Loop over all shapes/groups
+    for (auto& shape : shapes) {
+        for (auto& index : shape.mesh.indices) {
+            // Position
+            rawVertices.push_back(attrib.vertices[3 * index.vertex_index + 0]);
+            rawVertices.push_back(attrib.vertices[3 * index.vertex_index + 1]);
+            rawVertices.push_back(attrib.vertices[3 * index.vertex_index + 2]);
 
-        if (prefix == "v") {
-            float x, y, z;
-            ss >> x >> y >> z;
-            rawVertices.push_back(x); rawVertices.push_back(y); rawVertices.push_back(z);
-        } 
-        else if (prefix == "f") {
-            std::string vertexData;
-            while (ss >> vertexData) {
-                // Obj format is v/vt/vn, we only want the 'v' part (index)
-                size_t slashPos = vertexData.find('/');
-                int vIdx = std::stoi(vertexData.substr(0, slashPos)) - 1; // -1 because OBJ is 1-indexed
-                faceIndices.push_back(vIdx);
-            }
+            faceIndices.push_back(faceIndices.size()); // sequential since we're unrolling
         }
     }
-    
-    // Now you have your vectors ready for glBufferData!
+
+    // DEBUG
+    std::cout << "  Final rawVertices: " << rawVertices.size() / 3 << "\n";
+    std::cout << "  Final faceIndices: " << faceIndices.size() << "\n";
+
     obj.setVertices(rawVertices);
     obj.setIndices(faceIndices);
 }

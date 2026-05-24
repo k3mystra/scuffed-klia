@@ -1,18 +1,14 @@
 [gd_scene format=3 uid="uid://bosxf0b8ymmwd"]
 
+[ext_resource type="ArrayMesh" uid="uid://cvje5duc6dcye" path="res://airplane_obj/11805_airplane_v2_L2.obj" id="1_a202f"]
 [ext_resource type="ArrayMesh" uid="uid://7g1eikgii33q" path="res://cow.obj" id="1_noarx"]
-[ext_resource type="ArrayMesh" uid="uid://dnmn5qpjf5u2f" path="res://kettle.obj" id="2_a0tk4"]
 
 [node name="Node3D" type="Node3D" unique_id=1895618722]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1190679496]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -11.232892)
-mesh = ExtResource("2_a0tk4")
-
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=1976612293]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.102911, 4.3252172, 0)
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1784544920]
+transform = Transform3D(0.9470479, 0, -0.32109237, 0, 1, 0, 0.32109237, 0, 0.9470479, -16.497738, 2.8419805, -12.6166115)
 mesh = ExtResource("1_noarx")
 
-[node name="MeshInstance3D3" type="MeshInstance3D" parent="." unique_id=1195517824]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.756222, 4.3252172, 0)
-mesh = ExtResource("1_noarx")
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=2058212210]
+transform = Transform3D(-0.12910601, -0.48054484, 0.04907459, 2.220444e-16, 0.05079721, 0.49741295, -0.48304415, 0.12843801, -0.01311645, 0, 0, -13.154599)
+mesh = ExtResource("1_a202f")
