@@ -17,7 +17,7 @@ const std::vector<float>& MeshObject::getVertices() const {
 }
 
 void MeshObject::setVertices(const std::vector<float>& newVertices) {
-    vertices = newVertices;
+    vertices = std::vector(newVertices);
 }
 
 const std::vector<unsigned int>& MeshObject::getIndices() const {
@@ -25,7 +25,7 @@ const std::vector<unsigned int>& MeshObject::getIndices() const {
 }
 
 void MeshObject::setIndices(const std::vector<unsigned int>& newIndices) {
-    indices = newIndices;
+    indices = std::vector(newIndices);
 }
 
 // void MeshObject::loadSimpleObj(const std::string& path) {
