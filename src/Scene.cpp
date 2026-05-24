@@ -1,25 +1,38 @@
+#include "Input.h"
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
 #include "Scene.h"
 #include "Camera.h"
 #include "MeshObject.h"
 #include "SunLight.h"
+#include "WindowCallbackData.h"
 
+#include <GLFW/glfw3.h>
+#include <glm/gtx/string_cast.hpp>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <filesystem>
 #include <iostream>
-
-#include <glm/ext/vector_float3.hpp>
 #include <vector>
-
-
 #include <cerrno>
 #include <cstring>
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
+#define check_bit(mods,bit) (mods & bit) == bit
+
 
 Scene::Scene() {
+    initialWindowWidth = 640;
+    initialWindowHeight = 360;
+    targetAspectRatio = 16.0 / 9.0f;
+
+    isCursorLocked = true;
+    lastCursorPos = glm::vec2(-1.0, -1.0);
+    dragSpeedMultiplier = 0.1;
+
     allMeshObject = vector<MeshObject>();
     camera = Camera();
     // Kinda orange, going down
@@ -29,47 +42,92 @@ Scene::Scene() {
         1.2
     );
     ambientLight = AmbientLight(glm::vec3(1.0, 1.0, 1.0));
+    backgroundColor = glm::vec3(0.1);
 }
 
 Scene::~Scene() {
 }
 
-void Scene::processKeyboardInput(GLFWwindow *window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+bool isPressOrRelease(int act) {
+    return act == GLFW_PRESS || act == GLFW_REPEAT;
+}
+
+// Reminder that this will be called PER KEYPRESS
+// Only 1 keypress will be detected at a time
+void Scene::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    WindowCallbackData *data = (WindowCallbackData*)glfwGetWindowUserPointer(window);
+    // Ctrl + Q
+    if (key == GLFW_KEY_Q && check_bit(mods, GLFW_MOD_CONTROL) && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        if (isCursorLocked) {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            isCursorLocked = false;
+        }
+        else {
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            isCursorLocked = true;
+        }
+    }
 }
 
-MeshObject genCube() {
-  // For now just cube
-  vector<float> vertices = {0.5, 0.5,  0.5,  -0.5, 0.5,  0.5, -0.5, -0.5,
-                            0.5, 0.5,  -0.5, 0.5,  0.5,  0.5, -0.5, -0.5,
-                            0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5};
+void Scene::cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
+    glm::vec2 currentCursorPos = glm::vec2(xpos, ypos);
+    if (lastCursorPos == glm::vec2(-1, -1)) {
+        lastCursorPos = currentCursorPos;
+        return;
+    }
 
-  // Index start with 0 here
-  vector<unsigned int> indices = {0, 1, 2, 0, 2, 3, 0, 4, 5, 0, 5, 1, 2, 6, 7, 2, 7, 3, 7, 6, 5, 7, 5, 4, 1, 5, 6, 1, 6, 2, 3, 7, 4, 3, 4, 0};
-
-  MeshObject obj = MeshObject();
-  obj.setVertices(vertices);
-  obj.setIndices(indices);
-
-  return obj;
+    glm::vec3 rot = camera.getRotation();
+    glm::vec2 diff = (currentCursorPos - lastCursorPos) * -dragSpeedMultiplier;
+    if (isDragging) {
+        camera.setRotation(rot + glm::vec3(diff.y, diff.x, 0.0));
+    }
+    lastCursorPos = currentCursorPos;
 }
 
-struct SceneObject {
-    MeshObject mesh;
-    glm::vec3 position;
-    glm::vec3 rotation; // degrees
-    glm::vec3 scale;
-};
+void Scene::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+    isDragging = (button == GLFW_MOUSE_BUTTON_LEFT && isPressOrRelease(action) && isCursorLocked);
+}
 
-// void Scene::objectSetup() {
-//     MeshObject cube = genCube();
-//     cube.material = Material();
-//     // cube.material.color = glm::vec3(0.196, 0.5921, 0.6588);
-//     cube.material.color = glm::vec3(0.09, 0.757, 1);
-//     cube.setPosition(glm::vec3(0.0, 0.0, -3.0));
-//     cube.setRotation(glm::vec3(40.0, 20.0, 30.0));
-//     cube.recalcTransform();
+void Scene::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+    WindowCallbackData *data = (WindowCallbackData*)glfwGetWindowUserPointer(window);
+
+    glm::vec3 camPos = camera.getPosition();
+
+    // We want to zoom in/out of our current local Z-axis
+    // NOT the global Z axis
+    glm::vec3 zoomVector = camera.getTransform() * glm::vec4(0.0, 0.0, -yoffset, 0.0);
+    camera.setPosition(camPos + zoomVector);
+}
+
+void Scene::process(float deltaTime) {
+    const KeyInfo* wKey = Input::getKey(GLFW_KEY_W);
+    const KeyInfo* aKey = Input::getKey(GLFW_KEY_A);
+    const KeyInfo* sKey = Input::getKey(GLFW_KEY_S);
+    const KeyInfo* dKey = Input::getKey(GLFW_KEY_D);
+
+    glm::vec2 moveInput = glm::vec2(0.0);
+    if (wKey != nullptr && wKey->isPressed) {
+        moveInput.y = 1;
+    }
+    else if (sKey != nullptr && sKey->isPressed) {
+        moveInput.y = -1;
+    }
+
+    if (aKey != nullptr && aKey->isPressed) {
+        moveInput.x = -1;
+    }
+    else if (dKey != nullptr && dKey->isPressed) {
+        moveInput.x = 1;
+    }
+
+    const float cameraMoveSpeed = 10 * deltaTime;
+    glm::vec3 camPos = camera.getPosition();
+    glm::vec3 moveVector = camera.getTransform() * glm::vec4(moveInput, 0.0, 0.0) * cameraMoveSpeed;
+    camera.setPosition(camPos + moveVector);
+}
 
 
 void loadObjToMeshObject(const std::string& path, MeshObject& obj) {
@@ -161,7 +219,6 @@ std::vector<SceneObject> loadSceneLayout(const std::string& layoutPath) {
 }
 
 void Scene::objectSetup() {
-
     std::filesystem::path exePath = std::filesystem::current_path();
     std::cout << "Working directory: " << exePath << "\n";
 
@@ -170,12 +227,6 @@ void Scene::objectSetup() {
     
     auto sceneObjects = loadSceneLayout(layoutPath);
 
-
-    // if (sceneObjects.empty()) {
-    //     std::cerr << "No objects loaded from layout. Check the file and format.\n";
-    //     return;
-    // }
-    
     //applying the transform data to all mesh objects
     for (auto& sceneObj : sceneObjects) {
         sceneObj.mesh.setPosition(sceneObj.position);

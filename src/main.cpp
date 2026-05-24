@@ -1,3 +1,4 @@
+#define GLM_ENABLE_EXPERIMENTAL
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4244)
@@ -13,45 +14,25 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <glm/gtx/string_cast.hpp>
 
 #include "MeshObject.h"
 #include "Camera.h"
 #include "Scene.h"
 #include "Shader.h"
+#include "WindowCallbackData.h"
+#include "Input.h"
 
 using namespace std;
 
+GLFWwindow* setupGlfwWindow(WindowCallbackData* data);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
-struct WindowCallbackData {
-    float targetAspectRatio;
-    int viewportX;
-    int viewportY;
-    int viewportWidth;
-    int viewportHeight;
-};
+// Initialize scene
+Scene scene = Scene();
 
 
 int main (int argc, char *argv[]) {
-    // Initialize scene
-    Scene scene = Scene();
-
-    // Initialize GLFW
-    if (!glfwInit())
-        return -1;
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    // glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-    GLFWwindow *window = glfwCreateWindow(
-            scene.initialWindowWidth, scene.initialWindowHeight, "Larp Combat", NULL, NULL);
-    if (!window) {
-        cerr << "Failed to create GLFW window" << endl;
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-
     // By default already set to screen size, but useful if we resize the windows later
     glViewport(0, 0, scene.initialWindowWidth, scene.initialWindowHeight);
     // Pass WindowCallbackData for use by any callbacks
@@ -60,11 +41,11 @@ int main (int argc, char *argv[]) {
         .viewportX = 0,
         .viewportY = 0,
         .viewportWidth = scene.initialWindowWidth,
-        .viewportHeight = scene.initialWindowHeight
+        .viewportHeight = scene.initialWindowHeight,
+        .deltaTime = 0
     };
-    glfwSetWindowUserPointer(window, &data);
-    // Resize viewport on windows resize
-    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+
+    GLFWwindow* window = setupGlfwWindow(&data);
 
     // Init. GLEW to query the driver and actually load OpenGL library
     if (glewInit() != GLEW_OK)
@@ -78,7 +59,6 @@ int main (int argc, char *argv[]) {
     // ---- Subject to Change ----
     scene.objectSetup();
     vector<MeshObject> allObjs = scene.allMeshObject;
-    Camera cam = scene.camera;
 
     // Put all objects into GPU vertex buffer
     for (MeshObject &obj : allObjs) {
@@ -103,7 +83,6 @@ int main (int argc, char *argv[]) {
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
     }
-
     
     float deltaTime, aggregateDeltaTime = 0;
     float lastFrameTime = 0, currentFrameTime = 0;
@@ -119,16 +98,14 @@ int main (int argc, char *argv[]) {
         frameCount++;
         aggregateDeltaTime += deltaTime;
 
-        if (frameCount == 50) {
-            // cout << "FPS: " << 1.0 / (aggregateDeltaTime / 50.0) << endl;
-            // cout << "Delta time: " << aggregateDeltaTime / 50.0 << endl;
-            frameCount = 0;
-            aggregateDeltaTime = 0.0;
-        }
+        // if (frameCount == 50) {
+        //     cout << "FPS: " << 1.0 / (aggregateDeltaTime / 50.0) << endl;
+        //     cout << "Delta time: " << aggregateDeltaTime / 50.0 << endl;
+        //     frameCount = 0;
+        //     aggregateDeltaTime = 0.0;
+        // }
 
-        // Set to wireframe before full-face rendering done
-        // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        scene.processKeyboardInput(window);
+        data.deltaTime = deltaTime;
 
         // Clear the buffer before next render
         glClearColor(0, 0, 0, 1.0);
@@ -148,12 +125,18 @@ int main (int argc, char *argv[]) {
 
         mainShader.use();
 
+        scene.process(deltaTime);
 
         for (MeshObject &obj : allObjs) {
+            Camera* cam = &scene.camera;
+            // Recalc transform first
+            cam->recalcTransform();
+            obj.recalcTransform();
+
             // Pass vertex shader transformations
             mainShader.setMat4("model", obj.getTransform());
-            mainShader.setMat4("view", cam.getInvTransform());
-            mainShader.setMat4("projection", cam.getProjectionMatrix());
+            mainShader.setMat4("view", cam->getInvTransform());
+            mainShader.setMat4("projection", cam->getProjectionMatrix());
 
             // Pass material color
             mainShader.setVec3("matColor", obj.material.color);
@@ -208,4 +191,61 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     data->viewportHeight = viewportHeight;
 
     glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
+}
+
+GLFWwindow* setupGlfwWindow(WindowCallbackData* data) {
+    // Initialize GLFW
+    if (!glfwInit()) {
+        cerr << "GLFW init failed" << endl;
+        exit(1);
+    }
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    GLFWwindow *window = glfwCreateWindow(
+            scene.initialWindowWidth, scene.initialWindowHeight, "Larp Combat", NULL, NULL);
+    if (!window) {
+        cerr << "Failed to create GLFW window" << endl;
+        glfwTerminate();
+        exit(1);
+    }
+    glfwMakeContextCurrent(window);
+
+    
+    glfwSetWindowUserPointer(window, data);
+    // Resize viewport on windows resize
+    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    
+    // Fking terrible but it is what it is
+    glfwSetKeyCallback(window, 
+        [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+            scene.keyCallback(window, key, scancode, action, mods);
+            Input::absorbKeys(window, key, scancode, action, mods);
+        }
+    );
+    // Use raw mouse motion if supported
+    if (glfwRawMouseMotionSupported())
+        glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(
+        window,
+        [](GLFWwindow* window, double xpos, double ypos) {
+           scene.cursorPosCallback(window, xpos, ypos);
+        }
+    );
+    glfwSetMouseButtonCallback(
+        window,
+        [](GLFWwindow* window, int button, int action, int mods) {
+             scene.mouseButtonCallback(window, button, action, mods);
+        }
+    );
+    glfwSetScrollCallback(
+        window,
+        [](GLFWwindow* window, double xoffset, double yoffset) {
+            scene.scrollCallback(window, xoffset, yoffset);
+        }
+    );
+
+    return window;
 }
