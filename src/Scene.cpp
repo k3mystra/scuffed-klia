@@ -103,7 +103,7 @@ void Scene::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 
     // We want to zoom in/out of our current local Z-axis
     // NOT the global Z axis
-    glm::vec3 zoomVector = camera.getTransform() * glm::vec4(0.0, 0.0, -yoffset, 0.0);
+    glm::vec3 zoomVector = glm::vec4(0.0, yoffset, 0.0, 0.0);
     camera.setPosition(camPos + zoomVector);
 }
 
@@ -130,7 +130,7 @@ void Scene::process(float deltaTime) {
 
     const float cameraMoveSpeed = 10 * deltaTime;
     glm::vec3 camPos = camera.getPosition();
-    glm::vec3 moveVector = camera.getTransform() * glm::vec4(moveInput, 0.0, 0.0) * cameraMoveSpeed;
+    glm::vec3 moveVector = camera.getTransform() * glm::vec4(moveInput.x, 0.0, -moveInput.y, 0.0) * cameraMoveSpeed;
     camera.setPosition(camPos + moveVector);
 }
 
@@ -191,9 +191,9 @@ Model loadObjFile(const std::string& path) {
 
         //DEBUG
         std::cout << "Shape '" << shape.name << "' material_ids: ";
-        for (int id : shape.mesh.material_ids)
-            std::cout << id << " ";
-        std::cout << "\n";
+        // for (int id : shape.mesh.material_ids)
+        //     std::cout << id << " ";
+        // std::cout << "\n";
 
         for (int i = 0; i < materials.size(); i++) {
             std::cout << "Material " << i << ": " << materials[i].name 

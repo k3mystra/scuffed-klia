@@ -2,7 +2,7 @@
 
 ## Input
 
-WASD: Up,Down,Left,Right
-Scroll: Get closer/further
+WASD: Forward,Backward,Left,Right
+Scroll: Rise/Descend
 Esc: Toggle window focus
 Ctrl-Q: Exit
