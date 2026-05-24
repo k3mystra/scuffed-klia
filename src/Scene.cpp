@@ -7,6 +7,7 @@
 #include "MeshObject.h"
 #include "SunLight.h"
 #include "WindowCallbackData.h"
+#include "Model.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/gtx/string_cast.hpp>
@@ -18,6 +19,12 @@
 #include <vector>
 #include <cerrno>
 #include <cstring>
+
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "tiny_obj_loader.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 #define check_bit(mods,bit) (mods & bit) == bit
 
@@ -31,7 +38,7 @@ Scene::Scene() {
     lastCursorPos = glm::vec2(-1.0, -1.0);
     dragSpeedMultiplier = 0.1;
 
-    allMeshObject = vector<MeshObject>();
+    allModels = vector<Model>();
     camera = Camera();
     // Kinda orange, going down
     sunLight = SunLight(
@@ -96,7 +103,7 @@ void Scene::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
 
     // We want to zoom in/out of our current local Z-axis
     // NOT the global Z axis
-    glm::vec3 zoomVector = camera.getTransform() * glm::vec4(0.0, 0.0, -yoffset, 0.0);
+    glm::vec3 zoomVector = glm::vec4(0.0, yoffset, 0.0, 0.0);
     camera.setPosition(camPos + zoomVector);
 }
 
@@ -123,47 +130,90 @@ void Scene::process(float deltaTime) {
 
     const float cameraMoveSpeed = 10 * deltaTime;
     glm::vec3 camPos = camera.getPosition();
-    glm::vec3 moveVector = camera.getTransform() * glm::vec4(moveInput, 0.0, 0.0) * cameraMoveSpeed;
+    glm::vec3 moveVector = camera.getTransform() * glm::vec4(moveInput.x, 0.0, -moveInput.y, 0.0) * cameraMoveSpeed;
     camera.setPosition(camPos + moveVector);
 }
 
-void loadObjToMeshObject(const std::string& path, MeshObject& obj) {
-    std::ifstream file(path);
+Model loadObjFile(const std::string& path) {
+    Model model;
 
-    if (!file.is_open()) {
-        std::cerr << "Error: Could not open OBJ file: " << path << "\n";
-        return;
+    tinyobj::ObjReaderConfig config;
+    config.mtl_search_path = std::filesystem::path(path).parent_path().string();
+
+    tinyobj::ObjReader reader;
+    if (!reader.ParseFromFile(path, config)) {
+        std::cerr << "Error loading OBJ: " << reader.Error() << "\n";
+        return model; // return empty model
     }
 
-    std::string line;
-    std::vector<float> rawVertices;
-    std::vector<unsigned int> faceIndices;
+    if (!reader.Warning().empty())
+        std::cout << "OBJ Warning: " << reader.Warning() << "\n";
 
-    while (std::getline(file, line)) {
-        std::stringstream ss(line);
-        std::string prefix;
-        ss >> prefix;
+    auto& attrib    = reader.GetAttrib();
+    auto& shapes    = reader.GetShapes();
+    auto& materials = reader.GetMaterials();
 
-        if (prefix == "v") {
-            float x, y, z;
-            ss >> x >> y >> z;
-            rawVertices.push_back(x); rawVertices.push_back(y); rawVertices.push_back(z);
-        } 
-        else if (prefix == "f") {
-            std::string vertexData;
-            while (ss >> vertexData) {
-                // Obj format is v/vt/vn, we only want the 'v' part (index)
-                size_t slashPos = vertexData.find('/');
-                int vIdx = std::stoi(vertexData.substr(0, slashPos)) - 1; // -1 because OBJ is 1-indexed
-                faceIndices.push_back(vIdx);
+    std::string folder = std::filesystem::path(path).parent_path().string();
+
+    // One MeshObject per shape
+    for (auto& shape : shapes) {
+        MeshObject mesh;
+        std::vector<float>        rawVertices;
+        std::vector<unsigned int> faceIndices;
+
+        for (auto& index : shape.mesh.indices) {
+            rawVertices.push_back(attrib.vertices[3 * index.vertex_index + 0]);
+            rawVertices.push_back(attrib.vertices[3 * index.vertex_index + 1]);
+            rawVertices.push_back(attrib.vertices[3 * index.vertex_index + 2]);
+            faceIndices.push_back(faceIndices.size());
+        }
+
+        mesh.setVertices(rawVertices);
+        mesh.setIndices(faceIndices);
+
+        // Get material for this shape (use first face's material ID)
+        if (!shape.mesh.material_ids.empty()) {
+            int matID = shape.mesh.material_ids[0];
+            if (matID >= 0 && matID < (int)materials.size()) {
+                auto& mat = materials[matID];
+
+                mesh.material.color = glm::vec3(
+                    mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]
+                );
+
+                if (!mat.diffuse_texname.empty()) {
+                    mesh.material.diffuseTexturePath = folder + "/" + mat.diffuse_texname;
+                    std::cout << "  Shape '" << shape.name << "' texture: " 
+                              << mesh.material.diffuseTexturePath << "\n";
+                }
             }
         }
+
+        //DEBUG
+        std::cout << "Shape '" << shape.name << "' material_ids: ";
+        // for (int id : shape.mesh.material_ids)
+        //     std::cout << id << " ";
+        // std::cout << "\n";
+
+        for (int i = 0; i < materials.size(); i++) {
+            std::cout << "Material " << i << ": " << materials[i].name 
+                      << " diffuse(" << materials[i].diffuse[0] << "," 
+                      << materials[i].diffuse[1] << "," 
+                      << materials[i].diffuse[2] << ")"
+                      << " texture: " << materials[i].diffuse_texname << "\n";
+        }
+
+        std::cout << "  Shape '" << shape.name << "': "
+                  << rawVertices.size() / 3 << " vertices, "
+                  << faceIndices.size() / 3 << " triangles\n";
+
+        model.meshes.push_back(mesh);
     }
-    
-    // Now you have your vectors ready for glBufferData!
-    obj.setVertices(rawVertices);
-    obj.setIndices(faceIndices);
+
+    return model;
 }
+
+
 
 std::vector<SceneObject> loadSceneLayout(const std::string& layoutPath) {
     std::vector<SceneObject> sceneObjects;
@@ -196,8 +246,8 @@ std::vector<SceneObject> loadSceneLayout(const std::string& layoutPath) {
         sceneObj.rotation = glm::vec3(rx, ry, rz);
         sceneObj.scale    = glm::vec3(sx, sy, sz);
 
-        //getting the mesh
-        loadObjToMeshObject(objPath, sceneObj.mesh);
+        //getting the model
+        sceneObj.model = loadObjFile(objPath);
         sceneObjects.push_back(sceneObj);
         
         std::cout << "Loaded: " << objPath << " at (" << px << ", " << py << ", " << pz << ")\n";
@@ -215,14 +265,14 @@ void Scene::objectSetup() {
     
     auto sceneObjects = loadSceneLayout(layoutPath);
 
-    //applying the transform data to all mesh objects
+    //applying the transform data to all model objects
     for (auto& sceneObj : sceneObjects) {
-        sceneObj.mesh.setPosition(sceneObj.position);
-        sceneObj.mesh.setRotation(sceneObj.rotation);
-        sceneObj.mesh.setScale(sceneObj.scale);
-        sceneObj.mesh.recalcTransform();
+        sceneObj.model.setPosition(sceneObj.position);
+        sceneObj.model.setRotation(sceneObj.rotation);
+        sceneObj.model.setScale(sceneObj.scale);
+        sceneObj.model.recalcTransform();
 
-        sceneObj.mesh.material = Material { .color = glm::vec3(0.09, 0.757, 1)};
-        allMeshObject.push_back(sceneObj.mesh);
+        sceneObj.model.meshes[0].material = Material { .color = glm::vec3(0.09, 0.757, 1)};
+        allModels.push_back(sceneObj.model);
     }
 }

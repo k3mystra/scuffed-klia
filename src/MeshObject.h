@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include <glm/ext/vector_float3.hpp>
 #include <vector>
+#include <string>
 
 struct MeshBufferInfo {
     unsigned int VAO;
@@ -12,6 +13,8 @@ struct MeshBufferInfo {
 
 struct Material {
     glm::vec3 color;
+    std::string diffuseTexturePath; // from map_Kd in .mtl
+    unsigned int textureID = 0;     // OpenGL texture handle
 };
 
 
