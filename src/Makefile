@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -D GLM_ENABLE_EXPERIMENTAL
 BUILD_FOLDER := build
 .DEFAULT_GOAL := main.exe
 .PHONY: main.exe debug clean

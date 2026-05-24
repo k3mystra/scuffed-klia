@@ -10,16 +10,23 @@
 
 using namespace std;
 
+struct SceneObject {
+    MeshObject mesh;
+    glm::vec3 position;
+    glm::vec3 rotation; // degrees
+    glm::vec3 scale;
+};
+
 class Scene {
     public:
         Scene();
         ~Scene();
 
-        int initialWindowWidth = 640;
-        int initialWindowHeight = 360;
-        float targetAspectRatio = 16.0 / 9.0;
+        int initialWindowWidth;
+        int initialWindowHeight;
+        float targetAspectRatio;
 
-        glm::vec3 backgroundColor = glm::vec3(0.3);
+        glm::vec3 backgroundColor;
 
         vector<MeshObject> allMeshObject;
         Camera camera;
@@ -27,6 +34,16 @@ class Scene {
         SunLight sunLight;
         AmbientLight ambientLight;
 
+        bool isCursorLocked;
+        bool isDragging;
+        float dragSpeedMultiplier;
+        glm::vec2 lastCursorPos;
+        bool isKeyHold[GLFW_KEY_LAST + 1];
+
         void objectSetup();
-        void processKeyboardInput(GLFWwindow* window);
+        void process(float deltaTime);
+        void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+        void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
+        void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+        void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 };
