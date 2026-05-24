@@ -35,6 +35,9 @@ class Scene {
         AmbientLight ambientLight;
 
         bool isCursorLocked;
+        bool isDragging;
+        float dragSpeedMultiplier;
+        glm::vec2 lastCursorPos;
         bool isKeyHold[GLFW_KEY_LAST + 1];
 
         void objectSetup();

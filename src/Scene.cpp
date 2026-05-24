@@ -1,4 +1,6 @@
 #include "Input.h"
+#include <glm/ext/vector_float2.hpp>
+#include <glm/ext/vector_float3.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include "Scene.h"
 #include "Camera.h"
@@ -21,11 +23,13 @@
 
 
 Scene::Scene() {
-    initialWindowWidth = 1280;
-    initialWindowHeight = 720;
+    initialWindowWidth = 640;
+    initialWindowHeight = 360;
     targetAspectRatio = 16.0 / 9.0f;
 
     isCursorLocked = true;
+    lastCursorPos = glm::vec2(-1.0, -1.0);
+    dragSpeedMultiplier = 0.1;
 
     allMeshObject = vector<MeshObject>();
     camera = Camera();
@@ -50,13 +54,6 @@ bool isPressOrRelease(int act) {
 // Only 1 keypress will be detected at a time
 void Scene::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     WindowCallbackData *data = (WindowCallbackData*)glfwGetWindowUserPointer(window);
-
-    // Bypass press/repeat key model with press -> hold -> release model
-    if (action == GLFW_PRESS)
-        isKeyHold[key] = true;
-    else if (action == GLFW_RELEASE)
-        isKeyHold[key] = false;
-
     // Ctrl + Q
     if (key == GLFW_KEY_Q && check_bit(mods, GLFW_MOD_CONTROL) && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -73,11 +70,35 @@ void Scene::keyCallback(GLFWwindow* window, int key, int scancode, int action, i
     }
 }
 
-void Scene::cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {}
+void Scene::cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
+    glm::vec2 currentCursorPos = glm::vec2(xpos, ypos);
+    if (lastCursorPos == glm::vec2(-1, -1)) {
+        lastCursorPos = currentCursorPos;
+        return;
+    }
 
-void Scene::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {}
+    glm::vec3 rot = camera.getRotation();
+    glm::vec2 diff = (currentCursorPos - lastCursorPos) * -dragSpeedMultiplier;
+    if (isDragging) {
+        camera.setRotation(rot + glm::vec3(diff.y, diff.x, 0.0));
+    }
+    lastCursorPos = currentCursorPos;
+}
 
-void Scene::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {}
+void Scene::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+    isDragging = (button == GLFW_MOUSE_BUTTON_LEFT && isPressOrRelease(action) && isCursorLocked);
+}
+
+void Scene::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+    WindowCallbackData *data = (WindowCallbackData*)glfwGetWindowUserPointer(window);
+
+    glm::vec3 camPos = camera.getPosition();
+
+    // We want to zoom in/out of our current local Z-axis
+    // NOT the global Z axis
+    glm::vec3 zoomVector = camera.getTransform() * glm::vec4(0.0, 0.0, -yoffset, 0.0);
+    camera.setPosition(camPos + zoomVector);
+}
 
 void Scene::process(float deltaTime) {
     const KeyInfo* wKey = Input::getKey(GLFW_KEY_W);
@@ -85,7 +106,7 @@ void Scene::process(float deltaTime) {
     const KeyInfo* sKey = Input::getKey(GLFW_KEY_S);
     const KeyInfo* dKey = Input::getKey(GLFW_KEY_D);
 
-    glm::vec3 moveInput = glm::vec3(0.0);
+    glm::vec2 moveInput = glm::vec2(0.0);
     if (wKey != nullptr && wKey->isPressed) {
         moveInput.y = 1;
     }
@@ -102,7 +123,8 @@ void Scene::process(float deltaTime) {
 
     const float cameraMoveSpeed = 10 * deltaTime;
     glm::vec3 camPos = camera.getPosition();
-    camera.setPosition(camPos + (moveInput * cameraMoveSpeed));
+    glm::vec3 moveVector = camera.getTransform() * glm::vec4(moveInput, 0.0, 0.0) * cameraMoveSpeed;
+    camera.setPosition(camPos + moveVector);
 }
 
 void loadObjToMeshObject(const std::string& path, MeshObject& obj) {
