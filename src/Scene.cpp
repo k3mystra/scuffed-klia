@@ -23,7 +23,6 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
-#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
 #define check_bit(mods,bit) (mods & bit) == bit
@@ -162,9 +161,31 @@ Model loadObjFile(const std::string& path) {
         std::vector<unsigned int> faceIndices;
 
         for (auto& index : shape.mesh.indices) {
+            // Position (3 floats)
             rawVertices.push_back(attrib.vertices[3 * index.vertex_index + 0]);
             rawVertices.push_back(attrib.vertices[3 * index.vertex_index + 1]);
             rawVertices.push_back(attrib.vertices[3 * index.vertex_index + 2]);
+
+            // UV (2 floats)
+            if (index.texcoord_index >= 0) {
+                rawVertices.push_back(attrib.texcoords[2 * index.texcoord_index + 0]);
+                rawVertices.push_back(attrib.texcoords[2 * index.texcoord_index + 1]);
+            } else {
+                rawVertices.push_back(0.0f);
+                rawVertices.push_back(0.0f);
+            }
+
+            // Normal (3 floats)
+            if (index.normal_index >= 0) {
+                rawVertices.push_back(attrib.normals[3 * index.normal_index + 0]);
+                rawVertices.push_back(attrib.normals[3 * index.normal_index + 1]);
+                rawVertices.push_back(attrib.normals[3 * index.normal_index + 2]);
+            } else {
+                rawVertices.push_back(0.0f);
+                rawVertices.push_back(0.0f);
+                rawVertices.push_back(1.0f);
+            }
+
             faceIndices.push_back(faceIndices.size());
         }
 
@@ -190,30 +211,31 @@ Model loadObjFile(const std::string& path) {
         }
 
         //DEBUG
-        std::cout << "Shape '" << shape.name << "' material_ids: ";
+        // std::cout << "Shape '" << shape.name << "' material_ids: ";
         // for (int id : shape.mesh.material_ids)
         //     std::cout << id << " ";
         // std::cout << "\n";
 
-        for (int i = 0; i < materials.size(); i++) {
-            std::cout << "Material " << i << ": " << materials[i].name 
-                      << " diffuse(" << materials[i].diffuse[0] << "," 
-                      << materials[i].diffuse[1] << "," 
-                      << materials[i].diffuse[2] << ")"
-                      << " texture: " << materials[i].diffuse_texname << "\n";
-        }
+        // for (int i = 0; i < materials.size(); i++) {
+        //     std::cout << "Material " << i << ": " << materials[i].name 
+        //               << " diffuse(" << materials[i].diffuse[0] << "," 
+        //               << materials[i].diffuse[1] << "," 
+        //               << materials[i].diffuse[2] << ")"
+        //               << " texture: " << materials[i].diffuse_texname << "\n";
+        // }
 
-        std::cout << "  Shape '" << shape.name << "': "
-                  << rawVertices.size() / 3 << " vertices, "
-                  << faceIndices.size() / 3 << " triangles\n";
+        // std::cout << "  Shape '" << shape.name << "': "
+        //           << rawVertices.size() / 3 << " vertices, "
+        //           << faceIndices.size() / 3 << " triangles\n";
+        std::cout << "Shape '" << shape.name << "': "
+          << "has UVs: " << !attrib.texcoords.empty()
+          << " has normals: " << !attrib.normals.empty() << "\n";
 
         model.meshes.push_back(mesh);
     }
 
     return model;
 }
-
-
 
 std::vector<SceneObject> loadSceneLayout(const std::string& layoutPath) {
     std::vector<SceneObject> sceneObjects;
@@ -272,7 +294,6 @@ void Scene::objectSetup() {
         sceneObj.model.setScale(sceneObj.scale);
         sceneObj.model.recalcTransform();
 
-        sceneObj.model.meshes[0].material = Material { .color = glm::vec3(0.09, 0.757, 1)};
         allModels.push_back(sceneObj.model);
     }
 }

@@ -16,6 +16,7 @@
 #include <string>
 #include <glm/gtx/string_cast.hpp>
 
+#include "TextureLoader.h"
 #include "MeshObject.h"
 #include "Camera.h"
 #include "Scene.h"
@@ -81,10 +82,27 @@ int main (int argc, char *argv[]) {
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_DRAW);
 
             // Setup vertex attributes
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
             glEnableVertexAttribArray(0);
+            
+            // TexCoord: location 1, 2 floats
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+            glEnableVertexAttribArray(1);
         }
     }
+
+    for (Model& model : allModels) {
+        for (MeshObject& obj : model.meshes) {
+            if (!obj.material.diffuseTexturePath.empty()) {
+                std::cout << "Loading texture: " << obj.material.diffuseTexturePath << "\n";
+                obj.material.textureID = loadTexture(obj.material.diffuseTexturePath);
+                std::cout << "  textureID: " << obj.material.textureID << "\n";
+            } else {
+                std::cout << "No texture for this mesh, using flat color\n";
+            }
+        }
+    }
+
     float deltaTime, aggregateDeltaTime = 0;
     float lastFrameTime = 0, currentFrameTime = 0;
     int frameCount = 0;
@@ -130,6 +148,8 @@ int main (int argc, char *argv[]) {
 
         for (Model &model : allModels){
             for (MeshObject &obj : model.meshes) {
+
+
                 Camera* cam = &scene.camera;
                 // Recalc transform first
                 cam->recalcTransform();
@@ -149,6 +169,17 @@ int main (int argc, char *argv[]) {
                 // Pass diffuse light color (sunlight only for now)
                 mainShader.setVec3("sunLightColor", scene.sunLight.color * scene.sunLight.intensity);
                 mainShader.setVec3("sunLightDir", scene.sunLight.direction);
+                
+                // Bind texture if available, otherwise use flat color
+                bool hasTexture = obj.material.textureID != 0;
+                mainShader.setBool("hasTexture", hasTexture);
+                if (hasTexture) {
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, obj.material.textureID);
+                    mainShader.setInt("diffuseTexture", 0);
+                } else {
+                    mainShader.setVec3("matColor", obj.material.color);
+                }
 
                 glBindVertexArray(obj.bufferInfo.VAO);
 
