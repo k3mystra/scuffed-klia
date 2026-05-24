@@ -1,9 +1,13 @@
+#include "Input.h"
+#define GLM_ENABLE_EXPERIMENTAL
 #include "Scene.h"
 #include "Camera.h"
 #include "MeshObject.h"
 #include "SunLight.h"
+#include "WindowCallbackData.h"
 
 #include <GLFW/glfw3.h>
+#include <glm/gtx/string_cast.hpp>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -14,6 +18,7 @@
 #include <cstring>
 
 #define check_bit(mods,bit) (mods & bit) == bit
+
 
 Scene::Scene() {
     initialWindowWidth = 1280;
@@ -37,15 +42,26 @@ Scene::Scene() {
 Scene::~Scene() {
 }
 
+bool isPressOrRelease(int act) {
+    return act == GLFW_PRESS || act == GLFW_REPEAT;
+}
+
+// Reminder that this will be called PER KEYPRESS
+// Only 1 keypress will be detected at a time
 void Scene::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    // Only listen for key press lol
-    if (action != GLFW_PRESS)
-        return;
+    WindowCallbackData *data = (WindowCallbackData*)glfwGetWindowUserPointer(window);
+
+    // Bypass press/repeat key model with press -> hold -> release model
+    if (action == GLFW_PRESS)
+        isKeyHold[key] = true;
+    else if (action == GLFW_RELEASE)
+        isKeyHold[key] = false;
 
     // Ctrl + Q
-    if (key == GLFW_KEY_Q && check_bit(mods, GLFW_MOD_CONTROL))
+    if (key == GLFW_KEY_Q && check_bit(mods, GLFW_MOD_CONTROL) && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    else if (key == GLFW_KEY_ESCAPE) {
+
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         if (isCursorLocked) {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             isCursorLocked = false;
@@ -63,37 +79,31 @@ void Scene::mouseButtonCallback(GLFWwindow* window, int button, int action, int 
 
 void Scene::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {}
 
-MeshObject genCube() {
-  // For now just cube
-  vector<float> vertices = {0.5, 0.5,  0.5,  -0.5, 0.5,  0.5, -0.5, -0.5,
-                            0.5, 0.5,  -0.5, 0.5,  0.5,  0.5, -0.5, -0.5,
-                            0.5, -0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5};
+void Scene::process(float deltaTime) {
+    const KeyInfo* wKey = Input::getKey(GLFW_KEY_W);
+    const KeyInfo* aKey = Input::getKey(GLFW_KEY_A);
+    const KeyInfo* sKey = Input::getKey(GLFW_KEY_S);
+    const KeyInfo* dKey = Input::getKey(GLFW_KEY_D);
 
-  // Index start with 0 here
-  vector<unsigned int> indices = {0, 1, 2, 0, 2, 3, 0, 4, 5, 0, 5, 1, 2, 6, 7, 2, 7, 3, 7, 6, 5, 7, 5, 4, 1, 5, 6, 1, 6, 2, 3, 7, 4, 3, 4, 0};
+    glm::vec3 moveInput = glm::vec3(0.0);
+    if (wKey != nullptr && wKey->isPressed) {
+        moveInput.y = 1;
+    }
+    else if (sKey != nullptr && sKey->isPressed) {
+        moveInput.y = -1;
+    }
 
-  MeshObject obj = MeshObject();
-  obj.setVertices(vertices);
-  obj.setIndices(indices);
+    if (aKey != nullptr && aKey->isPressed) {
+        moveInput.x = -1;
+    }
+    else if (dKey != nullptr && dKey->isPressed) {
+        moveInput.x = 1;
+    }
 
-  return obj;
+    const float cameraMoveSpeed = 10 * deltaTime;
+    glm::vec3 camPos = camera.getPosition();
+    camera.setPosition(camPos + (moveInput * cameraMoveSpeed));
 }
-
-struct SceneObject {
-    MeshObject mesh;
-    glm::vec3 position;
-    glm::vec3 rotation; // degrees
-    glm::vec3 scale;
-};
-
-// void Scene::objectSetup() {
-//     MeshObject cube = genCube();
-//     cube.material = Material();
-//     // cube.material.color = glm::vec3(0.196, 0.5921, 0.6588);
-//     cube.material.color = glm::vec3(0.09, 0.757, 1);
-//     cube.setPosition(glm::vec3(0.0, 0.0, -3.0));
-//     cube.setRotation(glm::vec3(40.0, 20.0, 30.0));
-//     cube.recalcTransform();
 
 void loadObjToMeshObject(const std::string& path, MeshObject& obj) {
     std::ifstream file(path);
@@ -175,7 +185,6 @@ std::vector<SceneObject> loadSceneLayout(const std::string& layoutPath) {
 }
 
 void Scene::objectSetup() {
-
     std::filesystem::path exePath = std::filesystem::current_path();
     std::cout << "Working directory: " << exePath << "\n";
 
@@ -184,12 +193,6 @@ void Scene::objectSetup() {
     
     auto sceneObjects = loadSceneLayout(layoutPath);
 
-
-    // if (sceneObjects.empty()) {
-    //     std::cerr << "No objects loaded from layout. Check the file and format.\n";
-    //     return;
-    // }
-    
     //applying the transform data to all mesh objects
     for (auto& sceneObj : sceneObjects) {
         sceneObj.mesh.setPosition(sceneObj.position);

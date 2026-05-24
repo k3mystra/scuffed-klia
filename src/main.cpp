@@ -20,16 +20,10 @@
 #include "Camera.h"
 #include "Scene.h"
 #include "Shader.h"
+#include "WindowCallbackData.h"
+#include "Input.h"
 
 using namespace std;
-
-struct WindowCallbackData {
-    float targetAspectRatio;
-    int viewportX;
-    int viewportY;
-    int viewportWidth;
-    int viewportHeight;
-};
 
 GLFWwindow* setupGlfwWindow(WindowCallbackData* data);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -47,7 +41,8 @@ int main (int argc, char *argv[]) {
         .viewportX = 0,
         .viewportY = 0,
         .viewportWidth = scene.initialWindowWidth,
-        .viewportHeight = scene.initialWindowHeight
+        .viewportHeight = scene.initialWindowHeight,
+        .deltaTime = 0
     };
 
     GLFWwindow* window = setupGlfwWindow(&data);
@@ -64,7 +59,6 @@ int main (int argc, char *argv[]) {
     // ---- Subject to Change ----
     scene.objectSetup();
     vector<MeshObject> allObjs = scene.allMeshObject;
-    Camera cam = scene.camera;
 
     // Put all objects into GPU vertex buffer
     for (MeshObject &obj : allObjs) {
@@ -89,7 +83,6 @@ int main (int argc, char *argv[]) {
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
     }
-
     
     float deltaTime, aggregateDeltaTime = 0;
     float lastFrameTime = 0, currentFrameTime = 0;
@@ -105,12 +98,14 @@ int main (int argc, char *argv[]) {
         frameCount++;
         aggregateDeltaTime += deltaTime;
 
-        if (frameCount == 50) {
-            cout << "FPS: " << 1.0 / (aggregateDeltaTime / 50.0) << endl;
-            cout << "Delta time: " << aggregateDeltaTime / 50.0 << endl;
-            frameCount = 0;
-            aggregateDeltaTime = 0.0;
-        }
+        // if (frameCount == 50) {
+        //     cout << "FPS: " << 1.0 / (aggregateDeltaTime / 50.0) << endl;
+        //     cout << "Delta time: " << aggregateDeltaTime / 50.0 << endl;
+        //     frameCount = 0;
+        //     aggregateDeltaTime = 0.0;
+        // }
+
+        data.deltaTime = deltaTime;
 
         // Clear the buffer before next render
         glClearColor(0, 0, 0, 1.0);
@@ -130,12 +125,18 @@ int main (int argc, char *argv[]) {
 
         mainShader.use();
 
+        scene.process(deltaTime);
 
         for (MeshObject &obj : allObjs) {
+            Camera* cam = &scene.camera;
+            // Recalc transform first
+            cam->recalcTransform();
+            obj.recalcTransform();
+
             // Pass vertex shader transformations
             mainShader.setMat4("model", obj.getTransform());
-            mainShader.setMat4("view", cam.getInvTransform());
-            mainShader.setMat4("projection", cam.getProjectionMatrix());
+            mainShader.setMat4("view", cam->getInvTransform());
+            mainShader.setMat4("projection", cam->getProjectionMatrix());
 
             // Pass material color
             mainShader.setVec3("matColor", obj.material.color);
@@ -216,11 +217,11 @@ GLFWwindow* setupGlfwWindow(WindowCallbackData* data) {
     // Resize viewport on windows resize
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
     
-    // Input callbacks setup
-    glfwSetKeyCallback(
-        window,
+    // Fking terrible but it is what it is
+    glfwSetKeyCallback(window, 
         [](GLFWwindow* window, int key, int scancode, int action, int mods) {
             scene.keyCallback(window, key, scancode, action, mods);
+            Input::absorbKeys(window, key, scancode, action, mods);
         }
     );
     // Use raw mouse motion if supported
@@ -248,3 +249,7 @@ GLFWwindow* setupGlfwWindow(WindowCallbackData* data) {
 
     return window;
 }
+
+// void key_main(GLFWwindow* window, int key, int scancode, int action, int mods) {
+//     scene.keyCallback(window, key, scancode, action, mods);
+// }

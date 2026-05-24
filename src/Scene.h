@@ -10,6 +10,13 @@
 
 using namespace std;
 
+struct SceneObject {
+    MeshObject mesh;
+    glm::vec3 position;
+    glm::vec3 rotation; // degrees
+    glm::vec3 scale;
+};
+
 class Scene {
     public:
         Scene();
@@ -28,8 +35,10 @@ class Scene {
         AmbientLight ambientLight;
 
         bool isCursorLocked;
+        bool isKeyHold[GLFW_KEY_LAST + 1];
 
         void objectSetup();
+        void process(float deltaTime);
         void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
         void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
         void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
