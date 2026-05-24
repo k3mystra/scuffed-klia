@@ -58,32 +58,33 @@ int main (int argc, char *argv[]) {
 
     // ---- Subject to Change ----
     scene.objectSetup();
-    vector<MeshObject> allObjs = scene.allMeshObject;
+    vector<Model> allModels = scene.allModels;
 
     // Put all objects into GPU vertex buffer
-    for (MeshObject &obj : allObjs) {
-        // Vertex Array Object (VAO) to store vertex attributes layout
-        // for all VBO
-        glGenVertexArrays(1, &obj.bufferInfo.VAO);
-        glBindVertexArray(obj.bufferInfo.VAO);
+    for (Model &model : allModels){
+        for (MeshObject &obj : model.meshes) {
+            // Vertex Array Object (VAO) to store vertex attributes layout
+            // for all VBO
+            glGenVertexArrays(1, &obj.bufferInfo.VAO);
+            glBindVertexArray(obj.bufferInfo.VAO);
 
-        glGenBuffers(1, &obj.bufferInfo.VBO);
-        glBindBuffer(GL_ARRAY_BUFFER, obj.bufferInfo.VBO);
-        vector vertices = obj.getVertices();
-        // Dynamic draw so that we can change em fast later
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
+            glGenBuffers(1, &obj.bufferInfo.VBO);
+            glBindBuffer(GL_ARRAY_BUFFER, obj.bufferInfo.VBO);
+            vector vertices = obj.getVertices();
+            // Dynamic draw so that we can change em fast later
+            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
 
-        // Indices shit
-        glGenBuffers(1, &obj.bufferInfo.EBO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.bufferInfo.EBO);
-        vector indices = obj.getIndices();
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_DRAW);
+            // Indices shit
+            glGenBuffers(1, &obj.bufferInfo.EBO);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.bufferInfo.EBO);
+            vector indices = obj.getIndices();
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_DRAW);
 
-        // Setup vertex attributes
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
+            // Setup vertex attributes
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+            glEnableVertexAttribArray(0);
+        }
     }
-    
     float deltaTime, aggregateDeltaTime = 0;
     float lastFrameTime = 0, currentFrameTime = 0;
     int frameCount = 0;
@@ -127,35 +128,36 @@ int main (int argc, char *argv[]) {
 
         scene.process(deltaTime);
 
-        for (MeshObject &obj : allObjs) {
-            Camera* cam = &scene.camera;
-            // Recalc transform first
-            cam->recalcTransform();
-            obj.recalcTransform();
+        for (Model &model : allModels){
+            for (MeshObject &obj : model.meshes) {
+                Camera* cam = &scene.camera;
+                // Recalc transform first
+                cam->recalcTransform();
+                model.recalcTransform();
 
-            // Pass vertex shader transformations
-            mainShader.setMat4("model", obj.getTransform());
-            mainShader.setMat4("view", cam->getInvTransform());
-            mainShader.setMat4("projection", cam->getProjectionMatrix());
+                // Pass vertex shader transformations
+                mainShader.setMat4("model", model.getTransform());
+                mainShader.setMat4("view", cam->getInvTransform());
+                mainShader.setMat4("projection", cam->getProjectionMatrix());
 
-            // Pass material color
-            mainShader.setVec3("matColor", obj.material.color);
+                // Pass material color
+                mainShader.setVec3("matColor", obj.material.color);
 
-            // Pass ambient light color
-            mainShader.setVec3("ambientLightColor", scene.ambientLight.color);
+                // Pass ambient light color
+                mainShader.setVec3("ambientLightColor", scene.ambientLight.color);
 
-            // Pass diffuse light color (sunlight only for now)
-            mainShader.setVec3("sunLightColor", scene.sunLight.color * scene.sunLight.intensity);
-            mainShader.setVec3("sunLightDir", scene.sunLight.direction);
+                // Pass diffuse light color (sunlight only for now)
+                mainShader.setVec3("sunLightColor", scene.sunLight.color * scene.sunLight.intensity);
+                mainShader.setVec3("sunLightDir", scene.sunLight.direction);
 
-            glBindVertexArray(obj.bufferInfo.VAO);
+                glBindVertexArray(obj.bufferInfo.VAO);
 
-            // Render here
-            glDrawElements(GL_TRIANGLES, obj.getIndices().size(), GL_UNSIGNED_INT, 0);
-            // Unbind VAO just in case
-            glBindVertexArray(0);
+                // Render here
+                glDrawElements(GL_TRIANGLES, obj.getIndices().size(), GL_UNSIGNED_INT, 0);
+                // Unbind VAO just in case
+                glBindVertexArray(0);
+            }
         }
-
         glfwSwapBuffers(window);
         glfwPollEvents();    
     }

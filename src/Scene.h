@@ -4,6 +4,7 @@
 #include "MeshObject.h"
 #include "SunLight.h"
 #include "AmbientLight.h"
+#include "Model.h"
 
 #include <vector>
 #include <GLFW/glfw3.h>
@@ -11,7 +12,7 @@
 using namespace std;
 
 struct SceneObject {
-    MeshObject mesh;
+    Model model;
     glm::vec3 position;
     glm::vec3 rotation; // degrees
     glm::vec3 scale;
@@ -28,7 +29,7 @@ class Scene {
 
         glm::vec3 backgroundColor;
 
-        vector<MeshObject> allMeshObject;
+        vector<Model> allModels;
         Camera camera;
 
         SunLight sunLight;
