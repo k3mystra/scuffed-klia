@@ -249,7 +249,3 @@ GLFWwindow* setupGlfwWindow(WindowCallbackData* data) {
 
     return window;
 }
-
-// void key_main(GLFWwindow* window, int key, int scancode, int action, int mods) {
-//     scene.keyCallback(window, key, scancode, action, mods);
-// }
