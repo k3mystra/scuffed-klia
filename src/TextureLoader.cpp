@@ -1,4 +1,10 @@
+#include <iostream>
+#include <GL/glew.h>
 #include "TextureLoader.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 
 unsigned int loadTexture(const std::string& path) {
     unsigned int textureID;
