@@ -18,7 +18,7 @@ void main()
     vec3 ambientColor = ambientLightColor * 0.1;
 
     vec3 normal = normalize(faceNormal);
-    float diff = max(dot(normalize(sunLightDir), normal), 0.0);
+    float diff = max(dot(-normalize(sunLightDir), normal), 0.0);
     vec3 sunLight = min(diff * sunLightColor, 1.0);
 
     color = vec4((ambientColor + sunLight) * baseColor, 1.0);
