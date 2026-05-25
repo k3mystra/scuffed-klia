@@ -2,13 +2,18 @@
 
 [ext_resource type="ArrayMesh" uid="uid://cvje5duc6dcye" path="res://airplane_obj/11805_airplane_v2_L2.obj" id="1_a202f"]
 [ext_resource type="ArrayMesh" uid="uid://7g1eikgii33q" path="res://cow.obj" id="1_noarx"]
+[ext_resource type="ArrayMesh" uid="uid://bm4plumasemx8" path="res://carrier/carrier.obj" id="3_a0tk4"]
 
 [node name="Node3D" type="Node3D" unique_id=1895618722]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1784544920]
-transform = Transform3D(0.9470479, 0, -0.32109237, 0, 1, 0, 0.32109237, 0, 0.9470479, -16.497738, 2.8419805, -12.6166115)
+transform = Transform3D(0.9470479, 0, -0.32109237, 0, 1, 0, 0.32109237, 0, 0.9470479, -16.497738, 14.805836, -12.6166115)
 mesh = ExtResource("1_noarx")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=2058212210]
-transform = Transform3D(-0.0025821202, -0.009610897, 0.0009814859, 4.4408622e-18, 0.0010159382, 0.009948259, -0.009660883, 0.0025687602, -0.00026232746, 0, 0, -13.154599)
+transform = Transform3D(-0.0025821202, -0.009610897, 0.0009814859, 4.4408622e-18, 0.0010159382, 0.009948259, -0.009660883, 0.0025687602, -0.00026232746, 5.7085953, 11.642944, 2.4211817)
 mesh = ExtResource("1_a202f")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="." unique_id=637072821]
+transform = Transform3D(-0.06764956, 0, -0.99770916, 0, 1, 0, 0.99770916, 0, -0.06764956, 5.175907, -2.5610662, -0.7265825)
+mesh = ExtResource("3_a0tk4")
