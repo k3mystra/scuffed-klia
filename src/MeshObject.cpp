@@ -7,7 +7,7 @@
 
 MeshObject::MeshObject() : GameObject() {
     material = Material();
-    material.color = glm::vec3(0.0);
+    material.color = glm::vec3(0.5f,0.5f,0.5f);
 }
 
 MeshObject::~MeshObject() {}

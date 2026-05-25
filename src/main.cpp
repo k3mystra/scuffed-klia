@@ -16,6 +16,7 @@
 #include <string>
 #include <glm/gtx/string_cast.hpp>
 
+#include "TextureLoader.h"
 #include "MeshObject.h"
 #include "Camera.h"
 #include "Scene.h"
@@ -82,10 +83,27 @@ int main (int argc, char *argv[]) {
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_DRAW);
 
             // Setup vertex attributes
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
             glEnableVertexAttribArray(0);
+            
+            // TexCoord: location 1, 2 floats
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+            glEnableVertexAttribArray(1);
         }
     }
+
+    for (Model& model : allModels) {
+        for (MeshObject& obj : model.meshes) {
+            if (!obj.material.diffuseTexturePath.empty()) {
+                std::cout << "Loading texture: " << obj.material.diffuseTexturePath << "\n";
+                obj.material.textureID = loadTexture(obj.material.diffuseTexturePath);
+                std::cout << "  textureID: " << obj.material.textureID << "\n";
+            } else {
+                std::cout << "No texture for this mesh, using flat color\n";
+            }
+        }
+    }
+
     float deltaTime, aggregateDeltaTime = 0;
     float lastFrameTime = 0, currentFrameTime = 0;
     float phyTimeAccumulator = 0.0;
@@ -93,93 +111,115 @@ int main (int argc, char *argv[]) {
     // Main render loop
     while(!glfwWindowShouldClose(window))
     {
-        // Delta time calculations
-        currentFrameTime = glfwGetTime();
-        deltaTime = currentFrameTime - lastFrameTime;
-        lastFrameTime = currentFrameTime;
+            // Delta time calculations
+            currentFrameTime = glfwGetTime();
+            deltaTime = currentFrameTime - lastFrameTime;
+            lastFrameTime = currentFrameTime;
 
-        // frameCount++;
-        // aggregateDeltaTime += deltaTime;
+            // frameCount++;
+            // aggregateDeltaTime += deltaTime;
 
-        // if (frameCount == 50) {
-        //     cout << "FPS: " << 1.0 / (aggregateDeltaTime / 50.0) << endl;
-        //     cout << "Delta time: " << aggregateDeltaTime / 50.0 << endl;
-        //     frameCount = 0;
-        //     aggregateDeltaTime = 0.0;
-        // }
+            // if (frameCount == 50) {
+            //     cout << "FPS: " << 1.0 / (aggregateDeltaTime / 50.0) << endl;
+            //     cout << "Delta time: " << aggregateDeltaTime / 50.0 << endl;
+            //     frameCount = 0;
+            //     aggregateDeltaTime = 0.0;
+            // }
 
-        data.deltaTime = deltaTime;
+            data.deltaTime = deltaTime;
 
-        phyTimeAccumulator += deltaTime;
+            phyTimeAccumulator += deltaTime;
 
-        // Clear the buffer before next render
-        glClearColor(0, 0, 0, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            // Clear the buffer before next render
+            glClearColor(0, 0, 0, 1.0);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Clear viewport with different color
-        glEnable(GL_SCISSOR_TEST);
-        glScissor(data.viewportX, data.viewportY, data.viewportWidth, data.viewportHeight);
-        glClearColor(
-            scene.backgroundColor.r,
-            scene.backgroundColor.g,
-            scene.backgroundColor.b,
-            1.0f
-        );
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDisable(GL_SCISSOR_TEST);
+            // Clear viewport with different color
+            glEnable(GL_SCISSOR_TEST);
+            glScissor(data.viewportX, data.viewportY, data.viewportWidth, data.viewportHeight);
+            glClearColor(
+                scene.backgroundColor.r,
+                scene.backgroundColor.g,
+                scene.backgroundColor.b,
+                1.0f
+            );
+            glClear(GL_COLOR_BUFFER_BIT);
+            glDisable(GL_SCISSOR_TEST);
 
-        mainShader.use();
+            mainShader.use();
 
-        scene.process(deltaTime);
+            scene.process(deltaTime);
 
-        // Physics shit
-        while (phyTimeAccumulator >= PHYSICS_TIMESTEP) {
-            for (Model &model : allModels) {
-                glm::vec3 deltaPos = Physics::updateState(&model.physicsState, PHYSICS_TIMESTEP);
-                model.setPosition(model.getPosition() + deltaPos);
+
+            for (Model &model : allModels){
+                for (MeshObject &obj : model.meshes) {
+                    Camera* cam = &scene.camera;
+                    // Recalc transform first
+                    cam->recalcTransform();
+                    model.recalcTransform();
+                }
+            }
+            // Physics shit
+            while (phyTimeAccumulator >= PHYSICS_TIMESTEP) {
+                for (Model &model : allModels) {
+                    glm::vec3 deltaPos = Physics::updateState(&model.physicsState, PHYSICS_TIMESTEP);
+                    model.setPosition(model.getPosition() + deltaPos);
+                }
+
+
+                phyTimeAccumulator -= PHYSICS_TIMESTEP;
             }
 
-            phyTimeAccumulator -= PHYSICS_TIMESTEP;
-        }
+            for (Model &model : allModels){
 
-        for (Model &model : allModels){
+                Camera* cam = &scene.camera;
+                // Recalc transform first
+                cam->recalcTransform();
+                model.recalcTransform();
 
-            Camera* cam = &scene.camera;
-            // Recalc transform first
-            cam->recalcTransform();
-            model.recalcTransform();
+                for (MeshObject &obj : model.meshes) {
+                    // Pass vertex shader transformations
+                    mainShader.setMat4("model", model.getTransform());
+                    mainShader.setMat4("view", cam->getInvTransform());
+                    mainShader.setMat4("projection", cam->getProjectionMatrix());
 
-            for (MeshObject &obj : model.meshes) {
-                // Pass vertex shader transformations
-                mainShader.setMat4("model", model.getTransform());
-                mainShader.setMat4("view", cam->getInvTransform());
-                mainShader.setMat4("projection", cam->getProjectionMatrix());
+                    // Pass material color
+                    mainShader.setVec3("matColor", obj.material.color);
 
-                // Pass material color
-                mainShader.setVec3("matColor", obj.material.color);
+                    // Pass ambient light color
+                    mainShader.setVec3("ambientLightColor", scene.ambientLight.color);
 
-                // Pass ambient light color
-                mainShader.setVec3("ambientLightColor", scene.ambientLight.color);
+                    // Pass diffuse light color (sunlight only for now)
+                    mainShader.setVec3("sunLightColor", scene.sunLight.color * scene.sunLight.intensity);
+                    mainShader.setVec3("sunLightDir", scene.sunLight.direction);
+                    
+                    // Bind texture if available, otherwise use flat color
+                    bool hasTexture = obj.material.textureID != 0;
+                    mainShader.setBool("hasTexture", hasTexture);
+                    if (hasTexture) {
+                        glActiveTexture(GL_TEXTURE0);
+                        glBindTexture(GL_TEXTURE_2D, obj.material.textureID);
+                        mainShader.setInt("diffuseTexture", 0);
+                    } else {
+                        mainShader.setVec3("matColor", obj.material.color);
+                    }
 
-                // Pass diffuse light color (sunlight only for now)
-                mainShader.setVec3("sunLightColor", scene.sunLight.color * scene.sunLight.intensity);
-                mainShader.setVec3("sunLightDir", scene.sunLight.direction);
+                    glBindVertexArray(obj.bufferInfo.VAO);
 
-                glBindVertexArray(obj.bufferInfo.VAO);
-
-                // Render here
-                glDrawElements(GL_TRIANGLES, obj.getIndices().size(), GL_UNSIGNED_INT, 0);
-                // Unbind VAO just in case
-                glBindVertexArray(0);
+                    // Render here
+                    glDrawElements(GL_TRIANGLES, obj.getIndices().size(), GL_UNSIGNED_INT, 0);
+                    // Unbind VAO just in case
+                    glBindVertexArray(0);
+                }
             }
+            glfwSwapBuffers(window);
+            glfwPollEvents();    
         }
-        glfwSwapBuffers(window);
-        glfwPollEvents();    
+
+        glfwTerminate();
+        return 0;
     }
 
-    glfwTerminate();
-    return 0;
-}
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     WindowCallbackData *data = (WindowCallbackData*)glfwGetWindowUserPointer(window);
