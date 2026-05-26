@@ -25,6 +25,7 @@
 #include "WindowCallbackData.h"
 #include "Input.h"
 #include "Physics.h"
+#include "SkyCube.h"
 
 using namespace std;
 
@@ -131,6 +132,18 @@ int main (int argc, char *argv[]) {
         }
     }
 
+    SkyCube skybox;
+    std::vector<std::string> skyboxFaces = {
+        "3DScene/LarpCombat/skybox_right.png",
+        "3DScene/LarpCombat/skybox_left.png",
+        "3DScene/LarpCombat/skybox_top.png",
+        "3DScene/LarpCombat/skybox_bottom.png",
+        "3DScene/LarpCombat/skybox_front.png",
+        "3DScene/LarpCombat/skybox_back.png"
+    };
+    skybox.init(skyboxFaces);
+
+
     float deltaTime, aggregateDeltaTime = 0;
     float lastFrameTime = 0, currentFrameTime = 0;
     float phyTimeAccumulator = 0.0;
@@ -172,6 +185,10 @@ int main (int argc, char *argv[]) {
             );
             glClear(GL_COLOR_BUFFER_BIT);
             glDisable(GL_SCISSOR_TEST);
+
+            Camera* cam = &scene.camera;
+            cam->recalcTransform();
+            skybox.render(cam->getProjectionMatrix(), cam->getInvTransform());
 
             mainShader.use();
 
@@ -245,7 +262,6 @@ int main (int argc, char *argv[]) {
             // glm::vec3 camPos = scene.camera.getPosition();
             // scene.sea.setPosition(glm::vec3(camPos.x, 0.0f, camPos.z));
             // scene.sea.recalcTransform();
-            Camera* cam = &scene.camera;
             mainShader.setMat4("model", scene.sea.getTransform());
             mainShader.setMat4("view", cam->getInvTransform());
             mainShader.setMat4("projection", cam->getProjectionMatrix());
