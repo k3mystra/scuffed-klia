@@ -7,7 +7,7 @@ Camera::Camera()
     fov(45),
     aspectRatio(16.0f/9.0f),
     nearPlane(0.5f),
-    farPlane(100.0f) {
+    farPlane(1000.0f) {
 }
 
 Camera::Camera(float fov, float aspectRatio, float nearPlane, float farPlane)

@@ -6,6 +6,9 @@
 #include "AmbientLight.h"
 #include "Model.h"
 
+#include "SeaPlane.h"
+
+
 #include <vector>
 #include <GLFW/glfw3.h>
 
@@ -34,6 +37,8 @@ class Scene {
 
         SunLight sunLight;
         AmbientLight ambientLight;
+
+        SeaPlane sea;
 
         bool isCursorLocked;
         bool isDragging;

@@ -39,6 +39,12 @@ Scene::Scene() {
 
     allModels = vector<Model>();
     camera = Camera();
+
+    sea = SeaPlane(500, 10.0f); 
+    sea.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+    sea.recalcTransform();
+
+
     // Kinda orange, going down
     sunLight = SunLight(
         glm::vec3(-0.1961, -0.7845, 0.5883),

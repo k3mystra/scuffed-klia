@@ -16,6 +16,7 @@
 #include <string>
 #include <glm/gtx/string_cast.hpp>
 
+#include "SeaPlane.h"
 #include "TextureLoader.h"
 #include "MeshObject.h"
 #include "Camera.h"
@@ -91,6 +92,32 @@ int main (int argc, char *argv[]) {
             glEnableVertexAttribArray(1);
         }
     }
+
+        // Sea plane setup
+    glGenVertexArrays(1, &scene.sea.bufferInfo.VAO);
+    glBindVertexArray(scene.sea.bufferInfo.VAO);
+
+    glGenBuffers(1, &scene.sea.bufferInfo.VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, scene.sea.bufferInfo.VBO);
+    auto seaVerts = scene.sea.getVertices();
+    glBufferData(GL_ARRAY_BUFFER, seaVerts.size() * sizeof(float), seaVerts.data(), GL_STATIC_DRAW);
+
+    glGenBuffers(1, &scene.sea.bufferInfo.EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, scene.sea.bufferInfo.EBO);
+    auto seaIdx = scene.sea.getIndices();
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, seaIdx.size() * sizeof(unsigned int), seaIdx.data(), GL_STATIC_DRAW);
+
+    // Same layout as models: pos(3) + uv(2) + normal(3)
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    // Load textures
+    scene.sea.diffuseTextureID = loadTexture("3DScene/LarpCombat/water.jpg");
+    scene.sea.normalTextureID  = loadTexture("3DScene/LarpCombat/water_normal.jpg");
 
     for (Model& model : allModels) {
         for (MeshObject& obj : model.meshes) {
@@ -212,6 +239,33 @@ int main (int argc, char *argv[]) {
                     glBindVertexArray(0);
                 }
             }
+
+            // Snap sea to camera X/Z so it appears infinite
+            //-----------------------------------------------------------------------------------------
+            // glm::vec3 camPos = scene.camera.getPosition();
+            // scene.sea.setPosition(glm::vec3(camPos.x, 0.0f, camPos.z));
+            // scene.sea.recalcTransform();
+            Camera* cam = &scene.camera;
+            mainShader.setMat4("model", scene.sea.getTransform());
+            mainShader.setMat4("view", cam->getInvTransform());
+            mainShader.setMat4("projection", cam->getProjectionMatrix());
+            mainShader.setVec3("ambientLightColor", scene.ambientLight.color);
+            mainShader.setVec3("sunLightColor", scene.sunLight.color * scene.sunLight.intensity);
+            mainShader.setVec3("sunLightDir", scene.sunLight.direction);
+
+            bool seaHasTexture = scene.sea.diffuseTextureID != 0;
+            mainShader.setBool("hasTexture", seaHasTexture);
+            if (seaHasTexture) {
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, scene.sea.diffuseTextureID);
+                mainShader.setInt("diffuseTexture", 0);
+            }
+
+            glBindVertexArray(scene.sea.bufferInfo.VAO);
+            glDrawElements(GL_TRIANGLES, scene.sea.getIndices().size(), GL_UNSIGNED_INT, 0);
+            glBindVertexArray(0);
+            //------------------------------------------------------------------------------------------
+            
             glfwSwapBuffers(window);
             glfwPollEvents();    
         }
