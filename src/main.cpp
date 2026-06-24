@@ -151,144 +151,144 @@ int main (int argc, char *argv[]) {
     // Main render loop
     while(!glfwWindowShouldClose(window))
     {
-            // Delta time calculations
-            currentFrameTime = glfwGetTime();
-            deltaTime = currentFrameTime - lastFrameTime;
-            lastFrameTime = currentFrameTime;
+        // Delta time calculations
+        currentFrameTime = glfwGetTime();
+        deltaTime = currentFrameTime - lastFrameTime;
+        lastFrameTime = currentFrameTime;
 
-            // frameCount++;
-            // aggregateDeltaTime += deltaTime;
+        // frameCount++;
+        // aggregateDeltaTime += deltaTime;
 
-            // if (frameCount == 50) {
-            //     cout << "FPS: " << 1.0 / (aggregateDeltaTime / 50.0) << endl;
-            //     cout << "Delta time: " << aggregateDeltaTime / 50.0 << endl;
-            //     frameCount = 0;
-            //     aggregateDeltaTime = 0.0;
-            // }
+        // if (frameCount == 50) {
+        //     cout << "FPS: " << 1.0 / (aggregateDeltaTime / 50.0) << endl;
+        //     cout << "Delta time: " << aggregateDeltaTime / 50.0 << endl;
+        //     frameCount = 0;
+        //     aggregateDeltaTime = 0.0;
+        // }
 
-            data.deltaTime = deltaTime;
+        data.deltaTime = deltaTime;
 
-            phyTimeAccumulator += deltaTime;
+        phyTimeAccumulator += deltaTime;
 
-            // Clear the buffer before next render
-            glClearColor(0, 0, 0, 1.0);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // Clear the buffer before next render
+        glClearColor(0, 0, 0, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            // Clear viewport with different color
-            glEnable(GL_SCISSOR_TEST);
-            glScissor(data.viewportX, data.viewportY, data.viewportWidth, data.viewportHeight);
-            glClearColor(
-                scene.backgroundColor.r,
-                scene.backgroundColor.g,
-                scene.backgroundColor.b,
-                1.0f
-            );
-            glClear(GL_COLOR_BUFFER_BIT);
-            glDisable(GL_SCISSOR_TEST);
+        // Clear viewport with different color
+        glEnable(GL_SCISSOR_TEST);
+        glScissor(data.viewportX, data.viewportY, data.viewportWidth, data.viewportHeight);
+        glClearColor(
+            scene.backgroundColor.r,
+            scene.backgroundColor.g,
+            scene.backgroundColor.b,
+            1.0f
+        );
+        glClear(GL_COLOR_BUFFER_BIT);
+        glDisable(GL_SCISSOR_TEST);
 
-            Camera* cam = &scene.camera;
-            cam->recalcTransform();
-            skybox.render(cam->getProjectionMatrix(), cam->getInvTransform());
+        Camera* cam = &scene.camera;
+        cam->recalcTransform();
+        skybox.render(cam->getProjectionMatrix(), cam->getInvTransform());
 
-            mainShader.use();
+        mainShader.use();
 
-            scene.process(deltaTime);
-
-
-            for (Model &model : allModels){
-                for (MeshObject &obj : model.meshes) {
-                    Camera* cam = &scene.camera;
-                    // Recalc transform first
-                    cam->recalcTransform();
-                    model.recalcTransform();
-                }
-            }
-            // Physics shit
-            while (phyTimeAccumulator >= PHYSICS_TIMESTEP) {
-                for (Model &model : allModels) {
-                    glm::vec3 deltaPos = Physics::updateState(&model.physicsState, PHYSICS_TIMESTEP);
-                    model.setPosition(model.getPosition() + deltaPos);
-                }
+        scene.process(deltaTime);
 
 
-                phyTimeAccumulator -= PHYSICS_TIMESTEP;
-            }
-
-            for (Model &model : allModels){
-
+        for (Model &model : allModels){
+            for (MeshObject &obj : model.meshes) {
                 Camera* cam = &scene.camera;
                 // Recalc transform first
                 cam->recalcTransform();
                 model.recalcTransform();
-
-                for (MeshObject &obj : model.meshes) {
-                    // Pass vertex shader transformations
-                    mainShader.setMat4("model", model.getTransform());
-                    mainShader.setMat4("view", cam->getInvTransform());
-                    mainShader.setMat4("projection", cam->getProjectionMatrix());
-
-                    // Pass material color
-                    mainShader.setVec3("matColor", obj.material.color);
-
-                    // Pass ambient light color
-                    mainShader.setVec3("ambientLightColor", scene.ambientLight.color);
-
-                    // Pass diffuse light color (sunlight only for now)
-                    mainShader.setVec3("sunLightColor", scene.sunLight.color * scene.sunLight.intensity);
-                    mainShader.setVec3("sunLightDir", scene.sunLight.direction);
-                    
-                    // Bind texture if available, otherwise use flat color
-                    bool hasTexture = obj.material.textureID != 0;
-                    mainShader.setBool("hasTexture", hasTexture);
-                    if (hasTexture) {
-                        glActiveTexture(GL_TEXTURE0);
-                        glBindTexture(GL_TEXTURE_2D, obj.material.textureID);
-                        mainShader.setInt("diffuseTexture", 0);
-                    } else {
-                        mainShader.setVec3("matColor", obj.material.color);
-                    }
-
-                    glBindVertexArray(obj.bufferInfo.VAO);
-
-                    // Render here
-                    glDrawElements(GL_TRIANGLES, obj.getIndices().size(), GL_UNSIGNED_INT, 0);
-                    // Unbind VAO just in case
-                    glBindVertexArray(0);
-                }
+            }
+        }
+        // Physics shit
+        while (phyTimeAccumulator >= PHYSICS_TIMESTEP) {
+            for (Model &model : allModels) {
+                glm::vec3 deltaPos = Physics::updateState(&model.physicsState, PHYSICS_TIMESTEP);
+                model.setPosition(model.getPosition() + deltaPos);
             }
 
-            // Snap sea to camera X/Z so it appears infinite
-            //-----------------------------------------------------------------------------------------
-            // glm::vec3 camPos = scene.camera.getPosition();
-            // scene.sea.setPosition(glm::vec3(camPos.x, 0.0f, camPos.z));
-            // scene.sea.recalcTransform();
-            mainShader.setMat4("model", scene.sea.getTransform());
-            mainShader.setMat4("view", cam->getInvTransform());
-            mainShader.setMat4("projection", cam->getProjectionMatrix());
-            mainShader.setVec3("ambientLightColor", scene.ambientLight.color);
-            mainShader.setVec3("sunLightColor", scene.sunLight.color * scene.sunLight.intensity);
-            mainShader.setVec3("sunLightDir", scene.sunLight.direction);
 
-            bool seaHasTexture = scene.sea.diffuseTextureID != 0;
-            mainShader.setBool("hasTexture", seaHasTexture);
-            if (seaHasTexture) {
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, scene.sea.diffuseTextureID);
-                mainShader.setInt("diffuseTexture", 0);
-            }
-
-            glBindVertexArray(scene.sea.bufferInfo.VAO);
-            glDrawElements(GL_TRIANGLES, scene.sea.getIndices().size(), GL_UNSIGNED_INT, 0);
-            glBindVertexArray(0);
-            //------------------------------------------------------------------------------------------
-            
-            glfwSwapBuffers(window);
-            glfwPollEvents();    
+            phyTimeAccumulator -= PHYSICS_TIMESTEP;
         }
 
-        glfwTerminate();
-        return 0;
+        for (Model &model : allModels){
+
+            Camera* cam = &scene.camera;
+            // Recalc transform first
+            cam->recalcTransform();
+            model.recalcTransform();
+
+            for (MeshObject &obj : model.meshes) {
+                // Pass vertex shader transformations
+                mainShader.setMat4("model", model.getTransform());
+                mainShader.setMat4("view", cam->getInvTransform());
+                mainShader.setMat4("projection", cam->getProjectionMatrix());
+
+                // Pass material color
+                mainShader.setVec3("matColor", obj.material.color);
+
+                // Pass ambient light color
+                mainShader.setVec3("ambientLightColor", scene.ambientLight.color);
+
+                // Pass diffuse light color (sunlight only for now)
+                mainShader.setVec3("sunLightColor", scene.sunLight.color * scene.sunLight.intensity);
+                mainShader.setVec3("sunLightDir", scene.sunLight.direction);
+                
+                // Bind texture if available, otherwise use flat color
+                bool hasTexture = obj.material.textureID != 0;
+                mainShader.setBool("hasTexture", hasTexture);
+                if (hasTexture) {
+                    glActiveTexture(GL_TEXTURE0);
+                    glBindTexture(GL_TEXTURE_2D, obj.material.textureID);
+                    mainShader.setInt("diffuseTexture", 0);
+                } else {
+                    mainShader.setVec3("matColor", obj.material.color);
+                }
+
+                glBindVertexArray(obj.bufferInfo.VAO);
+
+                // Render here
+                glDrawElements(GL_TRIANGLES, obj.getIndices().size(), GL_UNSIGNED_INT, 0);
+                // Unbind VAO just in case
+                glBindVertexArray(0);
+            }
+        }
+
+        // Snap sea to camera X/Z so it appears infinite
+        //-----------------------------------------------------------------------------------------
+        // glm::vec3 camPos = scene.camera.getPosition();
+        // scene.sea.setPosition(glm::vec3(camPos.x, 0.0f, camPos.z));
+        // scene.sea.recalcTransform();
+        mainShader.setMat4("model", scene.sea.getTransform());
+        mainShader.setMat4("view", cam->getInvTransform());
+        mainShader.setMat4("projection", cam->getProjectionMatrix());
+        mainShader.setVec3("ambientLightColor", scene.ambientLight.color);
+        mainShader.setVec3("sunLightColor", scene.sunLight.color * scene.sunLight.intensity);
+        mainShader.setVec3("sunLightDir", scene.sunLight.direction);
+
+        bool seaHasTexture = scene.sea.diffuseTextureID != 0;
+        mainShader.setBool("hasTexture", seaHasTexture);
+        if (seaHasTexture) {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, scene.sea.diffuseTextureID);
+            mainShader.setInt("diffuseTexture", 0);
+        }
+
+        glBindVertexArray(scene.sea.bufferInfo.VAO);
+        glDrawElements(GL_TRIANGLES, scene.sea.getIndices().size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+        //------------------------------------------------------------------------------------------
+        
+        glfwSwapBuffers(window);
+        glfwPollEvents();    
     }
+
+    glfwTerminate();
+    return 0;
+}
 
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
