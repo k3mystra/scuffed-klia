@@ -1,14 +1,40 @@
-#include "Renderer.h"
+#include "RenderSystem.h"
 
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <variant>
 
 using namespace std;
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
+
+GLFWwindow* RenderSystemInit(unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
+     // By default already set to screen size, but useful if we resize the windows later
+    glViewport(0, 0, initialWindowWidth, initialWindowHeight);
+    // Pass WindowCallbackData for use by any callbacks
+    WindowCallbackData data {
+        .targetAspectRatio = 16.0 / 9.0,
+        .viewportX = 0,
+        .viewportY = 0,
+        .viewportWidth = initialWindowWidth,
+        .viewportHeight = initialWindowHeight,
+        .deltaTime = 0
+    };
+
+    GLFWwindow* window = setupGlfwWindow(&data);
+
+    // Init. GLEW to query the driver and actually load OpenGL library
+    if (glewInit() != GLEW_OK)
+        return nullptr;
+
+    // OpenGL Functions to enable
+    glEnable(GL_DEPTH_TEST);
+
+    return window;
+}
 
 GLFWwindow* setupGlfwWindow(WindowCallbackData* data, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
     // Initialize GLFW

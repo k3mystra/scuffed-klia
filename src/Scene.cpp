@@ -6,7 +6,6 @@
 #include "Camera.h"
 #include "MeshObject.h"
 #include "SunLight.h"
-#include "WindowCallbackData.h"
 #include "Model.h"
 
 #include <GLFW/glfw3.h>
@@ -65,7 +64,6 @@ bool isPressOrRelease(int act) {
 // Reminder that this will be called PER KEYPRESS
 // Only 1 keypress will be detected at a time
 void Scene::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    WindowCallbackData *data = (WindowCallbackData*)glfwGetWindowUserPointer(window);
     // Ctrl + Q
     if (key == GLFW_KEY_Q && check_bit(mods, GLFW_MOD_CONTROL) && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -102,8 +100,6 @@ void Scene::mouseButtonCallback(GLFWwindow* window, int button, int action, int 
 }
 
 void Scene::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
-    WindowCallbackData *data = (WindowCallbackData*)glfwGetWindowUserPointer(window);
-
     glm::vec3 camPos = camera.getPosition();
 
     // We want to zoom in/out of our current local Z-axis

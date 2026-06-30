@@ -1,3 +1,4 @@
+#include <cstddef>
 #define GLM_ENABLE_EXPERIMENTAL
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -7,14 +8,20 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <cstdlib>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/string_cast.hpp>
+
 #include <iostream>
 #include <vector>
 #include <string>
-#include <glm/gtx/string_cast.hpp>
+#include <cstdint>
+#include <unordered_map>
+
+#include "Components.h"
+
+#include "RenderSystem.h"
 
 #include "SeaPlane.h"
 #include "TextureLoader.h"
@@ -22,16 +29,40 @@
 #include "Camera.h"
 #include "Scene.h"
 #include "Shader.h"
-#include "Input.h"
+#include "InputSystem.h"
 #include "Physics.h"
 #include "SkyCube.h"
-#include "Renderer.h"
 
 using namespace std;
+
+
+typedef uint16_t EntityID;
+typedef int Key;
+
+struct WorldState {
+    vector<Transform> transformList = {};
+    vector<Light> lightList = {};
+    vector<Model> modelList = {};
+
+    unordered_map<EntityID, size_t> transformIndex = {};
+    unordered_map<EntityID, size_t> lightIndex = {};
+    unordered_map<EntityID, size_t> modelIndex = {};
+
+    vector<bool> keyState = vector(GLFW_KEY_LAST + 1, false);
+
+    Skybox skybox;
+
+    vector<InputEvent> caughtInputEventList = {};
+};
+
+int newEntityID();
+
 
 const unsigned int INITIAL_WINDOW_WIDTH = 640;
 const unsigned int INITIAL_WINDOW_HEIGHT = 480;
 
+
+int latestEntityID = 0;
 
 // New plan
 // ECS system cuz why not
@@ -46,26 +77,15 @@ const unsigned int INITIAL_WINDOW_HEIGHT = 480;
 Scene scene = Scene();
 
 int main (int argc, char *argv[]) {
-     // By default already set to screen size, but useful if we resize the windows later
-    glViewport(0, 0, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
-    // Pass WindowCallbackData for use by any callbacks
-    WindowCallbackData data {
-        .targetAspectRatio = 16.0 / 9.0,
-        .viewportX = 0,
-        .viewportY = 0,
-        .viewportWidth = INITIAL_WINDOW_WIDTH,
-        .viewportHeight = INITIAL_WINDOW_HEIGHT,
-        .deltaTime = 0
-    };
+    // ==== ECS Migration ====
+    // Data init
+    WorldState worldState = WorldState();
 
-    GLFWwindow* window = setupGlfwWindow(&data);
+    // System inits
+    GLFWwindow* window = RenderSystemInit(INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
 
-    // Init. GLEW to query the driver and actually load OpenGL library
-    if (glewInit() != GLEW_OK)
-        return -1;
-
-    // OpenGL Functions to enable
-    glEnable(GL_DEPTH_TEST);   
+    // Actual game loop
+    // ==== ECS Migration ====
 
     Shader mainShader = Shader("vertex_shader.glsl", "geometry_shader.glsl", "fragment_shader.glsl");
 
@@ -174,8 +194,6 @@ int main (int argc, char *argv[]) {
         //     frameCount = 0;
         //     aggregateDeltaTime = 0.0;
         // }
-
-        data.deltaTime = deltaTime;
 
         phyTimeAccumulator += deltaTime;
 
@@ -299,7 +317,7 @@ int main (int argc, char *argv[]) {
     return 0;
 }
 
-
-
-
-
+int newEntityID() {
+    latestEntityID++;
+    return latestEntityID;
+}
