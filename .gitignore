@@ -1,2 +1,5 @@
 main.exe
 build/
+
+# JetBrains IDE
+.idea/
