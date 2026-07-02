@@ -7,13 +7,11 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/string_cast.hpp>
 
 #include <iostream>
 #include <vector>
 #include <string>
+#include <fstream>
 
 #include "Components.h"
 
@@ -29,8 +27,6 @@
 #include "SkyCube.h"
 
 #include "World.h"
-
-using namespace std;
 
 
 int newEntityID();
@@ -57,10 +53,19 @@ Scene scene = Scene();
 int main (int argc, char *argv[]) {
     // ==== ECS Migration ====
     // Data init
+    // Load all the data needed
+    // The systems further processes them
     WorldState worldState = WorldState();
+    worldState.sceneConfig.open("scene.txt");
+
+    // New scene file format:
+    // # Entity Name
+    // The rest of the info
+    // <space>
+    // ...repeat
 
     // System inits
-    GLFWwindow* window = RenderSystemInit(worldState, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
+    RenderSystemInit(worldState, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
 
     // Actual game loop
     // ==== ECS Migration ====
@@ -69,7 +74,7 @@ int main (int argc, char *argv[]) {
 
     // ---- Subject to Change ----
     scene.objectSetup();
-    vector<Model> allModels = scene.allModels;
+    std::vector<Model> allModels = scene.allModels;
 
     // Put all objects into GPU vertex buffer
     for (Model &model : allModels){
@@ -81,14 +86,14 @@ int main (int argc, char *argv[]) {
 
             glGenBuffers(1, &obj.bufferInfo.VBO);
             glBindBuffer(GL_ARRAY_BUFFER, obj.bufferInfo.VBO);
-            vector vertices = obj.getVertices();
+            std::vector vertices = obj.getVertices();
             // Dynamic draw so that we can change em fast later
             glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
 
             // Indices shit
             glGenBuffers(1, &obj.bufferInfo.EBO);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.bufferInfo.EBO);
-            vector indices = obj.getIndices();
+            std::vector indices = obj.getIndices();
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_DRAW);
 
             // Setup vertex attributes
@@ -156,7 +161,7 @@ int main (int argc, char *argv[]) {
     float phyTimeAccumulator = 0.0;
     int frameCount = 0;
     // Main render loop
-    while(!glfwWindowShouldClose(window))
+    while(!glfwWindowShouldClose(worldState.window))
     {
         // Delta time calculations
         currentFrameTime = glfwGetTime();
@@ -292,6 +297,7 @@ int main (int argc, char *argv[]) {
     }
 
     glfwTerminate();
+    worldState.sceneConfig.close();
     return 0;
 }
 
