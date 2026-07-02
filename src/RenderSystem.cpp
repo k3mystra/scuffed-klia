@@ -13,7 +13,7 @@ static GLFWwindow* setupGlfwWindow(WindowCallbackData* data, unsigned int initia
 static void loadModels();
 
 
-void RenderSystemInit(WorldState& worldState, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
+void renderSystemInit(WorldState& worldState, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
      // By default already set to screen size, but useful if we resize the windows later
     glViewport(0, 0, initialWindowWidth, initialWindowHeight);
     // Pass WindowCallbackData for use by any callbacks

@@ -66,8 +66,8 @@ int main (int argc, char *argv[]) {
     // ...repeat
 
     // System inits
-    RenderSystemInit(worldState, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
     entityDataSytemInit(worldState);
+    renderSystemInit(worldState, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
 
     // Actual game loop
     // ==== ECS Migration ====

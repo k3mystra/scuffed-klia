@@ -11,4 +11,4 @@ struct WindowCallbackData {
     float deltaTime;
 };
 
-void RenderSystemInit(WorldState& worldState, unsigned int initialWindowWidth, unsigned int initialWindowHeight);
+void renderSystemInit(WorldState& worldState, unsigned int initialWindowWidth, unsigned int initialWindowHeight);

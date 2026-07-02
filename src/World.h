@@ -18,7 +18,7 @@ struct WorldState {
 
     std::ifstream sceneConfig;
 
-    std::vector<EntityData> EntityDataList = {};
+    std::vector<EntityData> entityDataList = {};
     std::vector<Transform> transformList = {};
     std::vector<Light> lightList = {};
     std::vector<Model> modelList = {};
