@@ -1,5 +1,3 @@
-#include <cstddef>
-#define GLM_ENABLE_EXPERIMENTAL
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4244)
@@ -16,8 +14,6 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include <cstdint>
-#include <unordered_map>
 
 #include "Components.h"
 
@@ -29,31 +25,13 @@
 #include "Camera.h"
 #include "Scene.h"
 #include "Shader.h"
-#include "InputSystem.h"
 #include "Physics.h"
 #include "SkyCube.h"
 
+#include "World.h"
+
 using namespace std;
 
-
-typedef uint16_t EntityID;
-typedef int Key;
-
-struct WorldState {
-    vector<Transform> transformList = {};
-    vector<Light> lightList = {};
-    vector<Model> modelList = {};
-
-    unordered_map<EntityID, size_t> transformIndex = {};
-    unordered_map<EntityID, size_t> lightIndex = {};
-    unordered_map<EntityID, size_t> modelIndex = {};
-
-    vector<bool> keyState = vector(GLFW_KEY_LAST + 1, false);
-
-    Skybox skybox;
-
-    vector<InputEvent> caughtInputEventList = {};
-};
 
 int newEntityID();
 
@@ -82,7 +60,7 @@ int main (int argc, char *argv[]) {
     WorldState worldState = WorldState();
 
     // System inits
-    GLFWwindow* window = RenderSystemInit(INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
+    GLFWwindow* window = RenderSystemInit(&worldState, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
 
     // Actual game loop
     // ==== ECS Migration ====

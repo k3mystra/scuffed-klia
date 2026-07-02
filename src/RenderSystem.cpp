@@ -1,17 +1,19 @@
-#include "RenderSystem.h"
-
 #include <iostream>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <variant>
+
+#include "RenderSystem.h"
+#include "World.h"
 
 using namespace std;
 
-void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+static GLFWwindow* setupGlfwWindow(WindowCallbackData* data, unsigned int initialWindowWidth, unsigned int initialWindowHeight);
 
 
-GLFWwindow* RenderSystemInit(unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
+GLFWwindow* RenderSystemInit(WorldState& worldState, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
      // By default already set to screen size, but useful if we resize the windows later
     glViewport(0, 0, initialWindowWidth, initialWindowHeight);
     // Pass WindowCallbackData for use by any callbacks
@@ -24,7 +26,7 @@ GLFWwindow* RenderSystemInit(unsigned int initialWindowWidth, unsigned int initi
         .deltaTime = 0
     };
 
-    GLFWwindow* window = setupGlfwWindow(&data);
+    GLFWwindow* window = setupGlfwWindow(&data, initialWindowWidth, initialWindowHeight);
 
     // Init. GLEW to query the driver and actually load OpenGL library
     if (glewInit() != GLEW_OK)
@@ -35,6 +37,7 @@ GLFWwindow* RenderSystemInit(unsigned int initialWindowWidth, unsigned int initi
 
     return window;
 }
+
 
 GLFWwindow* setupGlfwWindow(WindowCallbackData* data, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
     // Initialize GLFW
@@ -54,49 +57,15 @@ GLFWwindow* setupGlfwWindow(WindowCallbackData* data, unsigned int initialWindow
         exit(1);
     }
     glfwMakeContextCurrent(window);
-
     
     glfwSetWindowUserPointer(window, data);
     // Resize viewport on windows resize
     glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
-    // Bunch of input stuff
-    // Not gonna settle them yet
-    
-    // Fking terrible but it is what it is
-    // glfwSetKeyCallback(window, 
-    //     [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-    //         scene.keyCallback(window, key, scancode, action, mods);
-    //         Input::absorbKeys(window, key, scancode, action, mods);
-    //     }
-    // );
-    // // Use raw mouse motion if supported
-    // if (glfwRawMouseMotionSupported())
-    //     glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    // glfwSetCursorPosCallback(
-    //     window,
-    //     [](GLFWwindow* window, double xpos, double ypos) {
-    //        scene.cursorPosCallback(window, xpos, ypos);
-    //     }
-    // );
-    // glfwSetMouseButtonCallback(
-    //     window,
-    //     [](GLFWwindow* window, int button, int action, int mods) {
-    //          scene.mouseButtonCallback(window, button, action, mods);
-    //     }
-    // );
-    // glfwSetScrollCallback(
-    //     window,
-    //     [](GLFWwindow* window, double xoffset, double yoffset) {
-    //         scene.scrollCallback(window, xoffset, yoffset);
-    //     }
-    // );
-
     return window;
 }
 
-void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
+static void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     WindowCallbackData *data = (WindowCallbackData*)glfwGetWindowUserPointer(window);
     float targetAspectRatio = data->targetAspectRatio;
 
@@ -123,4 +92,8 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     data->viewportHeight = viewportHeight;
 
     glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
+}
+
+static void loadModels() {
+
 }

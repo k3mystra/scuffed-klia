@@ -1,9 +1,6 @@
-#ifndef RenderSystem
-#define RenderSystem
+#pragma once
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
+#include "World.h"
 
 struct WindowCallbackData {
     float targetAspectRatio;
@@ -14,7 +11,4 @@ struct WindowCallbackData {
     float deltaTime;
 };
 
-GLFWwindow* RenderSystemInit(unsigned int initialWindowWidth, unsigned int initialWindowHeight);
-GLFWwindow* setupGlfwWindow(WindowCallbackData* data);
-
-#endif  // Render
+GLFWwindow* RenderSystemInit(WorldState& worldState, unsigned int initialWindowWidth, unsigned int initialWindowHeight);
