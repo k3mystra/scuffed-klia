@@ -1,0 +1,242 @@
+[
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-c",
+   "AmbientLight.cpp",
+   "-o",
+   "build/AmbientLight.o"
+  ],
+  "file": "AmbientLight.cpp"
+ },
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-c",
+   "Camera.cpp",
+   "-o",
+   "build/Camera.o"
+  ],
+  "file": "Camera.cpp"
+ },
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-c",
+   "GameObject.cpp",
+   "-o",
+   "build/GameObject.o"
+  ],
+  "file": "GameObject.cpp"
+ },
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-c",
+   "InputSystem.cpp",
+   "-o",
+   "build/InputSystem.o"
+  ],
+  "file": "InputSystem.cpp"
+ },
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-c",
+   "Light.cpp",
+   "-o",
+   "build/Light.o"
+  ],
+  "file": "Light.cpp"
+ },
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-c",
+   "main.cpp",
+   "-o",
+   "build/main.o"
+  ],
+  "file": "main.cpp"
+ },
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-c",
+   "MeshObject.cpp",
+   "-o",
+   "build/MeshObject.o"
+  ],
+  "file": "MeshObject.cpp"
+ },
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-c",
+   "Model.cpp",
+   "-o",
+   "build/Model.o"
+  ],
+  "file": "Model.cpp"
+ },
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-c",
+   "Physics.cpp",
+   "-o",
+   "build/Physics.o"
+  ],
+  "file": "Physics.cpp"
+ },
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-c",
+   "RenderSystem.cpp",
+   "-o",
+   "build/RenderSystem.o"
+  ],
+  "file": "RenderSystem.cpp"
+ },
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-c",
+   "Scene.cpp",
+   "-o",
+   "build/Scene.o"
+  ],
+  "file": "Scene.cpp"
+ },
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-c",
+   "SeaPlane.cpp",
+   "-o",
+   "build/SeaPlane.o"
+  ],
+  "file": "SeaPlane.cpp"
+ },
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-c",
+   "Shader.cpp",
+   "-o",
+   "build/Shader.o"
+  ],
+  "file": "Shader.cpp"
+ },
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-c",
+   "SkyCube.cpp",
+   "-o",
+   "build/SkyCube.o"
+  ],
+  "file": "SkyCube.cpp"
+ },
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-c",
+   "SunLight.cpp",
+   "-o",
+   "build/SunLight.o"
+  ],
+  "file": "SunLight.cpp"
+ },
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-c",
+   "TextureLoader.cpp",
+   "-o",
+   "build/TextureLoader.o"
+  ],
+  "file": "TextureLoader.cpp"
+ }
+]
