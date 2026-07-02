@@ -7,7 +7,6 @@
 #include "RenderSystem.h"
 #include "World.h"
 
-using namespace std;
 
 static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 static GLFWwindow* setupGlfwWindow(WindowCallbackData* data, unsigned int initialWindowWidth, unsigned int initialWindowHeight);
@@ -29,8 +28,9 @@ GLFWwindow* RenderSystemInit(WorldState& worldState, unsigned int initialWindowW
     GLFWwindow* window = setupGlfwWindow(&data, initialWindowWidth, initialWindowHeight);
 
     // Init. GLEW to query the driver and actually load OpenGL library
-    if (glewInit() != GLEW_OK)
-        return nullptr;
+    if (glewInit() != GLEW_OK) {
+        std::cerr << "GLEW init failed\n";
+        exit(1);
 
     // OpenGL Functions to enable
     glEnable(GL_DEPTH_TEST);
@@ -42,7 +42,7 @@ GLFWwindow* RenderSystemInit(WorldState& worldState, unsigned int initialWindowW
 GLFWwindow* setupGlfwWindow(WindowCallbackData* data, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
     // Initialize GLFW
     if (!glfwInit()) {
-        cerr << "GLFW init failed" << endl;
+        std::cerr << "GLFW init failed\n";
         exit(1);
     }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -52,7 +52,7 @@ GLFWwindow* setupGlfwWindow(WindowCallbackData* data, unsigned int initialWindow
     GLFWwindow *window = glfwCreateWindow(
             initialWindowWidth, initialWindowHeight, "Larp Combat", NULL, NULL);
     if (!window) {
-        cerr << "Failed to create GLFW window" << endl;
+        std::cerr << "Failed to create GLFW window\n";
         glfwTerminate();
         exit(1);
     }

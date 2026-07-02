@@ -6,7 +6,10 @@
 
 #include <glm/glm.hpp>
 
-using namespace std;
+
+struct EntityData {
+    std::string name;
+};
 
 struct Transform {
     bool isDirty;
@@ -28,13 +31,13 @@ struct Mesh {
     Material material;
     unsigned int shaderProgramID = 0;
 
-    string vertexShaderSrcPath = "";
-    string geometryShaderSrcPath = "";
-    string fragmentShaderSrcPath = "";
+    std::string vertexShaderSrcPath = "";
+    std::string geometryShaderSrcPath = "";
+    std::string fragmentShaderSrcPath = "";
 };
 
 struct Model {
-    vector<Mesh> meshes;
+    std::vector<Mesh> meshes;
 };
 
 struct Light {
