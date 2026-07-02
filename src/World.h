@@ -13,7 +13,10 @@
 typedef uint16_t EntityID;
 
 struct WorldState {
+    int totalEntity = 0;
+
     GLFWwindow* window = nullptr;
+
     Skybox skybox;
 
     std::ifstream sceneConfig;

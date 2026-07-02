@@ -30,14 +30,8 @@
 #include "World.h"
 
 
-int newEntityID();
-
-
 const unsigned int INITIAL_WINDOW_WIDTH = 640;
 const unsigned int INITIAL_WINDOW_HEIGHT = 480;
-
-
-int latestEntityID = 0;
 
 // New plan
 // ECS system cuz why not
@@ -294,16 +288,11 @@ int main (int argc, char *argv[]) {
         glBindVertexArray(0);
         //------------------------------------------------------------------------------------------
         
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(worldState.window);
         glfwPollEvents();    
     }
 
     glfwTerminate();
     worldState.sceneConfig.close();
     return 0;
-}
-
-int newEntityID() {
-    latestEntityID++;
-    return latestEntityID;
 }

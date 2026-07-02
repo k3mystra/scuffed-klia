@@ -18,5 +18,7 @@ void entityDataSytemInit(WorldState& worldState) {
         data.name = line.substr(2, std::string::npos);
 
         worldState.entityDataList.push_back(data);
+
+        worldState.totalEntity++;
     }
 }
