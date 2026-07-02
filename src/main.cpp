@@ -16,6 +16,7 @@
 #include "Components.h"
 
 #include "RenderSystem.h"
+#include "EntityDataSystem.h"
 
 #include "SeaPlane.h"
 #include "TextureLoader.h"
@@ -66,6 +67,7 @@ int main (int argc, char *argv[]) {
 
     // System inits
     RenderSystemInit(worldState, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
+    entityDataSytemInit(worldState);
 
     // Actual game loop
     // ==== ECS Migration ====
