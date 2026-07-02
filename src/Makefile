@@ -1,8 +1,7 @@
 CC = g++
 CFLAGS = -g -Wall -D GLM_ENABLE_EXPERIMENTAL
 BUILD_FOLDER := build
-.DEFAULT_GOAL := main.exe
-.PHONY: main.exe debug clean
+DEFAULT_GOAL := all
 
 # 1. DETECT OPERATING SYSTEM
 ifeq ($(OS),Windows_NT)
@@ -11,13 +10,17 @@ ifeq ($(OS),Windows_NT)
     MKDIR = if not exist $(BUILD_FOLDER) mkdir $(BUILD_FOLDER)
     RM_DIR = rmdir /s /q
     RM_FILE = del /q /f
+    TARGET = main.exe
 else
     # Linux / macOS configuration
     LDFLAGS = -lGL -lGLEW -lglfw
     MKDIR = mkdir -p $(BUILD_FOLDER)
     RM_DIR = rm -rf
     RM_FILE = rm -f
+    TARGET = main
 endif
+
+.PHONY: all debug clean
 
 # 2. AUTOMATIC FILE DETECTION
 SOURCES := $(wildcard *.cpp)
@@ -30,8 +33,8 @@ $(BUILD_FOLDER)/%.o: %.cpp | $(BUILD_FOLDER)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Safe linker order: $(OBJECTS) comes BEFORE $(LDFLAGS)
-main.exe: $(OBJECTS)
-	$(CC) $(foreach x, $(LIBS), -I $x) $(OBJECTS) -o main.exe $(LDFLAGS)
+all: $(OBJECTS)
+	$(CC) $(foreach x, $(LIBS), -I $x) $(OBJECTS) -o $(TARGET) $(LDFLAGS)
 
 $(BUILD_FOLDER):
 	$(MKDIR)
