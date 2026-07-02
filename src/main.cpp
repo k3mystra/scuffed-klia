@@ -60,7 +60,7 @@ int main (int argc, char *argv[]) {
     WorldState worldState = WorldState();
 
     // System inits
-    GLFWwindow* window = RenderSystemInit(&worldState, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
+    GLFWwindow* window = RenderSystemInit(worldState, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
 
     // Actual game loop
     // ==== ECS Migration ====
