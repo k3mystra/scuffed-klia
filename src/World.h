@@ -12,6 +12,7 @@
 typedef uint16_t EntityID;
 
 struct WorldState {
+    GLFWwindow* window = nullptr;
     std::vector<Transform> transformList = {};
     std::vector<Light> lightList = {};
     std::vector<Model> modelList = {};

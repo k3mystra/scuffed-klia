@@ -11,4 +11,4 @@ struct WindowCallbackData {
     float deltaTime;
 };
 
-GLFWwindow* RenderSystemInit(WorldState& worldState, unsigned int initialWindowWidth, unsigned int initialWindowHeight);
+void RenderSystemInit(WorldState& worldState, unsigned int initialWindowWidth, unsigned int initialWindowHeight);

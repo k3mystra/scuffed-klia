@@ -10,9 +10,10 @@
 
 static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 static GLFWwindow* setupGlfwWindow(WindowCallbackData* data, unsigned int initialWindowWidth, unsigned int initialWindowHeight);
+static void loadModels();
 
 
-GLFWwindow* RenderSystemInit(WorldState& worldState, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
+void RenderSystemInit(WorldState& worldState, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
      // By default already set to screen size, but useful if we resize the windows later
     glViewport(0, 0, initialWindowWidth, initialWindowHeight);
     // Pass WindowCallbackData for use by any callbacks
@@ -25,17 +26,16 @@ GLFWwindow* RenderSystemInit(WorldState& worldState, unsigned int initialWindowW
         .deltaTime = 0
     };
 
-    GLFWwindow* window = setupGlfwWindow(&data, initialWindowWidth, initialWindowHeight);
+    worldState.window = setupGlfwWindow(&data, initialWindowWidth, initialWindowHeight);
 
     // Init. GLEW to query the driver and actually load OpenGL library
     if (glewInit() != GLEW_OK) {
         std::cerr << "GLEW init failed\n";
         exit(1);
+    }
 
     // OpenGL Functions to enable
     glEnable(GL_DEPTH_TEST);
-
-    return window;
 }
 
 
