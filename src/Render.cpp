@@ -1,16 +1,17 @@
+#include <fstream>
 #include <iostream>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include "RenderSystem.h"
+#include "Render.h"
 #include "World.h"
 
 
 static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 static GLFWwindow* setupGlfwWindow(WindowCallbackData* data, unsigned int initialWindowWidth, unsigned int initialWindowHeight);
-static void loadModels();
+static void parseSceneFile(WorldState& worldState);
 
 
 void renderSystemInit(WorldState& worldState, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
@@ -36,6 +37,8 @@ void renderSystemInit(WorldState& worldState, unsigned int initialWindowWidth, u
 
     // OpenGL Functions to enable
     glEnable(GL_DEPTH_TEST);
+
+    parseSceneFile(worldState);
 }
 
 
@@ -94,6 +97,19 @@ static void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
 }
 
-static void loadModels() {
+static void parseSceneFile(WorldState& worldState) {
+    std::ifstream& sceneFile = worldState.sceneConfig;
+    sceneFile.seekg(0);
 
+    std::string line;
+    while (std::getline(sceneFile, line)) {
+        if (line[0] != '#')
+            continue;
+
+        // TODO: get the offset
+
+        // Get model
+        // Line format: path to OBJ file (enclosed in quotes)
+        Model model = Model();
+    }
 }
