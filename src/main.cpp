@@ -15,7 +15,8 @@
 
 #include "Components.h"
 
-#include "RenderSystem.h"
+#include "Render.h"
+#include "Transform.h"
 #include "EntityDataSystem.h"
 
 #include "SeaPlane.h"
@@ -61,6 +62,7 @@ int main (int argc, char *argv[]) {
 
     // System inits
     entityDataSytemInit(worldState);
+    transformSystemInit(worldState);
     renderSystemInit(worldState, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
 
     // Actual game loop

@@ -5,6 +5,8 @@
 #include <string>
 
 #include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 
 struct EntityData {
@@ -12,12 +14,12 @@ struct EntityData {
 };
 
 struct Transform {
-    bool isDirty;
+    bool isDirty = false;
 
-    glm::mat4 transform;
-    glm::mat4 invTransform;
+    glm::mat4 matrix;
+    glm::mat4 invMatrix;
     glm::vec3 position;
-    glm::vec3 rotation;
+    glm::quat rotation;
     glm::vec3 scale;
 };
 
@@ -38,6 +40,7 @@ struct Mesh {
 
 struct Model {
     std::vector<Mesh> meshes;
+    std::string srcPath = "";
 };
 
 struct Light {
