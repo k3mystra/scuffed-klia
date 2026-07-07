@@ -2,6 +2,9 @@
 
 #include <string>
 
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
+
 static void recalcTransform(Transform& transform);
 
 
@@ -43,13 +46,10 @@ void transformSystemInit(WorldState& worldState) {
 }
 
 static void recalcTransform(Transform& transform) {
-    transform.matrix = glm::mat4 (
-    );
+    transform.matrix = glm::mat4(1);
 
     transform.matrix = glm::translate(transform.matrix, transform.position);
-    transform.matrix = glm::rotate(transform.matrix, glm::radians(transform.rotation.z), glm::vec3(0, 0, 1));
-    transform.matrix = glm::rotate(transform.matrix, glm::radians(transform.rotation.y), glm::vec3(0, 1, 0));
-    transform.matrix = glm::rotate(transform.matrix, glm::radians(transform.rotation.x), glm::vec3(1, 0, 0));
+    transform.matrix = transform.matrix * glm::toMat4(transform.rotation);
     transform.matrix = glm::scale(transform.matrix, transform.scale);
 
     transform.invMatrix = glm::inverse(transform.matrix);
