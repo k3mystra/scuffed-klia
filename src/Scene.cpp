@@ -1,7 +1,6 @@
 #include "Input.h"
 #include <glm/ext/vector_float2.hpp>
 #include <glm/ext/vector_float3.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
 #include "Scene.h"
 #include "Camera.h"
 #include "MeshObject.h"

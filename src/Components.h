@@ -30,12 +30,15 @@ struct Material {
 };
 
 struct Mesh {
-    Material material;
     unsigned int shaderProgramID = 0;
+    Material material;
 
     std::string vertexShaderSrcPath = "";
     std::string geometryShaderSrcPath = "";
     std::string fragmentShaderSrcPath = "";
+
+    std::vector<float> vertices = std::vector<float>();
+    std::vector<float> faceIndices = std::vector<float>();
 };
 
 struct Model {
