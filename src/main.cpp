@@ -16,8 +16,6 @@
 #include "Components.h"
 
 #include "Render.h"
-#include "Transform.h"
-#include "EntityDataSystem.h"
 
 #include "SeaPlane.h"
 #include "TextureLoader.h"
@@ -51,8 +49,7 @@ int main (int argc, char *argv[]) {
     // Data init
     // Load all the data needed
     // The systems further processes them
-    WorldState worldState = WorldState();
-    worldState.sceneConfig.open("scene.txt");
+    World world = loadFromFile("world.txt");
 
     // New scene file format:
     // # Entity Name
@@ -60,11 +57,7 @@ int main (int argc, char *argv[]) {
     // <space>
     // ...repeat
 
-    // System inits
-    entityDataSytemInit(worldState);
-    transformSystemInit(worldState);
-    renderSystemInit(worldState, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
-
+    renderSystemInit(world, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
     // Actual game loop
     // ==== ECS Migration ====
 
@@ -159,7 +152,7 @@ int main (int argc, char *argv[]) {
     float phyTimeAccumulator = 0.0;
     int frameCount = 0;
     // Main render loop
-    while(!glfwWindowShouldClose(worldState.window))
+    while(!glfwWindowShouldClose(world.window))
     {
         // Delta time calculations
         currentFrameTime = glfwGetTime();
@@ -290,11 +283,11 @@ int main (int argc, char *argv[]) {
         glBindVertexArray(0);
         //------------------------------------------------------------------------------------------
         
-        glfwSwapBuffers(worldState.window);
+        glfwSwapBuffers(world.window);
         glfwPollEvents();    
     }
 
     glfwTerminate();
-    worldState.sceneConfig.close();
+    world.sceneConfig.close();
     return 0;
 }

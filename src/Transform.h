@@ -1,8 +1,8 @@
 #pragma once
 
-#include "World.h"
 
-#include <glm/glm.hpp>
+#include "Components.h"
 
-
-void transformSystemInit(WorldState& worldState);
+namespace transform_utils {
+    void recalcTransform(Transform& transform);
+};

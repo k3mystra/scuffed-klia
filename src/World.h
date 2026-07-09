@@ -12,7 +12,7 @@
 
 typedef uint16_t EntityID;
 
-struct WorldState {
+struct World {
     int totalEntity = 0;
 
     GLFWwindow* window = nullptr;
@@ -26,9 +26,12 @@ struct WorldState {
     std::vector<Light> lightList = {};
     std::vector<Model> modelList = {};
 
+    std::unordered_map<EntityID, size_t> transformIndex = {};
     std::unordered_map<EntityID, size_t> lightIndex = {};
     std::unordered_map<EntityID, size_t> modelIndex = {};
 
     std::vector<bool> keyState = std::vector(GLFW_KEY_LAST + 1, false);
     std::vector<InputEvent> caughtInputEventList = {};
 };
+
+World loadFromFile(std::string filename);
