@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-#include <glm/glm.hpp>
+#include <glm/fwd.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/quaternion.hpp>
 
@@ -23,19 +23,25 @@ struct Transform {
     glm::vec3 scale;
 };
 
+const glm::vec3 BLACK_COLOR = glm::vec3(0);
+
 struct Material {
-    glm::vec3 color;
-    std::string diffuseTexturePath = "";
     unsigned int textureID = 0;
+    glm::vec3 color = BLACK_COLOR;
+    std::string diffuseTexturePath = "";
 };
 
-struct Mesh {
+struct Shader {
     unsigned int shaderProgramID = 0;
-    Material material;
 
     std::string vertexShaderSrcPath = "";
     std::string geometryShaderSrcPath = "";
     std::string fragmentShaderSrcPath = "";
+};
+
+struct Mesh {
+    Material material = Material();
+    Shader shader = Shader();
 
     std::vector<float> vertices = std::vector<float>();
     std::vector<float> faceIndices = std::vector<float>();
