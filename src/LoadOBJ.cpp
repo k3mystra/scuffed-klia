@@ -101,44 +101,21 @@ Model loadObjFile(const std::string& path) {
         Mesh mesh = parseMesh(shape.mesh, attrib);
 
         // Get material for this shape (use first face's material ID)
-        if (!shape.mesh.material_ids.empty()) {
-            int matID = shape.mesh.material_ids[0];
-            if (matID >= 0 && matID < (int)materials.size()) {
-                auto& mat = materials[matID];
+        // IF they are available
+        if (shape.mesh.material_ids.empty())
+            continue;
 
-                mesh.material.color = glm::vec3(
-                    mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]
-                );
+        int matID = shape.mesh.material_ids[0];
+        if (matID >= 0 && matID < (int)materials.size()) {
+            auto& mat = materials[matID];
 
-                if (!mat.diffuse_texname.empty()) {
-                    mesh.material.diffuseTexturePath = parentFolder + "/" + mat.diffuse_texname;
-                    std::cout << "  Shape '" << shape.name << "' texture: " 
-                              << mesh.material.diffuseTexturePath << "\n";
-                }
-            }
+            mesh.material.color = glm::vec3(
+                mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]
+            );
+
+            if (!mat.diffuse_texname.empty())
+                mesh.material.diffuseTexturePath = parentFolder + "/" + mat.diffuse_texname;
         }
-
-        //DEBUG
-        // std::cout << "Shape '" << shape.name << "' material_ids: ";
-        // for (int id : shape.mesh.material_ids)
-        //     std::cout << id << " ";
-        // std::cout << "\n";
-
-        // for (int i = 0; i < materials.size(); i++) {
-        //     std::cout << "Material " << i << ": " << materials[i].name 
-        //               << " diffuse(" << materials[i].diffuse[0] << "," 
-        //               << materials[i].diffuse[1] << "," 
-        //               << materials[i].diffuse[2] << ")"
-        //               << " texture: " << materials[i].diffuse_texname << "\n";
-        // }
-
-        // std::cout << "  Shape '" << shape.name << "': "
-        //           << rawVertices.size() / 3 << " vertices, "
-        //           << faceIndices.size() / 3 << " triangles\n";
-
-        std::cout << "Shape '" << shape.name << "': "
-          << "has UVs: " << !attrib.texcoords.empty()
-          << " has normals: " << !attrib.normals.empty() << "\n";
 
         model.meshes.push_back(mesh);
     }
