@@ -46,6 +46,7 @@ static void loadTransformComponent(const std::string& line, World& world) {
 static void loadRenderComponent(const std::string& line, World& world) {
     std::string filename = line.substr(2, std::string::npos);
     Model model = loadObjFile(filename);
+    model.srcPath = filename;
 
     world.modelList.push_back(model);
 }

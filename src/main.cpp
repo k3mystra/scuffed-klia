@@ -47,8 +47,6 @@ Scene scene = Scene();
 int main (int argc, char *argv[]) {
     // ==== ECS Migration ====
     // Data init
-    // Load all the data needed
-    // The systems further processes them
     World world = loadFromFile("world.txt");
 
     // New scene file format:
