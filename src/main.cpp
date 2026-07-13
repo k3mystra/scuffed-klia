@@ -55,95 +55,66 @@ int main (int argc, char *argv[]) {
     // <space>
     // ...repeat
 
-    renderSystemInit(world, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
+    RenderSystem renderer = RenderSystem();
+    renderer.renderSystemInit(world, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
+
     // Actual game loop
     // ==== ECS Migration ====
 
-    Shader mainShader = Shader("vertex_shader.glsl", "geometry_shader.glsl", "fragment_shader.glsl");
-
     // ---- Subject to Change ----
-    scene.objectSetup();
-    std::vector<Model> allModels = scene.allModels;
-
-    // Put all objects into GPU vertex buffer
-    for (Model &model : allModels){
-        for (MeshObject &obj : model.meshes) {
-            // Vertex Array Object (VAO) to store vertex attributes layout
-            // for all VBO
-            glGenVertexArrays(1, &obj.bufferInfo.VAO);
-            glBindVertexArray(obj.bufferInfo.VAO);
-
-            glGenBuffers(1, &obj.bufferInfo.VBO);
-            glBindBuffer(GL_ARRAY_BUFFER, obj.bufferInfo.VBO);
-            std::vector vertices = obj.getVertices();
-            // Dynamic draw so that we can change em fast later
-            glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
-
-            // Indices shit
-            glGenBuffers(1, &obj.bufferInfo.EBO);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj.bufferInfo.EBO);
-            std::vector indices = obj.getIndices();
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_DYNAMIC_DRAW);
-
-            // Setup vertex attributes
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-            glEnableVertexAttribArray(0);
-            
-            // TexCoord: location 1, 2 floats
-            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-            glEnableVertexAttribArray(1);
-        }
-    }
-
-        // Sea plane setup
-    glGenVertexArrays(1, &scene.sea.bufferInfo.VAO);
-    glBindVertexArray(scene.sea.bufferInfo.VAO);
-
-    glGenBuffers(1, &scene.sea.bufferInfo.VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, scene.sea.bufferInfo.VBO);
-    auto seaVerts = scene.sea.getVertices();
-    glBufferData(GL_ARRAY_BUFFER, seaVerts.size() * sizeof(float), seaVerts.data(), GL_STATIC_DRAW);
-
-    glGenBuffers(1, &scene.sea.bufferInfo.EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, scene.sea.bufferInfo.EBO);
-    auto seaIdx = scene.sea.getIndices();
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, seaIdx.size() * sizeof(unsigned int), seaIdx.data(), GL_STATIC_DRAW);
-
-    // Same layout as models: pos(3) + uv(2) + normal(3)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
-    // Load textures
-    scene.sea.diffuseTextureID = loadTexture("3DScene/LarpCombat/water.jpg");
-    scene.sea.normalTextureID  = loadTexture("3DScene/LarpCombat/water_normal.jpg");
-
-    for (Model& model : allModels) {
-        for (MeshObject& obj : model.meshes) {
-            if (!obj.material.diffuseTexturePath.empty()) {
-                std::cout << "Loading texture: " << obj.material.diffuseTexturePath << "\n";
-                obj.material.textureID = loadTexture(obj.material.diffuseTexturePath);
-                std::cout << "  textureID: " << obj.material.textureID << "\n";
-            } else {
-                std::cout << "No texture for this mesh, using flat color\n";
-            }
-        }
-    }
-
-    SkyCube skybox;
-    std::vector<std::string> skyboxFaces = {
-        "3DScene/LarpCombat/skybox_right.png",
-        "3DScene/LarpCombat/skybox_left.png",
-        "3DScene/LarpCombat/skybox_top.png",
-        "3DScene/LarpCombat/skybox_bottom.png",
-        "3DScene/LarpCombat/skybox_front.png",
-        "3DScene/LarpCombat/skybox_back.png"
-    };
-    skybox.init(skyboxFaces);
-
+    // scene.objectSetup();
+    //
+    // // Put all objects into GPU vertex buffer
+    //
+    //     // Sea plane setup
+    // glGenVertexArrays(1, &scene.sea.bufferInfo.VAO);
+    // glBindVertexArray(scene.sea.bufferInfo.VAO);
+    //
+    // glGenBuffers(1, &scene.sea.bufferInfo.VBO);
+    // glBindBuffer(GL_ARRAY_BUFFER, scene.sea.bufferInfo.VBO);
+    // auto seaVerts = scene.sea.getVertices();
+    // glBufferData(GL_ARRAY_BUFFER, seaVerts.size() * sizeof(float), seaVerts.data(), GL_STATIC_DRAW);
+    //
+    // glGenBuffers(1, &scene.sea.bufferInfo.EBO);
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, scene.sea.bufferInfo.EBO);
+    // auto seaIdx = scene.sea.getIndices();
+    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, seaIdx.size() * sizeof(unsigned int), seaIdx.data(), GL_STATIC_DRAW);
+    //
+    // // Same layout as models: pos(3) + uv(2) + normal(3)
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    // glEnableVertexAttribArray(0);
+    // glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    // glEnableVertexAttribArray(1);
+    // glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    // glEnableVertexAttribArray(2);
+    //
+    // // Load textures
+    // scene.sea.diffuseTextureID = loadTexture("3DScene/LarpCombat/water.jpg");
+    // scene.sea.normalTextureID  = loadTexture("3DScene/LarpCombat/water_normal.jpg");
+    //
+    // for (Model& model : allModels) {
+    //     for (MeshObject& obj : model.meshes) {
+    //         if (!obj.material.diffuseTexturePath.empty()) {
+    //             std::cout << "Loading texture: " << obj.material.diffuseTexturePath << "\n";
+    //             obj.material.textureID = loadTexture(obj.material.diffuseTexturePath);
+    //             std::cout << "  textureID: " << obj.material.textureID << "\n";
+    //         } else {
+    //             std::cout << "No texture for this mesh, using flat color\n";
+    //         }
+    //     }
+    // }
+    //
+    // SkyCube skybox;
+    // std::vector<std::string> skyboxFaces = {
+    //     "3DScene/LarpCombat/skybox_right.png",
+    //     "3DScene/LarpCombat/skybox_left.png",
+    //     "3DScene/LarpCombat/skybox_top.png",
+    //     "3DScene/LarpCombat/skybox_bottom.png",
+    //     "3DScene/LarpCombat/skybox_front.png",
+    //     "3DScene/LarpCombat/skybox_back.png"
+    // };
+    // skybox.init(skyboxFaces);
+    //
 
     float deltaTime, aggregateDeltaTime = 0;
     float lastFrameTime = 0, currentFrameTime = 0;
@@ -169,21 +140,7 @@ int main (int argc, char *argv[]) {
 
         phyTimeAccumulator += deltaTime;
 
-        // Clear the buffer before next render
-        glClearColor(0, 0, 0, 1.0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // Clear viewport with different color
-        glEnable(GL_SCISSOR_TEST);
-        glScissor(data.viewportX, data.viewportY, data.viewportWidth, data.viewportHeight);
-        glClearColor(
-            scene.backgroundColor.r,
-            scene.backgroundColor.g,
-            scene.backgroundColor.b,
-            1.0f
-        );
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDisable(GL_SCISSOR_TEST);
+        
 
         Camera* cam = &scene.camera;
         cam->recalcTransform();
