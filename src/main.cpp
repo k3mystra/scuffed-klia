@@ -1,3 +1,4 @@
+#include "Transform.h"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4244)
@@ -132,21 +133,11 @@ int main (int argc, char *argv[]) {
 
         phyTimeAccumulator += deltaTime;
 
-        Camera* cam = &scene.camera;
-        cam->recalcTransform();
+        updateTransform(world);
         // skybox.render(cam->getProjectionMatrix(), cam->getInvTransform());
 
         scene.process(deltaTime);
 
-
-        for (Model &model : allModels){
-            for (MeshObject &obj : model.meshes) {
-                Camera* cam = &scene.camera;
-                // Recalc transform first
-                cam->recalcTransform();
-                model.recalcTransform();
-            }
-        }
         // Physics shit
         // while (phyTimeAccumulator >= PHYSICS_TIMESTEP) {
         //     for (Model &model : allModels) {
@@ -159,12 +150,6 @@ int main (int argc, char *argv[]) {
         // }
 
         for (Model &model : allModels){
-
-            Camera* cam = &scene.camera;
-            // Recalc transform first
-            cam->recalcTransform();
-            model.recalcTransform();
-
             for (MeshObject &obj : model.meshes) {
                 // Pass vertex shader transformations
                 mainShader.setMat4("model", model.getTransform());
@@ -206,31 +191,30 @@ int main (int argc, char *argv[]) {
         // glm::vec3 camPos = scene.camera.getPosition();
         // scene.sea.setPosition(glm::vec3(camPos.x, 0.0f, camPos.z));
         // scene.sea.recalcTransform();
-        mainShader.setMat4("model", scene.sea.getTransform());
-        mainShader.setMat4("view", cam->getInvTransform());
-        mainShader.setMat4("projection", cam->getProjectionMatrix());
-        mainShader.setVec3("ambientLightColor", scene.ambientLight.color);
-        mainShader.setVec3("sunLightColor", scene.sunLight.color * scene.sunLight.intensity);
-        mainShader.setVec3("sunLightDir", scene.sunLight.direction);
-
-        bool seaHasTexture = scene.sea.diffuseTextureID != 0;
-        mainShader.setBool("hasTexture", seaHasTexture);
-        if (seaHasTexture) {
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, scene.sea.diffuseTextureID);
-            mainShader.setInt("diffuseTexture", 0);
-        }
-
-        glBindVertexArray(scene.sea.bufferInfo.VAO);
-        glDrawElements(GL_TRIANGLES, scene.sea.getIndices().size(), GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        // mainShader.setMat4("model", scene.sea.getTransform());
+        // mainShader.setMat4("view", cam->getInvTransform());
+        // mainShader.setMat4("projection", cam->getProjectionMatrix());
+        // mainShader.setVec3("ambientLightColor", scene.ambientLight.color);
+        // mainShader.setVec3("sunLightColor", scene.sunLight.color * scene.sunLight.intensity);
+        // mainShader.setVec3("sunLightDir", scene.sunLight.direction);
+        //
+        // bool seaHasTexture = scene.sea.diffuseTextureID != 0;
+        // mainShader.setBool("hasTexture", seaHasTexture);
+        // if (seaHasTexture) {
+        //     glActiveTexture(GL_TEXTURE0);
+        //     glBindTexture(GL_TEXTURE_2D, scene.sea.diffuseTextureID);
+        //     mainShader.setInt("diffuseTexture", 0);
+        // }
+        //
+        // glBindVertexArray(scene.sea.bufferInfo.VAO);
+        // glDrawElements(GL_TRIANGLES, scene.sea.getIndices().size(), GL_UNSIGNED_INT, 0);
+        // glBindVertexArray(0);
         //------------------------------------------------------------------------------------------
         
-        glfwSwapBuffers(world.window);
+        glfwSwapBuffers(renderer.getWindowPointer());
         glfwPollEvents();    
     }
 
     glfwTerminate();
-    world.sceneConfig.close();
     return 0;
 }

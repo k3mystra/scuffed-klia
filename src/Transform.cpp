@@ -17,3 +17,9 @@ void recalcTransform(Transform& transform) {
 
     transform.isDirty = false;
 }
+
+void updateTransform(World& world) {
+    for (Transform& transform : world.transformList) {
+        recalcTransform(transform);
+    }
+}
