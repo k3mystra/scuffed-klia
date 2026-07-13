@@ -122,6 +122,10 @@ void RenderSystem::initializeComponents(World& world) {
             initializeMesh(mesh);
         }
     }
+
+    // Assume only 1 exists
+    Camera cam = world.cameraList[0];
+    cam.projectionMatrix = glm::perspective(cam.fov, cam.aspectRatio, cam.nearPlane, cam.farPlane);
 }
 
 // Thank god for cpp
@@ -132,7 +136,6 @@ RenderSystem::RenderSystem()
         shader.vertexShaderSrcPath = VERTEX_SHADER_SRC_PATH;
         shader.geometryShaderSrcPath = GEOMETRY_SHADER_SRC_PATH;
         shader.fragmentShaderSrcPath = FRAGMENT_SHADER_SRC_PATH;
-        initializeShader(shader);
         return shader;
     }()) {}
 

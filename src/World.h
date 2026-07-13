@@ -15,14 +15,17 @@ struct World {
 
     Skybox skybox;
 
+    AmbientLight ambientLight = AmbientLight();
+    SunLight sunlight = SunLight();
+
     std::vector<EntityData> entityDataList = {};
     std::vector<Transform> transformList = {};
-    std::vector<Light> lightList = {};
     std::vector<Model> modelList = {};
+    std::vector<Camera> cameraList = {};
 
     std::unordered_map<EntityID, size_t> transformIndex = {};
-    std::unordered_map<EntityID, size_t> lightIndex = {};
     std::unordered_map<EntityID, size_t> modelIndex = {};
+    std::unordered_map<EntityID, size_t> cameraIndex = {};
 
     std::vector<bool> keyState = std::vector(GLFW_KEY_LAST + 1, false);
     std::vector<InputEvent> caughtInputEventList = {};

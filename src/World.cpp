@@ -1,8 +1,10 @@
 #include "World.h"
 
+#include "Components.h"
 #include "Transform.h"
 #include "LoadOBJ.h"
 
+#include <fstream>
 #include <sstream>
 #include <string>
 #include <iostream>
@@ -43,12 +45,17 @@ static void loadTransformComponent(const std::string& line, World& world) {
     world.transformList.push_back(transform);
 }
 
-static void loadRenderComponent(const std::string& line, World& world) {
+static void loadModelComponent(const std::string& line, World& world) {
     std::string filename = line.substr(2, std::string::npos);
     Model model = loadObjFile(filename);
     model.srcPath = filename;
 
     world.modelList.push_back(model);
+}
+
+static void loadCameraComponent(const std::string& line, World& world) {
+    Camera cam = Camera();
+    world.cameraList.push_back(cam);
 }
 
 World loadFromFile(std::string filename) {
@@ -70,9 +77,13 @@ World loadFromFile(std::string filename) {
                 loadTransformComponent(line, world);
                 world.transformIndex.insert({ world.totalEntity - 1, world.transformList.size() - 1 });
                 break;
-            case 'R':
-                loadRenderComponent(line, world);
+            case 'M':
+                loadModelComponent(line, world);
                 world.modelIndex.insert({ world.totalEntity - 1, world.modelList.size() - 1 });
+                break;
+            case 'C':
+                loadCameraComponent(line, world);
+                world.cameraIndex.insert({ world.totalEntity - 1, world.cameraList.size() - 1 });
                 break;
             default:
                 continue;
