@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <unordered_map>
-#include <fstream>
 
 #include "Components.h"
 #include "InputSystem.h"
@@ -15,8 +14,6 @@ struct World {
     float deltaTime = 0;
 
     Skybox skybox;
-
-    std::ifstream sceneConfig;
 
     std::vector<EntityData> entityDataList = {};
     std::vector<Transform> transformList = {};
