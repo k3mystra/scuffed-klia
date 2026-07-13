@@ -9,6 +9,7 @@
 #include "Components.h"
 #include "World.h"
 #include "Shader.h"
+#include "TextureLoader.h"
 
 
 const std::string FRAGMENT_SHADER_SRC_PATH = "default_shaders/fragment_shader.glsl";
@@ -76,34 +77,49 @@ static GLFWwindow* setupGlfwWindow(WindowCallbackData* data, unsigned int initia
     return window;
 }
 
+static void initializeMesh(Mesh& mesh) {
+    // === Load vertex & face data
+
+    // Vertex Array Object (VAO) to store vertex attributes layout
+    // for all VBO
+    glGenVertexArrays(1, &mesh.VAO);
+    glBindVertexArray(mesh.VAO);
+
+    glGenBuffers(1, &mesh.VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+    // Dynamic draw so that we can change em fast later
+    glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(float), mesh.vertices.data(), GL_DYNAMIC_DRAW);
+
+    // Indices shit
+    glGenBuffers(1, &mesh.EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.faceIndices.size() * sizeof(unsigned int), mesh.faceIndices.data(), GL_DYNAMIC_DRAW);
+
+    // Setup vertex attributes
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    
+    // TexCoord: location 1, 2 floats
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    // === Load Textures ===
+    if (!mesh.material.diffuseTexturePath.empty()) {
+        std::cout << "Loading texture: " << mesh.material.diffuseTexturePath << "\n";
+        mesh.material.textureID = loadTexture(mesh.material.diffuseTexturePath);
+        std::cout << "  textureID: " << mesh.material.textureID << "\n";
+    } else {
+        std::cout << "No texture for this mesh, using flat color\n";
+    }
+}
+
 
 void RenderSystem::initializeComponents(World& world) {
     for (Model& model : world.modelList) {
         model.shader = DEFAULT_SHADER;
 
         for (Mesh& mesh : model.meshes) {
-            // Vertex Array Object (VAO) to store vertex attributes layout
-            // for all VBO
-            glGenVertexArrays(1, &mesh.VAO);
-            glBindVertexArray(mesh.VAO);
-
-            glGenBuffers(1, &mesh.VBO);
-            glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
-            // Dynamic draw so that we can change em fast later
-            glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(float), mesh.vertices.data(), GL_DYNAMIC_DRAW);
-
-            // Indices shit
-            glGenBuffers(1, &mesh.EBO);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.faceIndices.size() * sizeof(unsigned int), mesh.faceIndices.data(), GL_DYNAMIC_DRAW);
-
-            // Setup vertex attributes
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-            glEnableVertexAttribArray(0);
-            
-            // TexCoord: location 1, 2 floats
-            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-            glEnableVertexAttribArray(1);
+            initializeMesh(mesh);
         }
     }
 }
@@ -119,6 +135,10 @@ RenderSystem::RenderSystem()
         initializeShader(shader);
         return shader;
     }()) {}
+
+GLFWwindow* RenderSystem::getWindowPointer() {
+    return window;
+}
 
 void RenderSystem::renderSystemInit(World& world, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
      // By default already set to screen size, but useful if we resize the windows later

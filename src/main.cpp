@@ -88,21 +88,10 @@ int main (int argc, char *argv[]) {
     // glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
     // glEnableVertexAttribArray(2);
     //
-    // // Load textures
+    // Load textures
     // scene.sea.diffuseTextureID = loadTexture("3DScene/LarpCombat/water.jpg");
     // scene.sea.normalTextureID  = loadTexture("3DScene/LarpCombat/water_normal.jpg");
-    //
-    // for (Model& model : allModels) {
-    //     for (MeshObject& obj : model.meshes) {
-    //         if (!obj.material.diffuseTexturePath.empty()) {
-    //             std::cout << "Loading texture: " << obj.material.diffuseTexturePath << "\n";
-    //             obj.material.textureID = loadTexture(obj.material.diffuseTexturePath);
-    //             std::cout << "  textureID: " << obj.material.textureID << "\n";
-    //         } else {
-    //             std::cout << "No texture for this mesh, using flat color\n";
-    //         }
-    //     }
-    // }
+
     //
     // SkyCube skybox;
     // std::vector<std::string> skyboxFaces = {
@@ -144,9 +133,8 @@ int main (int argc, char *argv[]) {
 
         Camera* cam = &scene.camera;
         cam->recalcTransform();
-        skybox.render(cam->getProjectionMatrix(), cam->getInvTransform());
 
-        mainShader.use();
+        // skybox.render(cam->getProjectionMatrix(), cam->getInvTransform());
 
         scene.process(deltaTime);
 
@@ -160,15 +148,15 @@ int main (int argc, char *argv[]) {
             }
         }
         // Physics shit
-        while (phyTimeAccumulator >= PHYSICS_TIMESTEP) {
-            for (Model &model : allModels) {
-                glm::vec3 deltaPos = Physics::updateState(&model.physicsState, PHYSICS_TIMESTEP);
-                model.setPosition(model.getPosition() + deltaPos);
-            }
-
-
-            phyTimeAccumulator -= PHYSICS_TIMESTEP;
-        }
+        // while (phyTimeAccumulator >= PHYSICS_TIMESTEP) {
+        //     for (Model &model : allModels) {
+        //         glm::vec3 deltaPos = Physics::updateState(&model.physicsState, PHYSICS_TIMESTEP);
+        //         model.setPosition(model.getPosition() + deltaPos);
+        //     }
+        //
+        //
+        //     phyTimeAccumulator -= PHYSICS_TIMESTEP;
+        // }
 
         for (Model &model : allModels){
 
