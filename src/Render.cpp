@@ -1,18 +1,24 @@
 #include <cstddef>
-#include <fstream>
-#include <filesystem>
-#include <functional>
 #include <iostream>
-#include <unordered_map>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <vector>
 
 #include "Render.h"
-#include "World.h"
 #include "Components.h"
+#include "World.h"
+#include "Shader.h"
+
+
+const std::string FRAGMENT_SHADER_SRC_PATH = "default_shaders/fragment_shader.glsl";
+const std::string GEOMETRY_SHADER_SRC_PATH = "default_shaders/geometry_shader.glsl";
+const std::string VERTEX_SHADER_SRC_PATH = "default_shaders/vertex_shader.glsl";
+
+const std::string SKYBOX_FRAGMENT_SHADER_SRC_PATH = "default_shaders/skybox_fragment.glsl";
+const std::string SKYBOX_VERTEX_SHADER_SRC_PATH = "default_shaders/skybox_vertex.glsl";
+
+const glm::vec3 DEFAULT_BG = glm::vec3(0.5, 0.5, 0.5);
 
 
 static void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
@@ -44,7 +50,7 @@ static void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(viewportX, viewportY, viewportWidth, viewportHeight);
 }
 
-GLFWwindow* setupGlfwWindow(WindowCallbackData* data, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
+static GLFWwindow* setupGlfwWindow(WindowCallbackData* data, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
     // Initialize GLFW
     if (!glfwInit()) {
         std::cerr << "GLFW init failed\n";
@@ -70,11 +76,55 @@ GLFWwindow* setupGlfwWindow(WindowCallbackData* data, unsigned int initialWindow
     return window;
 }
 
-void renderSystemInit(World& world, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
+
+void RenderSystem::initializeComponents(World& world) {
+    for (Model& model : world.modelList) {
+        model.shader = DEFAULT_SHADER;
+
+        for (Mesh& mesh : model.meshes) {
+            // Vertex Array Object (VAO) to store vertex attributes layout
+            // for all VBO
+            glGenVertexArrays(1, &mesh.VAO);
+            glBindVertexArray(mesh.VAO);
+
+            glGenBuffers(1, &mesh.VBO);
+            glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+            // Dynamic draw so that we can change em fast later
+            glBufferData(GL_ARRAY_BUFFER, mesh.vertices.size() * sizeof(float), mesh.vertices.data(), GL_DYNAMIC_DRAW);
+
+            // Indices shit
+            glGenBuffers(1, &mesh.EBO);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.EBO);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.faceIndices.size() * sizeof(unsigned int), mesh.faceIndices.data(), GL_DYNAMIC_DRAW);
+
+            // Setup vertex attributes
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+            glEnableVertexAttribArray(0);
+            
+            // TexCoord: location 1, 2 floats
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+            glEnableVertexAttribArray(1);
+        }
+    }
+}
+
+// Thank god for cpp
+// gotta love this
+RenderSystem::RenderSystem() 
+    : DEFAULT_SHADER([] {
+        Shader shader = Shader();
+        shader.vertexShaderSrcPath = VERTEX_SHADER_SRC_PATH;
+        shader.geometryShaderSrcPath = GEOMETRY_SHADER_SRC_PATH;
+        shader.fragmentShaderSrcPath = FRAGMENT_SHADER_SRC_PATH;
+        initializeShader(shader);
+        return shader;
+    }()) {}
+
+void RenderSystem::renderSystemInit(World& world, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
      // By default already set to screen size, but useful if we resize the windows later
     glViewport(0, 0, initialWindowWidth, initialWindowHeight);
     // Pass WindowCallbackData for use by any callbacks
-    WindowCallbackData data {
+    windowCallbackData = {
         .targetAspectRatio = 16.0 / 9.0,
         .viewportX = 0,
         .viewportY = 0,
@@ -83,7 +133,7 @@ void renderSystemInit(World& world, unsigned int initialWindowWidth, unsigned in
         .deltaTime = 0
     };
 
-    world.window = setupGlfwWindow(&data, initialWindowWidth, initialWindowHeight);
+    window = setupGlfwWindow(&windowCallbackData, initialWindowWidth, initialWindowHeight);
 
     // Init. GLEW to query the driver and actually load OpenGL library
     if (glewInit() != GLEW_OK) {
@@ -93,4 +143,29 @@ void renderSystemInit(World& world, unsigned int initialWindowWidth, unsigned in
 
     // OpenGL Functions to enable
     glEnable(GL_DEPTH_TEST);
+
+    initializeComponents(world);
+}
+
+void RenderSystem::resetBuffer() {
+    // Clear the buffer before next render
+    glClearColor(0, 0, 0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Clear viewport with different color
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(
+        windowCallbackData.viewportX,
+        windowCallbackData.viewportY,
+        windowCallbackData.viewportWidth,
+        windowCallbackData.viewportHeight
+    );
+    glClearColor(
+        DEFAULT_BG.x,
+        DEFAULT_BG.y,
+        DEFAULT_BG.z,
+        1.0f
+    );
+    glClear(GL_COLOR_BUFFER_BIT);
+    glDisable(GL_SCISSOR_TEST);
 }

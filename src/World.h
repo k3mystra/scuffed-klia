@@ -1,7 +1,5 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
-
 #include <vector>
 #include <unordered_map>
 #include <fstream>
@@ -14,8 +12,6 @@ typedef uint16_t EntityID;
 
 struct World {
     int totalEntity = 0;
-
-    GLFWwindow* window = nullptr;
 
     Skybox skybox;
 

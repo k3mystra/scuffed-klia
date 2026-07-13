@@ -32,7 +32,7 @@ struct Material {
 };
 
 struct Shader {
-    unsigned int shaderProgramID = 0;
+    unsigned int programID = 0;
 
     std::string vertexShaderSrcPath = "";
     std::string geometryShaderSrcPath = "";
@@ -40,14 +40,18 @@ struct Shader {
 };
 
 struct Mesh {
+    unsigned int VAO = 0;
+    unsigned int VBO = 0;
+    unsigned int EBO = 0;
+
     Material material = Material();
-    Shader shader = Shader();
 
     std::vector<float> vertices = std::vector<float>();
     std::vector<float> faceIndices = std::vector<float>();
 };
 
 struct Model {
+    Shader shader = Shader();
     std::vector<Mesh> meshes;
     std::string srcPath = "";
 };
