@@ -12,6 +12,7 @@ typedef uint16_t EntityID;
 
 struct World {
     int totalEntity = 0;
+    float deltaTime = 0;
 
     Skybox skybox;
 

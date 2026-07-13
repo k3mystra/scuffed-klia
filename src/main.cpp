@@ -109,13 +109,16 @@ int main (int argc, char *argv[]) {
     float lastFrameTime = 0, currentFrameTime = 0;
     float phyTimeAccumulator = 0.0;
     int frameCount = 0;
+
     // Main render loop
-    while(!glfwWindowShouldClose(world.window))
+    while(!glfwWindowShouldClose(renderer.getWindowPointer()))
     {
         // Delta time calculations
         currentFrameTime = glfwGetTime();
         deltaTime = currentFrameTime - lastFrameTime;
         lastFrameTime = currentFrameTime;
+
+        world.deltaTime = deltaTime;
 
         // frameCount++;
         // aggregateDeltaTime += deltaTime;
@@ -129,11 +132,8 @@ int main (int argc, char *argv[]) {
 
         phyTimeAccumulator += deltaTime;
 
-        
-
         Camera* cam = &scene.camera;
         cam->recalcTransform();
-
         // skybox.render(cam->getProjectionMatrix(), cam->getInvTransform());
 
         scene.process(deltaTime);
