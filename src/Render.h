@@ -19,6 +19,7 @@ public:
     RenderSystem();
     void renderSystemInit(World& world, unsigned int initialWindowWidth, unsigned int initialWindowHeight);
     GLFWwindow* getWindowPointer();
+    void render(World& world);
 private:
     const Shader DEFAULT_SHADER;
     GLFWwindow* window;

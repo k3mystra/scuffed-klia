@@ -2,8 +2,10 @@
 #include <iostream>
 
 #include <GL/glew.h>
+#include <GL/gl.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <utility>
 
 #include "Render.h"
 #include "Components.h"
@@ -19,7 +21,10 @@ const std::string VERTEX_SHADER_SRC_PATH = "default_shaders/vertex_shader.glsl";
 const std::string SKYBOX_FRAGMENT_SHADER_SRC_PATH = "default_shaders/skybox_fragment.glsl";
 const std::string SKYBOX_VERTEX_SHADER_SRC_PATH = "default_shaders/skybox_vertex.glsl";
 
-const glm::vec3 DEFAULT_BG = glm::vec3(0.5, 0.5, 0.5);
+const glm::vec3 DEFAULT_BG = COLOR::GREY;
+
+typedef std::pair<Camera, Transform> CameraTransformData;
+typedef std::pair<Model, Transform> ModelTransformData;
 
 
 static void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
@@ -136,6 +141,7 @@ RenderSystem::RenderSystem()
         shader.vertexShaderSrcPath = VERTEX_SHADER_SRC_PATH;
         shader.geometryShaderSrcPath = GEOMETRY_SHADER_SRC_PATH;
         shader.fragmentShaderSrcPath = FRAGMENT_SHADER_SRC_PATH;
+        shader_utils::initializeShader(shader);
         return shader;
     }()) {}
 
@@ -191,4 +197,85 @@ void RenderSystem::resetBuffer() {
     );
     glClear(GL_COLOR_BUFFER_BIT);
     glDisable(GL_SCISSOR_TEST);
+}
+
+static void renderObj(
+    const ModelTransformData& modelData,
+    const CameraTransformData& camData,
+    const World& world
+) {
+
+    glUseProgram(modelData.first.shader.programID);
+
+    for (const Mesh& mesh : modelData.first.meshes) {
+        shader_utils::setMat4(modelData.first.shader, "model", modelData.second.matrix);
+        shader_utils::setMat4(modelData.first.shader, "view", camData.second.invMatrix);
+        shader_utils::setMat4(modelData.first.shader, "projection", camData.first.projectionMatrix);
+
+        shader_utils::setVec3(modelData.first.shader, "matColor", mesh.material.color);
+
+        shader_utils::setVec3(modelData.first.shader, "ambientLightColor", world.ambientLight.color);
+
+        shader_utils::setVec3(modelData.first.shader, "sunLightColor", world.sunlight.color);
+        shader_utils::setVec3(modelData.first.shader, "sunLightDir", world.sunlight.direction);
+
+        bool hasTexture = mesh.material.textureID != 0;
+        shader_utils::setBool(modelData.first.shader, "hasTexture", hasTexture);
+        if (hasTexture) {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, mesh.material.textureID);
+            shader_utils::setInt(modelData.first.shader, "diffuseTexture", 0);
+        }
+
+        glBindVertexArray(mesh.VAO);
+
+        // Actually rendering
+        // crazy
+        glDrawElements(GL_TRIANGLES, mesh.faceIndices.size(), GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
+}
+
+void RenderSystem::render(World& world) {
+    resetBuffer();
+
+    // A whole lot of slow code
+    // Would be nice to move to Unity DOTS archetype system
+
+    CameraTransformData camObjectData;
+    // Find camera data
+    for (int e = 0; e < world.totalEntity; e++) {
+        auto camSearch = world.cameraIndex.find(e);
+        if (camSearch == world.cameraIndex.end())
+            continue;
+
+        auto transformSearch = world.transformIndex.find(e);
+        if (transformSearch == world.transformIndex.end())
+            continue;
+
+        camObjectData.first = world.cameraList[camSearch->second];
+        camObjectData.second = world.transformList[transformSearch->second];
+        break;
+    }
+
+    // Iterate thru all entity, since we need multiple components from each entity
+    ModelTransformData modelObjectData;
+    for (int e = 0; e < world.totalEntity; e++) {
+        auto modelSearch = world.modelIndex.find(e);
+        if (modelSearch == world.modelIndex.end())
+            continue;
+
+        auto transformSearch = world.transformIndex.find(e);
+        if (transformSearch == world.transformIndex.end())
+            continue;
+
+        modelObjectData.first = world.modelList[modelSearch->second];
+        modelObjectData.second = world.transformList[transformSearch->second];
+
+        renderObj(modelObjectData, camObjectData, world);
+    }
+
+    // Bunch of window handling
+    glfwSwapBuffers(window);
+    glfwPollEvents();    
 }

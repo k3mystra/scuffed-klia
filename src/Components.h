@@ -1,5 +1,4 @@
-#ifndef Components
-#define Components
+#pragma once
 
 #include <vector>
 #include <string>
@@ -7,6 +6,8 @@
 #include <glm/fwd.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/quaternion.hpp>
+
+#include "Color.h"
 
 
 struct EntityData {
@@ -56,18 +57,24 @@ struct Model {
     std::string srcPath = "";
 };
 
-struct Light {
-    enum Type {
-        Ambient, Sunlight, Spotlight
-    };
+struct AmbientLight {
+    float intensity = 0.2;
+    glm::vec3 color = COLOR::GREY;
+};
 
-    Type type;
-    float intensity;
-
-    glm::vec3 color;
-    glm::vec3 direction;
+struct SunLight {
+    float intensity = 0.5;
+    glm::vec3 color = COLOR::WHITE;
+    glm::vec3 direction = glm::vec3(0.5, 0.5, 0.5);
 };
 
 struct Skybox {};
 
-#endif
+struct Camera {
+    float fov = 45;
+    float aspectRatio = 16.0/9.0;
+    float nearPlane = 0.5;
+    float farPlane = 1000;
+
+    glm::mat4 projectionMatrix = glm::mat4(1);
+};
