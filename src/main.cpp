@@ -30,7 +30,7 @@ const unsigned int INITIAL_WINDOW_HEIGHT = 480;
 int main (int argc, char *argv[]) {
     // ==== ECS Migration ====
     // Data init
-    World world = loadFromFile("world.txt");
+    World world = loadFromFile("3DScene/LarpCombat/world.txt");
 
     // New scene file format:
     // # Entity Name
