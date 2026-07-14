@@ -8,17 +8,30 @@
 #include <filesystem>
 #include <unordered_map>
 
-static void insertVertexDataIntoMesh(std::vector<float>& vertices, const tinyobj::index_t& idx, const tinyobj::attrib_t& attrib) {
+struct VertexData {
+    int vertexIndex;
+    int normalIndex;
+    int texcoordIndex;
+
+    bool operator==(const VertexData& rhs) const {
+        return (vertexIndex == rhs.vertexIndex) &&
+            (normalIndex == rhs.normalIndex) &&
+            (texcoordIndex == rhs.texcoordIndex);
+    };
+};
+
+
+static void insertVertexDataIntoMesh(std::vector<float>& vertices, const VertexData& vd, const tinyobj::attrib_t& attrib) {
     // position of vertices
-    vertices.push_back(attrib.vertices[3 * idx.vertex_index + 0]);
-    vertices.push_back(attrib.vertices[3 * idx.vertex_index + 1]);
-    vertices.push_back(attrib.vertices[3 * idx.vertex_index + 2]);
+    vertices.push_back(attrib.vertices[3 * vd.vertexIndex + 0]);
+    vertices.push_back(attrib.vertices[3 * vd.vertexIndex + 1]);
+    vertices.push_back(attrib.vertices[3 * vd.vertexIndex + 2]);
 
     // Normal vector on each vertex
-    if (idx.normal_index >= 0) {
-        vertices.push_back(attrib.normals[3 * idx.normal_index + 0]);
-        vertices.push_back(attrib.normals[3 * idx.normal_index + 1]);
-        vertices.push_back(attrib.normals[3 * idx.normal_index + 2]);
+    if (vd.normalIndex >= 0) {
+        vertices.push_back(attrib.normals[3 * vd.normalIndex + 0]);
+        vertices.push_back(attrib.normals[3 * vd.normalIndex + 1]);
+        vertices.push_back(attrib.normals[3 * vd.normalIndex + 2]);
     }
     else {
         vertices.push_back(0);
@@ -27,9 +40,9 @@ static void insertVertexDataIntoMesh(std::vector<float>& vertices, const tinyobj
     }
 
     // texcoords for each vertex
-    if (idx.texcoord_index >= 0) {
-        vertices.push_back(attrib.texcoords[3 * idx.normal_index + 0]);
-        vertices.push_back(attrib.texcoords[3 * idx.normal_index + 1]);
+    if (vd.texcoordIndex >= 0) {
+        vertices.push_back(attrib.texcoords[3 * vd.normalIndex + 0]);
+        vertices.push_back(attrib.texcoords[3 * vd.normalIndex + 1]);
     }
     else {
         vertices.push_back(0);
@@ -43,30 +56,36 @@ static Mesh parseMesh(const tinyobj::mesh_t& mesh_t, const tinyobj::attrib_t& at
     // Apparently this is a common trick when you need to combine multiple hashes
     // The magic numbers just have to be large prime numbers
     struct VertexDataHash {
-        size_t operator()(const tinyobj::index_t& k) const {
-            return (std::hash<int>()(k.vertex_index) * 73856093) ^
-                (std::hash<int>()(k.normal_index) * 19349663) ^
-                (std::hash<int>()(k.texcoord_index) * 83492791);
+        size_t operator()(const VertexData& k) const {
+            return (std::hash<int>()(k.vertexIndex) * 73856093) ^
+                (std::hash<int>()(k.normalIndex) * 19349663) ^
+                (std::hash<int>()(k.texcoordIndex) * 83492791);
         }
     };
 
     // Mappings from file's indices to new indices
     // Important to use new indices as Mesh::faceIndices will be referring to Mesh::vertices only, not the whole file
-    std::unordered_map<tinyobj::index_t, size_t, VertexDataHash> idxMapping = {};
+    std::unordered_map<VertexData, size_t, VertexDataHash> vdMapping = {};
 
     for (int i = 0; i < mesh_t.indices.size(); i++) {
         tinyobj::index_t idx = mesh_t.indices[i];
 
+        VertexData vd = {
+            .vertexIndex = idx.vertex_index,
+            .normalIndex = idx.normal_index,
+            .texcoordIndex = idx.texcoord_index
+        };
+
         i++;
 
         // check if already in mapping
-        if (auto searchResult = idxMapping.find(idx); searchResult != idxMapping.end())
+        if (auto searchResult = vdMapping.find(vd); searchResult != vdMapping.end())
             // if yes, add the new index into mesh.faceIndices
             mesh.faceIndices.push_back(searchResult->second);
         else {
             // if no, add the VertexData into the mapping, and set new index as (idxMapping.size() - 1), and put into list of vertices
-            insertVertexDataIntoMesh(mesh.vertices, idx, attrib);
-            idxMapping.insert({ idx, idxMapping.size() - 1 });
+            insertVertexDataIntoMesh(mesh.vertices, vd, attrib);
+            vdMapping.insert({ vd, vdMapping.size() - 1 });
         }
     }
 
