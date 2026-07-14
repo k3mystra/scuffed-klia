@@ -10,3 +10,6 @@ src/.cache/
 
 # Pre-compiled headers
 *.gch
+
+# python environment
+env/
