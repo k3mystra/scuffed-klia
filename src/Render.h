@@ -21,10 +21,11 @@ public:
     GLFWwindow* getWindowPointer();
     void render(World& world);
 private:
-    const Shader DEFAULT_SHADER;
     GLFWwindow* window;
     WindowCallbackData windowCallbackData;
+    Shader _defaultShader = Shader();
 
+    Shader getDefaultShader();
     void initializeComponents(World& world);
     void resetBuffer();
 };

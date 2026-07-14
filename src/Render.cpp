@@ -121,7 +121,7 @@ static void initializeMesh(Mesh& mesh) {
 
 void RenderSystem::initializeComponents(World& world) {
     for (Model& model : world.modelList) {
-        model.shader = DEFAULT_SHADER;
+        model.shader = getDefaultShader();
 
         for (Mesh& mesh : model.meshes) {
             initializeMesh(mesh);
@@ -135,15 +135,7 @@ void RenderSystem::initializeComponents(World& world) {
 
 // Thank god for cpp
 // gotta love this
-RenderSystem::RenderSystem() 
-    : DEFAULT_SHADER([] {
-        Shader shader = Shader();
-        shader.vertexShaderSrcPath = VERTEX_SHADER_SRC_PATH;
-        shader.geometryShaderSrcPath = GEOMETRY_SHADER_SRC_PATH;
-        shader.fragmentShaderSrcPath = FRAGMENT_SHADER_SRC_PATH;
-        shader_utils::initializeShader(shader);
-        return shader;
-    }()) {}
+RenderSystem::RenderSystem() {}
 
 GLFWwindow* RenderSystem::getWindowPointer() {
     return window;
@@ -174,6 +166,18 @@ void RenderSystem::renderSystemInit(World& world, unsigned int initialWindowWidt
     glEnable(GL_DEPTH_TEST);
 
     initializeComponents(world);
+}
+
+Shader RenderSystem::getDefaultShader() {
+    if (_defaultShader.programID != 0)
+        return _defaultShader;
+
+    _defaultShader.vertexShaderSrcPath = VERTEX_SHADER_SRC_PATH;
+    _defaultShader.geometryShaderSrcPath = GEOMETRY_SHADER_SRC_PATH;
+    _defaultShader.fragmentShaderSrcPath = FRAGMENT_SHADER_SRC_PATH;
+
+    shader_utils::initializeShader(_defaultShader);
+    return _defaultShader;
 }
 
 void RenderSystem::resetBuffer() {

@@ -24,11 +24,9 @@ struct Transform {
     glm::vec3 scale;
 };
 
-const glm::vec3 BLACK_COLOR = glm::vec3(0);
-
 struct Material {
     unsigned int textureID = 0;
-    glm::vec3 color = BLACK_COLOR;
+    glm::vec3 color = COLOR::BLACK;
     std::string diffuseTexturePath = "";
 };
 
