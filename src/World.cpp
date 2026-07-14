@@ -4,6 +4,7 @@
 #include "Transform.h"
 #include "LoadOBJ.h"
 
+#include <cstdlib>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -62,6 +63,11 @@ World loadFromFile(std::string filename) {
     World world = World();
 
     std::ifstream worldSetupFile(filename);
+
+    if (worldSetupFile.fail()) {
+        std::cerr << "Failed to open world setup file\n";
+        exit(1);
+    }
 
     std::string line;
     // This code works since we are reading the file top-to-bottom
