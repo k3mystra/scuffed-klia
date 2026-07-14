@@ -39,72 +39,74 @@ static unsigned int compileShader(unsigned int shaderType, const char* source) {
     return shader;
 }
 
-void setBool(const Shader& shader, const std::string &name, bool value) {         
-    glUniform1i(glGetUniformLocation(shader.programID, name.c_str()), (int)value); 
-}
-void setInt(const Shader& shader, const std::string &name, int value) { 
-    glUniform1i(glGetUniformLocation(shader.programID, name.c_str()), value); 
-}
-void setFloat(const Shader& shader, const std::string &name, float value) { 
-    glUniform1f(glGetUniformLocation(shader.programID, name.c_str()), value); 
-}
-void setVec3(const Shader& shader, const std::string &name, const glm::vec3 &value) { 
-    glUniform3fv(glGetUniformLocation(shader.programID, name.c_str()), 1, glm::value_ptr(value)); 
-}
-void setMat4(const Shader& shader, const std::string &name, const glm::mat4 &mat) {
-    glUniformMatrix4fv(glGetUniformLocation(shader.programID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
-}
-
-void initializeShader(Shader& shader) {
-    std::string vertexCode;
-    std::string geometryCode;
-    std::string fragmentCode;
-
-    // Load vertex shader
-    if (!shader.vertexShaderSrcPath.empty()) {
-        vertexCode = readFile(shader.vertexShaderSrcPath);
+namespace shader_utils {
+    void setBool(const Shader& shader, const std::string &name, bool value) {         
+        glUniform1i(glGetUniformLocation(shader.programID, name.c_str()), (int)value); 
     }
-    
-    // Load geometry shader
-    if (!shader.geometryShaderSrcPath.empty()) {
-        geometryCode = readFile(shader.geometryShaderSrcPath);
+    void setInt(const Shader& shader, const std::string &name, int value) { 
+        glUniform1i(glGetUniformLocation(shader.programID, name.c_str()), value); 
+    }
+    void setFloat(const Shader& shader, const std::string &name, float value) { 
+        glUniform1f(glGetUniformLocation(shader.programID, name.c_str()), value); 
+    }
+    void setVec3(const Shader& shader, const std::string &name, const glm::vec3 &value) { 
+        glUniform3fv(glGetUniformLocation(shader.programID, name.c_str()), 1, glm::value_ptr(value)); 
+    }
+    void setMat4(const Shader& shader, const std::string &name, const glm::mat4 &value) {
+        glUniformMatrix4fv(glGetUniformLocation(shader.programID, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
     }
 
-    // Load fragment shader
-    if (!shader.fragmentShaderSrcPath.empty()) {
-        fragmentCode = readFile(shader.fragmentShaderSrcPath);
-    }
+    void initializeShader(Shader& shader) {
+        std::string vertexCode;
+        std::string geometryCode;
+        std::string fragmentCode;
 
-    // Compile shaders
-    unsigned int vertex = 0, geometry = 0, fragment = 0;
-    
-    if (!vertexCode.empty())
-        vertex = compileShader(GL_VERTEX_SHADER, vertexCode.c_str());
+        // Load vertex shader
+        if (!shader.vertexShaderSrcPath.empty()) {
+            vertexCode = readFile(shader.vertexShaderSrcPath);
+        }
         
-    if (!geometryCode.empty())
-        geometry = compileShader(GL_GEOMETRY_SHADER, geometryCode.c_str());
+        // Load geometry shader
+        if (!shader.geometryShaderSrcPath.empty()) {
+            geometryCode = readFile(shader.geometryShaderSrcPath);
+        }
+
+        // Load fragment shader
+        if (!shader.fragmentShaderSrcPath.empty()) {
+            fragmentCode = readFile(shader.fragmentShaderSrcPath);
+        }
+
+        // Compile shaders
+        unsigned int vertex = 0, geometry = 0, fragment = 0;
         
-    if (!fragmentCode.empty())
-        fragment = compileShader(GL_FRAGMENT_SHADER, fragmentCode.c_str());
+        if (!vertexCode.empty())
+            vertex = compileShader(GL_VERTEX_SHADER, vertexCode.c_str());
+            
+        if (!geometryCode.empty())
+            geometry = compileShader(GL_GEOMETRY_SHADER, geometryCode.c_str());
+            
+        if (!fragmentCode.empty())
+            fragment = compileShader(GL_FRAGMENT_SHADER, fragmentCode.c_str());
 
-    // Shader Program
-    shader.programID = glCreateProgram();
-    if (!vertexCode.empty() && vertex != 0) glAttachShader(shader.programID, vertex);
-    if (!geometryCode.empty() && geometry != 0) glAttachShader(shader.programID, geometry);
-    if (!fragmentCode.empty() && fragment != 0) glAttachShader(shader.programID, fragment);
-    glLinkProgram(shader.programID);
-    
-    // Check for linking errors
-    int success;
-    char infoLog[512];
-    glGetProgramiv(shader.programID, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shader.programID, 512, NULL, infoLog);
-        std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        // Shader Program
+        shader.programID = glCreateProgram();
+        if (!vertexCode.empty() && vertex != 0) glAttachShader(shader.programID, vertex);
+        if (!geometryCode.empty() && geometry != 0) glAttachShader(shader.programID, geometry);
+        if (!fragmentCode.empty() && fragment != 0) glAttachShader(shader.programID, fragment);
+        glLinkProgram(shader.programID);
+        
+        // Check for linking errors
+        int success;
+        char infoLog[512];
+        glGetProgramiv(shader.programID, GL_LINK_STATUS, &success);
+        if (!success) {
+            glGetProgramInfoLog(shader.programID, 512, NULL, infoLog);
+            std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        }
+
+        // Delete shaders as they're linked into our program now and no longer necessary
+        if (!vertexCode.empty() && vertex != 0) glDeleteShader(vertex);
+        if (!geometryCode.empty() && geometry != 0) glDeleteShader(geometry);
+        if (!fragmentCode.empty() && fragment != 0) glDeleteShader(fragment);
     }
-
-    // Delete shaders as they're linked into our program now and no longer necessary
-    if (!vertexCode.empty() && vertex != 0) glDeleteShader(vertex);
-    if (!geometryCode.empty() && geometry != 0) glDeleteShader(geometry);
-    if (!fragmentCode.empty() && fragment != 0) glDeleteShader(fragment);
 }
