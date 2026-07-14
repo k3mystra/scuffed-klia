@@ -1,4 +1,3 @@
-#include "Transform.h"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4244)
@@ -9,24 +8,10 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include <iostream>
-#include <vector>
 #include <string>
-#include <fstream>
-
-#include "Components.h"
 
 #include "Render.h"
-
-#include "SeaPlane.h"
-#include "TextureLoader.h"
-#include "MeshObject.h"
-#include "Camera.h"
-#include "Scene.h"
-#include "Shader.h"
-#include "Physics.h"
-#include "SkyCube.h"
-
+#include "Transform.h"
 #include "World.h"
 
 
@@ -41,9 +26,6 @@ const unsigned int INITIAL_WINDOW_HEIGHT = 480;
 // System are functions that processes those components data
 //
 // Components (so far): Mesh, Light, Skybox, Transform
-
-// Initialize scene
-Scene scene = Scene();
 
 int main (int argc, char *argv[]) {
     // ==== ECS Migration ====
@@ -136,8 +118,6 @@ int main (int argc, char *argv[]) {
         updateTransform(world);
         // skybox.render(cam->getProjectionMatrix(), cam->getInvTransform());
 
-        scene.process(deltaTime);
-
         // Physics shit
         // while (phyTimeAccumulator >= PHYSICS_TIMESTEP) {
         //     for (Model &model : allModels) {
@@ -148,43 +128,6 @@ int main (int argc, char *argv[]) {
         //
         //     phyTimeAccumulator -= PHYSICS_TIMESTEP;
         // }
-
-        for (Model &model : allModels){
-            for (MeshObject &obj : model.meshes) {
-                // Pass vertex shader transformations
-                mainShader.setMat4("model", model.getTransform());
-                mainShader.setMat4("view", cam->getInvTransform());
-                mainShader.setMat4("projection", cam->getProjectionMatrix());
-
-                // Pass material color
-                mainShader.setVec3("matColor", obj.material.color);
-
-                // Pass ambient light color
-                mainShader.setVec3("ambientLightColor", scene.ambientLight.color);
-
-                // Pass diffuse light color (sunlight only for now)
-                mainShader.setVec3("sunLightColor", scene.sunLight.color * scene.sunLight.intensity);
-                mainShader.setVec3("sunLightDir", scene.sunLight.direction);
-                
-                // Bind texture if available, otherwise use flat color
-                bool hasTexture = obj.material.textureID != 0;
-                mainShader.setBool("hasTexture", hasTexture);
-                if (hasTexture) {
-                    glActiveTexture(GL_TEXTURE0);
-                    glBindTexture(GL_TEXTURE_2D, obj.material.textureID);
-                    mainShader.setInt("diffuseTexture", 0);
-                } else {
-                    mainShader.setVec3("matColor", obj.material.color);
-                }
-
-                glBindVertexArray(obj.bufferInfo.VAO);
-
-                // Render here
-                glDrawElements(GL_TRIANGLES, obj.getIndices().size(), GL_UNSIGNED_INT, 0);
-                // Unbind VAO just in case
-                glBindVertexArray(0);
-            }
-        }
 
         // Snap sea to camera X/Z so it appears infinite
         //-----------------------------------------------------------------------------------------
