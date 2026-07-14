@@ -1,6 +1,7 @@
 #include "World.h"
 
 #include "Components.h"
+#include "Model.h"
 #include "Transform.h"
 #include "LoadOBJ.h"
 
@@ -50,6 +51,8 @@ static void loadModelComponent(const std::string& line, World& world) {
     std::string filename = line.substr(2, std::string::npos);
     Model model = loadObjFile(filename);
     model.srcPath = filename;
+
+    model_utils::printModel(model);
 
     world.modelList.push_back(model);
 }
