@@ -76,8 +76,6 @@ static Mesh parseMesh(const tinyobj::mesh_t& mesh_t, const tinyobj::attrib_t& at
             .texcoordIndex = idx.texcoord_index
         };
 
-        i++;
-
         // check if already in mapping
         if (auto searchResult = vdMapping.find(vd); searchResult != vdMapping.end())
             // if yes, add the new index into mesh.faceIndices
@@ -86,6 +84,7 @@ static Mesh parseMesh(const tinyobj::mesh_t& mesh_t, const tinyobj::attrib_t& at
             // if no, add the VertexData into the mapping, and set new index as (idxMapping.size() - 1), and put into list of vertices
             insertVertexDataIntoMesh(mesh.vertices, vd, attrib);
             vdMapping.insert({ vd, vdMapping.size() - 1 });
+            mesh.faceIndices.push_back(mesh.vertices.size() - 1);
         }
     }
 
