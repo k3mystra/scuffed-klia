@@ -1,3 +1,7 @@
+# cube2
+T 3.106727 0.000000 3.333026 0.999921 0.000000 0.000000 0.012547 1.000000 1.000000 1.000000
+M /home/k3mystra/Coding_Projects/cpp/scuffed-klia/src/3DScene/LarpCombat/cube.obj
+
 # cube
 T 0.000000 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000 1.000000 1.000000
 M /home/k3mystra/Coding_Projects/cpp/scuffed-klia/src/3DScene/LarpCombat/cube.obj
@@ -5,3 +9,27 @@ M /home/k3mystra/Coding_Projects/cpp/scuffed-klia/src/3DScene/LarpCombat/cube.ob
 # camera
 T 1.128174 0.692086 1.377465 0.934338 -0.168988 0.308766 0.055845 1.000000 1.000000 1.000000
 C
+# cube3
+T 3.106727 0.000000 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000 1.000000 1.000000
+M /home/k3mystra/Coding_Projects/cpp/scuffed-klia/src/3DScene/LarpCombat/cube.obj
+
+# cube4
+T 0.000000 0.000000 3.333026 1.000000 0.000000 0.000000 0.000000 1.000000 1.000000 1.000000
+M /home/k3mystra/Coding_Projects/cpp/scuffed-klia/src/3DScene/LarpCombat/cube.obj
+
+# cube5
+T 3.112617 2.357661 3.333026 0.999921 0.000000 0.000000 0.012547 1.000000 1.000000 1.000000
+M /home/k3mystra/Coding_Projects/cpp/scuffed-klia/src/3DScene/LarpCombat/cube.obj
+
+# cube6
+T 0.005891 2.357661 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000 1.000000 1.000000
+M /home/k3mystra/Coding_Projects/cpp/scuffed-klia/src/3DScene/LarpCombat/cube.obj
+
+# cube7
+T 3.112617 2.357661 0.000000 1.000000 0.000000 0.000000 0.000000 1.000000 1.000000 1.000000
+M /home/k3mystra/Coding_Projects/cpp/scuffed-klia/src/3DScene/LarpCombat/cube.obj
+
+# cube8
+T 0.005891 2.357661 3.333026 1.000000 0.000000 0.000000 0.000000 1.000000 1.000000 1.000000
+M /home/k3mystra/Coding_Projects/cpp/scuffed-klia/src/3DScene/LarpCombat/cube.obj
+
