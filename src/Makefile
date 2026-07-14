@@ -1,9 +1,7 @@
 CC = g++
 CFLAGS = -g -Wall -D GLM_ENABLE_EXPERIMENTAL -D GLM_FORCE_QUAT_DATA_WXYZ
 BUILD_FOLDER := build
-DEFAULT_GOAL := all
 
-# 1. DETECT OPERATING SYSTEM
 ifeq ($(OS),Windows_NT)
     # Windows (MinGW / MSYS2) configuration
     LDFLAGS = -lglew32 -lglfw3 -lopengl32 -lgdi32
@@ -20,20 +18,25 @@ else
     TARGET = main
 endif
 
-.PHONY: all debug clean
+.PHONY: debug clean
+.DEFAULT_GOAL := $(TARGET)
 
-# 2. AUTOMATIC FILE DETECTION
 SOURCES := $(wildcard *.cpp)
 OBJECTS := $(foreach x, $(basename $(notdir $(SOURCES))), $(BUILD_FOLDER)/$(x).o)
 LIBS :=
+INCLUDE := include
+HEADER_LIB := include/pch.h
+COMPILED_HEADER_LIB := include/pch.h.gch
 
-# 3. COMPILATION RULES
+$(COMPILED_HEADER_LIB): $(HEADER_LIB)
+	$(CC) $(CFLAGS) -x c++-header $^
+
 # Order-only dependency ensures the build folder is safely created first
-$(BUILD_FOLDER)/%.o: %.cpp | $(BUILD_FOLDER)
-	$(CC) $(CFLAGS) -c $< -o $@
+$(BUILD_FOLDER)/%.o: %.cpp | $(BUILD_FOLDER) $(COMPILED_HEADER_LIB)
+	$(CC) $(CFLAGS) -include $(HEADER_LIB) -c $< -o $@
 
 # Safe linker order: $(OBJECTS) comes BEFORE $(LDFLAGS)
-all: $(OBJECTS)
+$(TARGET): $(OBJECTS)
 	$(CC) $(foreach x, $(LIBS), -I $x) $(OBJECTS) -o $(TARGET) $(LDFLAGS)
 
 $(BUILD_FOLDER):
@@ -47,4 +50,5 @@ debug:
 
 clean:
 	$(RM_DIR) $(BUILD_FOLDER)
-	$(RM_FILE) main.exe
+	$(RM_FILE) $(TARGET)
+	$(RM_FILE) $(COMPILED_HEADER_LIB)
