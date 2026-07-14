@@ -128,6 +128,7 @@ int main (int argc, char *argv[]) {
         //
         //     phyTimeAccumulator -= PHYSICS_TIMESTEP;
         // }
+        renderer.render(world);
 
         // Snap sea to camera X/Z so it appears infinite
         //-----------------------------------------------------------------------------------------
