@@ -26,7 +26,7 @@ struct Transform {
 
 struct Material {
     unsigned int textureID = 0;
-    glm::vec3 color = COLOR::BLACK;
+    glm::vec3 color = COLOR::RED;
     std::string diffuseTexturePath = "";
 };
 
@@ -56,14 +56,14 @@ struct Model {
 };
 
 struct AmbientLight {
-    float intensity = 0.2;
-    glm::vec3 color = COLOR::GREY;
+    float intensity = 1.0;
+    glm::vec3 color = COLOR::WHITE;
 };
 
 struct SunLight {
-    float intensity = 0.5;
+    float intensity = 1.2;
     glm::vec3 color = COLOR::WHITE;
-    glm::vec3 direction = glm::vec3(0.5, 0.5, 0.5);
+    glm::vec3 direction = glm::vec3(-0.1961, -0.7845, 0.5883);
 };
 
 struct Skybox {};
