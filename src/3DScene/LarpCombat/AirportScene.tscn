@@ -1,0 +1,86 @@
+[gd_scene format=3 uid="uid://dvdhap7mpgc60"]
+
+[ext_resource type="Script" uid="uid://btihsjqc4h2tp" path="res://airport_scene.gd" id="1_g5bj2"]
+[ext_resource type="ArrayMesh" uid="uid://bfky6yxsba86s" path="res://AllAirportObj/02_ControlTower_AIRPORT_0.obj" id="1_pitgv"]
+[ext_resource type="ArrayMesh" uid="uid://di8pss6whtsxc" path="res://AllAirportObj/06_Tunnel_AIRPORT_0.obj" id="2_g5bj2"]
+
+[sub_resource type="Animation" id="Animation_g5bj2"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("02ControlTowerAirport0:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-0.017, 93.2825, -0.031)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("06TunnelAirport0:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(61.057266, 17.709389, 101.0939)]
+}
+
+[sub_resource type="Animation" id="Animation_qec78"]
+resource_name = "test"
+length = 5.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("02ControlTowerAirport0:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(-0.017, 47.48416, -0.031), Vector3(-0.017, 93.2825, -0.031)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("06TunnelAirport0:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(36.616066, 17.709389, 101.0939), Vector3(61.057266, 17.709389, 101.0939)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_e8og4"]
+_data = {
+&"RESET": SubResource("Animation_g5bj2"),
+&"test": SubResource("Animation_qec78")
+}
+
+[node name="AirportScene" type="Node3D" unique_id=2091411737]
+script = ExtResource("1_g5bj2")
+
+[node name="02ControlTowerAirport0" type="MeshInstance3D" parent="." unique_id=1393510959]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.017, 93.2825, -0.031)
+mesh = ExtResource("1_pitgv")
+
+[node name="06TunnelAirport0" type="MeshInstance3D" parent="." unique_id=180191624]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 61.057266, 17.709389, 101.0939)
+mesh = ExtResource("2_g5bj2")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2010793360]
+libraries/ = SubResource("AnimationLibrary_e8og4")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=855623862]
+transform = Transform3D(1, 0, 0, 0, 0.96881276, 0.24779382, 0, -0.24779382, 0.96881276, 0, 73, 169)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=317267472]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 235, 210)
