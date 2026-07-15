@@ -5,12 +5,9 @@
 
 namespace transform_utils {
     void recalcTransform(Transform& transform) {
-        transform.matrix = glm::mat4(1);
-
-        transform.matrix = glm::translate(transform.matrix, transform.position);
-        transform.matrix = transform.matrix * glm::toMat4(transform.rotation);
-        transform.matrix = glm::scale(transform.matrix, transform.scale);
-
+        transform.matrix = glm::translate(glm::mat4(1.0f), transform.position)
+                  * glm::toMat4(transform.rotation)
+                  * glm::scale(glm::mat4(1.0f), transform.scale);
         transform.invMatrix = glm::inverse(transform.matrix);
 
         transform.isDirty = false;
