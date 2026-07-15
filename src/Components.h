@@ -46,7 +46,7 @@ struct Mesh {
     Material material = Material();
 
     std::vector<float> vertices = std::vector<float>();
-    std::vector<float> faceIndices = std::vector<float>();
+    std::vector<unsigned int> faceIndices = std::vector<unsigned int>();
 };
 
 struct Model {
