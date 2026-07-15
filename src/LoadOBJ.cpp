@@ -27,6 +27,16 @@ static void insertVertexDataIntoMesh(std::vector<float>& vertices, const VertexD
     vertices.push_back(attrib.vertices[3 * vd.vertexIndex + 1]);
     vertices.push_back(attrib.vertices[3 * vd.vertexIndex + 2]);
 
+    // texcoords for each vertex
+    if (vd.texcoordIndex >= 0) {
+        vertices.push_back(attrib.texcoords[2 * vd.texcoordIndex + 0]);
+        vertices.push_back(attrib.texcoords[2 * vd.texcoordIndex + 1]);
+    }
+    else {
+        vertices.push_back(0);
+        vertices.push_back(0);
+    }
+
     // Normal vector on each vertex
     if (vd.normalIndex >= 0) {
         vertices.push_back(attrib.normals[3 * vd.normalIndex + 0]);
@@ -35,16 +45,6 @@ static void insertVertexDataIntoMesh(std::vector<float>& vertices, const VertexD
     }
     else {
         vertices.push_back(0);
-        vertices.push_back(0);
-        vertices.push_back(1);
-    }
-
-    // texcoords for each vertex
-    if (vd.texcoordIndex >= 0) {
-        vertices.push_back(attrib.texcoords[3 * vd.normalIndex + 0]);
-        vertices.push_back(attrib.texcoords[3 * vd.normalIndex + 1]);
-    }
-    else {
         vertices.push_back(0);
         vertices.push_back(1);
     }
