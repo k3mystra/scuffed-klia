@@ -207,6 +207,8 @@ static void initializeMesh(Mesh& mesh) {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
     // === Load Textures ===
     if (!mesh.material.diffuseTexturePath.empty()) {
         std::cout << "Loading texture: " << mesh.material.diffuseTexturePath << "\n";
