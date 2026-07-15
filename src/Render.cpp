@@ -230,8 +230,8 @@ void RenderSystem::initializeComponents(World& world) {
     }
 
     // Assume only 1 exists
-    Camera cam = world.cameraList[0];
-    cam.projectionMatrix = glm::perspective(cam.fov, cam.aspectRatio, cam.nearPlane, cam.farPlane);
+    Camera* cam = &world.cameraList[0];
+    cam->projectionMatrix = glm::perspective(glm::radians(cam->fov), cam->aspectRatio, cam->nearPlane, cam->farPlane);
 }
 
 // Thank god for cpp
