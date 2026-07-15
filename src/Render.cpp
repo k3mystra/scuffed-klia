@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <glm/fwd.hpp>
 #include <iostream>
 
 #include <GL/glew.h>
@@ -22,7 +23,7 @@ const std::string VERTEX_SHADER_SRC_PATH = "default_shaders/vertex_shader.glsl";
 const std::string SKYBOX_FRAGMENT_SHADER_SRC_PATH = "default_shaders/skybox_fragment.glsl";
 const std::string SKYBOX_VERTEX_SHADER_SRC_PATH = "default_shaders/skybox_vertex.glsl";
 
-const glm::vec3 DEFAULT_BG = COLOR::GREY;
+const glm::vec3 DEFAULT_BG = glm::vec3(0.2, 0.2, 0.2);
 
 typedef std::pair<Camera, Transform> CameraTransformData;
 typedef std::pair<Model, Transform> ModelTransformData;
@@ -209,6 +210,7 @@ static void initializeMesh(Mesh& mesh) {
 
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
     glEnableVertexAttribArray(2);
+
     // === Load Textures ===
     if (!mesh.material.diffuseTexturePath.empty()) {
         std::cout << "Loading texture: " << mesh.material.diffuseTexturePath << "\n";
@@ -271,6 +273,8 @@ void RenderSystem::renderSystemInit(World& world, unsigned int initialWindowWidt
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(openGLDebugCallback, 0);
     #endif
+
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     initializeComponents(world);
 }
