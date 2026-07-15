@@ -83,8 +83,8 @@ static Mesh parseMesh(const tinyobj::mesh_t& mesh_t, const tinyobj::attrib_t& at
         else {
             // if no, add the VertexData into the mapping, and set new index as (idxMapping.size() - 1), and put into list of vertices
             insertVertexDataIntoMesh(mesh.vertices, vd, attrib);
-            vdMapping.insert({ vd, vdMapping.size() - 1 });
-            mesh.faceIndices.push_back(mesh.vertices.size() - 1);
+            vdMapping.insert({ vd, vdMapping.size() });
+            mesh.faceIndices.push_back(vdMapping.size() - 1);
         }
     }
 
