@@ -13,6 +13,8 @@ struct World {
     int totalEntity = 0;
     float deltaTime = 0;
 
+    GLFWwindow* window = nullptr;
+
     Skybox skybox;
 
     AmbientLight ambientLight = AmbientLight();
