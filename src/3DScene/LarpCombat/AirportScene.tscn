@@ -1,0 +1,659 @@
+[gd_scene format=3 uid="uid://dvdhap7mpgc60"]
+
+[ext_resource type="Script" uid="uid://btihsjqc4h2tp" path="res://airport_scene.gd" id="1_g5bj2"]
+[ext_resource type="ArrayMesh" uid="uid://bfky6yxsba86s" path="res://AllAirportObj/02_ControlTower_AIRPORT_0.obj" id="1_pitgv"]
+[ext_resource type="ArrayMesh" uid="uid://di8pss6whtsxc" path="res://AllAirportObj/06_Tunnel_AIRPORT_0.obj" id="2_g5bj2"]
+[ext_resource type="ArrayMesh" uid="uid://d06jr5u2rci0" path="res://AllAirportObj/07_Modulo1_AIRPORT_0.obj" id="4_qec78"]
+[ext_resource type="ArrayMesh" uid="uid://c728m0ykyfqdk" path="res://AllAirportObj/17_9_2_Model_AIRPORT_0.obj" id="5_5xko8"]
+[ext_resource type="ArrayMesh" uid="uid://b718oifelwta4" path="res://AllAirportObj/07_Modulo2_AIRPORT_0.obj" id="6_n5die"]
+[ext_resource type="ArrayMesh" uid="uid://cmwogvafqudh1" path="res://AllAirportObj/04_Hangar_AIRPORT_0.obj" id="7_uwc3m"]
+[ext_resource type="ArrayMesh" uid="uid://cbtakgwe1q1gx" path="res://AllAirportObj/LandingTrack5StraightAngled_AIRPORT_0.obj" id="8_urchi"]
+[ext_resource type="ArrayMesh" uid="uid://c3mo2yxfusgwg" path="res://AllAirportObj/LandingTrack4Curve3_AIRPORT_0.obj" id="9_rbofk"]
+[ext_resource type="ArrayMesh" uid="uid://dv7inw14hqyqe" path="res://AllAirportObj/LandingTrack3Curve2_AIRPORT_0.obj" id="10_un7pw"]
+[ext_resource type="ArrayMesh" uid="uid://cgbyhc33e1cop" path="res://AllAirportObj/LandingTrack1Straight_AIRPORT_0.obj" id="12_csqee"]
+[ext_resource type="ArrayMesh" uid="uid://72wtnkri7w0l" path="res://AllAirportObj/18_3_Airplane_AIRPORT_0.obj" id="14_57blr"]
+[ext_resource type="ArrayMesh" uid="uid://l6ckqimv5ryf" path="res://AllAirportObj/18_4_Airplane_AIRPORT_0.obj" id="15_un7pw"]
+[ext_resource type="ArrayMesh" uid="uid://ckkbmuuoyihh4" path="res://AllAirportObj/19_Firetruck_AIRPORT_0.obj" id="16_gbodw"]
+[ext_resource type="ArrayMesh" uid="uid://b2tir84srfbbd" path="res://AllAirportObj/20_PassengerBus_AIRPORT_0.obj" id="17_csqee"]
+[ext_resource type="ArrayMesh" uid="uid://cdeouen0xd8ha" path="res://AllAirportObj/18_2_Airplane_AIRPORT_0.obj" id="18_3qk8v"]
+[ext_resource type="ArrayMesh" uid="uid://ddtrejr0yq7lh" path="res://AllAirportObj/05_Container2_AIRPORT_0.obj" id="18_ijc6k"]
+[ext_resource type="ArrayMesh" uid="uid://cjywkg0wq6gsv" path="res://AllAirportObj/18_1_Airplane_AIRPORT_0.obj" id="19_57blr"]
+[ext_resource type="ArrayMesh" uid="uid://dtjlk3mubu0ek" path="res://AllAirportObj/05_Container3_AIRPORT_0.obj" id="19_lnjah"]
+[ext_resource type="ArrayMesh" uid="uid://cl32fta5s1qgw" path="res://AllAirportObj/05_Container4_AIRPORT_0.obj" id="20_shiv6"]
+[ext_resource type="ArrayMesh" uid="uid://c1oihkuehvu0a" path="res://AllAirportObj/05_Container5_AIRPORT_0.obj" id="21_sje4t"]
+[ext_resource type="ArrayMesh" uid="uid://b1yqdkptcxua2" path="res://AllAirportObj/05_Container_AIRPORT_0.obj" id="22_n4ytj"]
+[ext_resource type="ArrayMesh" uid="uid://byrrfj1qvp8qr" path="res://AllAirportObj/21_1_BaggageTruck_AIRPORT_0.obj" id="23_rii0k"]
+[ext_resource type="ArrayMesh" uid="uid://cngf0f2rylbh" path="res://AllAirportObj/21_2_BaggageTruck_AIRPORT_0.obj" id="24_q2irx"]
+[ext_resource type="ArrayMesh" uid="uid://dqdcvqybbswe2" path="res://AllAirportObj/21_3_BaggageTruck_AIRPORT_0.obj" id="25_p3idx"]
+
+[sub_resource type="Animation" id="Animation_g5bj2"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("182AirplaneAirport4:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(1500.4215, 748.66516, 1887.4998)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("182AirplaneAirport4:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(1.8182336e-08, 1.5707964, -0.42900193)]
+}
+
+[sub_resource type="Animation" id="Animation_qec78"]
+resource_name = "test"
+length = 33.03842
+step = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("182AirplaneAirport4:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 10, 15, 17, 18, 20.965626, 21.465626, 21.965626, 22.465626, 22.965626, 23.465626, 24.436058, 25.43125, 25.93125, 26.43125, 27.451202, 28.421635, 28.921635, 29.941586, 30.441586, 30.941586, 31.441586),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(1500.4215, 748.66516, 2607.495), Vector3(1500.4215, 3.0390625, 1569.8646), Vector3(1500.4215, 9.656788, 854.2705), Vector3(1477.7267, 9.656789, 757.3252), Vector3(1444.0988, 9.656789, 757.3252), Vector3(1021.4641, 9.656788, 757.3252), Vector3(960.0858, 9.65679, 757.3252), Vector3(929.374, 9.657, 741.089), Vector3(883.172, 9.657, 727.73), Vector3(842.536, 9.657, 694.33), Vector3(821.94, 9.657, 640.892), Vector3(818.154, 9.657, 517.448), Vector3(818.154, 9.657, 375.897), Vector3(808.702, 9.657, 301.237), Vector3(754.221, 9.657, 251.206), Vector3(683.02124, 9.656799, 163.44218), Vector3(592.8959, 9.656799, 81.919525), Vector3(557.0161, 9.656799, 68.21675), Vector3(475.94025, 9.656799, 59.9133), Vector3(450.99115, 9.656799, 54.40909), Vector3(425.3547, 9.656799, 49.01538), Vector3(403.35144, 9.656799, 49.01538)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("182AirplaneAirport4:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 10, 15.0178795, 17, 18, 20.965626, 21.465626, 21.965626, 22.465626, 22.965626, 23.465626, 24.436058, 25.43125, 25.93125, 26.43125, 27.451202, 28.421635, 28.921635, 29.941586, 30.441586, 30.941586, 31.441586),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector3(1.8182334e-08, 1.5707964, -0.42900193), Vector3(0, 1.5707964, 0), Vector3(0, 1.5707964, 0), Vector3(0, 2.6369658, 0), Vector3(0, 3.1415927, 0), Vector3(0, 3.1415927, 0), Vector3(0, 2.9835706, 0), Vector3(0, 2.8722186, 0), Vector3(0, 2.5040066, 0), Vector3(0, 2.0314064, 0), Vector3(0, 1.6335412, 0), Vector3(0, 1.5707964, 0), Vector3(0, 1.5707964, 0), Vector3(0, 1.9460421, 0), Vector3(0, 2.286713, 0), Vector3(0, 2.286713, 0), Vector3(0, 2.617226, 0), Vector3(0, 2.9423285, 0), Vector3(0, 3.0485492, 0), Vector3(0, 3.0485492, 0), Vector3(0, 3.0485492, 0), Vector3(0, 3.0485492, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_e8og4"]
+_data = {
+&"RESET": SubResource("Animation_g5bj2"),
+&"test": SubResource("Animation_qec78")
+}
+
+[node name="AirportScene" type="Node3D" unique_id=2091411737]
+script = ExtResource("1_g5bj2")
+
+[node name="02ControlTowerAirport0" type="MeshInstance3D" parent="." unique_id=1393510959]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.017, 47.48416, -0.031)
+mesh = ExtResource("1_pitgv")
+
+[node name="06TunnelAirport0" type="MeshInstance3D" parent="." unique_id=180191624]
+transform = Transform3D(-4.3711385e-08, 0, -0.99999994, 0, 1, 0, 0.99999994, 0, -4.3711385e-08, 36.616066, 17.709389, 101.0939)
+mesh = ExtResource("2_g5bj2")
+
+[node name="06TunnelAirport1" type="MeshInstance3D" parent="." unique_id=402731569]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 370.41605, 5.362, 28.439934)
+mesh = ExtResource("2_g5bj2")
+
+[node name="06TunnelAirport3" type="MeshInstance3D" parent="." unique_id=924605348]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 370.41605, 5.362, -29.07078)
+mesh = ExtResource("2_g5bj2")
+
+[node name="02ControlTowerAirport1" type="MeshInstance3D" parent="." unique_id=1762056843]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 377.17902, 50.29253, 175.51584)
+mesh = ExtResource("1_pitgv")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=317267472]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 235, 210)
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=855623862]
+transform = Transform3D(1, 0, 0, 0, 0.9688128, 0.24779384, 0, -0.24779384, 0.9688128, 282.9624, 73, 169)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2010793360]
+libraries/ = SubResource("AnimationLibrary_e8og4")
+
+[node name="07Modulo1Airport0" type="MeshInstance3D" parent="." unique_id=1128634500]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 301.58975, 16.259201, -225.07135)
+mesh = ExtResource("4_qec78")
+
+[node name="floor" type="CSGBox3D" parent="." unique_id=863255073]
+transform = Transform3D(10000, 0, 0, 0, 2, 0, 0, 0, 10000, 0, -1, 0)
+use_collision = true
+metadata/_edit_lock_ = true
+
+[node name="1792ModelAirport0" type="MeshInstance3D" parent="." unique_id=1586085233]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 76.2557, 50.41646, -124.99204)
+visible = false
+mesh = ExtResource("5_5xko8")
+
+[node name="07Modulo2Airport1" type="MeshInstance3D" parent="." unique_id=1540376950]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 303.85757, 16.551, -294.936)
+mesh = ExtResource("6_n5die")
+
+[node name="07Modulo2Airport6" type="MeshInstance3D" parent="." unique_id=343395863]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 355.18497, 16.551, -0.46730804)
+mesh = ExtResource("6_n5die")
+
+[node name="07Modulo2Airport8" type="MeshInstance3D" parent="." unique_id=369791925]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 355.18497, 16.551, -225.34741)
+mesh = ExtResource("6_n5die")
+
+[node name="07Modulo2Airport3" type="MeshInstance3D" parent="." unique_id=904883561]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 303.85757, 16.551, -363.6763)
+mesh = ExtResource("6_n5die")
+
+[node name="07Modulo2Airport5" type="MeshInstance3D" parent="." unique_id=892584347]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 303.85757, 16.551, -430.7874)
+mesh = ExtResource("6_n5die")
+
+[node name="07Modulo2Airport11" type="MeshInstance3D" parent="." unique_id=990000118]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 303.85757, 16.551, -499.94028)
+mesh = ExtResource("6_n5die")
+
+[node name="07Modulo2Airport12" type="MeshInstance3D" parent="." unique_id=1892144484]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 303.85757, 16.551, -570.2451)
+mesh = ExtResource("6_n5die")
+
+[node name="07Modulo2Airport0" type="MeshInstance3D" parent="." unique_id=705837142]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 303.85794, 16.550522, -155.99284)
+mesh = ExtResource("6_n5die")
+
+[node name="07Modulo2Airport2" type="MeshInstance3D" parent="." unique_id=345805295]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 303.85794, 16.550522, -87.39425)
+mesh = ExtResource("6_n5die")
+
+[node name="07Modulo2Airport9" type="MeshInstance3D" parent="." unique_id=747597482]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 350.6805, 16.550522, -103.54765)
+mesh = ExtResource("6_n5die")
+
+[node name="07Modulo2Airport10" type="MeshInstance3D" parent="." unique_id=1634343664]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 350.6805, 16.550522, -346.83252)
+mesh = ExtResource("6_n5die")
+
+[node name="07Modulo2Airport4" type="MeshInstance3D" parent="." unique_id=1715526733]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 303.85794, 16.550522, -18.809921)
+mesh = ExtResource("6_n5die")
+
+[node name="07Modulo2Airport13" type="MeshInstance3D" parent="." unique_id=435721962]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 303.85794, 16.550522, 51.26715)
+mesh = ExtResource("6_n5die")
+
+[node name="07Modulo2Airport14" type="MeshInstance3D" parent="." unique_id=58804299]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 303.85794, 16.550522, 118.96567)
+mesh = ExtResource("6_n5die")
+
+[node name="04HangarAirport0" type="MeshInstance3D" parent="." unique_id=1993662708]
+transform = Transform3D(-4.371139e-08, 0, 1.355, 0, 1.895, 0, -1, 0, -5.922893e-08, 477.48648, 24.098791, 188.91757)
+mesh = ExtResource("7_uwc3m")
+
+[node name="04HangarAirport2" type="MeshInstance3D" parent="." unique_id=611247193]
+transform = Transform3D(-4.371139e-08, 0, 1.355, 0, 1.895, 0, -1, 0, -5.922893e-08, 547.2491, 24.098791, 188.91757)
+mesh = ExtResource("7_uwc3m")
+
+[node name="04HangarAirport1" type="MeshInstance3D" parent="." unique_id=1930776950]
+transform = Transform3D(-4.3711385e-08, 0, -0.99999994, 0, 1, 0, 0.99999994, 0, -4.3711385e-08, 418.98172, 13.120311, -630.57263)
+mesh = ExtResource("7_uwc3m")
+
+[node name="04HangarAirport3" type="MeshInstance3D" parent="." unique_id=1581624593]
+transform = Transform3D(-4.3711385e-08, 0, -0.99999994, 0, 1, 0, 0.99999994, 0, -4.3711385e-08, 472.32233, 12.90668, -630.57263)
+mesh = ExtResource("7_uwc3m")
+
+[node name="AllRoads" type="Node3D" parent="." unique_id=932975061]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 933.568, 0.350041, 91.365616)
+metadata/_edit_lock_ = true
+
+[node name="LandingTrack5StraightAngledAirport0" type="MeshInstance3D" parent="AllRoads" unique_id=1118446729]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -251.86163, 1.2785196e-05, -735.5992)
+mesh = ExtResource("8_urchi")
+
+[node name="LandingTrack5StraightAngledAirport1" type="MeshInstance3D" parent="AllRoads" unique_id=1394519813]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, 1, -251.66852, 1.2785196e-05, 81.951416)
+mesh = ExtResource("8_urchi")
+
+[node name="LandingTrack4Curve3Airport0" type="MeshInstance3D" parent="AllRoads" unique_id=1015915928]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -134.98755, -2.1994114e-05, -340.48715)
+mesh = ExtResource("9_rbofk")
+
+[node name="LandingTrack4Curve3Airport1" type="MeshInstance3D" parent="AllRoads" unique_id=175620355]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, 1, -134.64532, -2.1994114e-05, -297.8014)
+mesh = ExtResource("9_rbofk")
+
+[node name="LandingTrack3Curve2Airport0" type="MeshInstance3D" parent="AllRoads" unique_id=316160520]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -64.98297, -1.40070915e-05, 614.4053)
+mesh = ExtResource("10_un7pw")
+
+[node name="LandingTrack3Curve2Airport1" type="MeshInstance3D" parent="AllRoads" unique_id=1707258799]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -65.869934, -1.40070915e-05, -1383.4349)
+mesh = ExtResource("10_un7pw")
+
+[node name="LandingTrack1StraightAirport17" type="MeshInstance3D" parent="AllRoads" unique_id=1098200699]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, 51.498047, 0, -684.1194)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport29" type="MeshInstance3D" parent="AllRoads" unique_id=114573151]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, -270.76, 0.01, -318.441)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport18" type="MeshInstance3D" parent="AllRoads" unique_id=755941476]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, 51.498047, 0, 50.75609)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport21" type="MeshInstance3D" parent="AllRoads" unique_id=730552303]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, 150.71973, 0, 663.2864)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport22" type="MeshInstance3D" parent="AllRoads" unique_id=747366760]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, 402.90784, 0, 663.2864)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport23" type="MeshInstance3D" parent="AllRoads" unique_id=974890216]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, 150.71973, 0, -1432.7694)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport24" type="MeshInstance3D" parent="AllRoads" unique_id=686787219]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, 402.90784, 0, -1432.7694)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport27" type="MeshInstance3D" parent="AllRoads" unique_id=523487973]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, 150.71973, 0, 50.67212)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport28" type="MeshInstance3D" parent="AllRoads" unique_id=729447736]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, 402.90784, 0, 50.67212)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport25" type="MeshInstance3D" parent="AllRoads" unique_id=1440496066]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, 150.71973, 0, -684.47327)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport26" type="MeshInstance3D" parent="AllRoads" unique_id=119708447]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, 402.90784, 0, -684.47327)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport31" type="MeshInstance3D" parent="AllRoads" unique_id=471766114]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, -684.47327)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport32" type="MeshInstance3D" parent="AllRoads" unique_id=1526079212]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, -430.21796)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport33" type="MeshInstance3D" parent="AllRoads" unique_id=619380672]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, -175.96275)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport34" type="MeshInstance3D" parent="AllRoads" unique_id=314356436]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, 78.29256)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport39" type="MeshInstance3D" parent="AllRoads" unique_id=941667081]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, -1697.3602)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport40" type="MeshInstance3D" parent="AllRoads" unique_id=962790995]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, -1443.1049)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport41" type="MeshInstance3D" parent="AllRoads" unique_id=1862725146]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, -1188.8497)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport42" type="MeshInstance3D" parent="AllRoads" unique_id=460878493]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, -934.59436)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport49" type="MeshInstance3D" parent="AllRoads" unique_id=989834090]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 652.4813, 0, -684.47327)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport50" type="MeshInstance3D" parent="AllRoads" unique_id=534936899]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 652.4813, 0, -430.21796)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport51" type="MeshInstance3D" parent="AllRoads" unique_id=1621682993]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 652.4813, 0, -1697.3602)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport52" type="MeshInstance3D" parent="AllRoads" unique_id=1107541202]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 652.4813, 0, -1443.1049)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport53" type="MeshInstance3D" parent="AllRoads" unique_id=940548824]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 652.4813, 0, -1188.8497)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport54" type="MeshInstance3D" parent="AllRoads" unique_id=1424744676]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 652.4813, 0, -934.59436)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport55" type="MeshInstance3D" parent="AllRoads" unique_id=592515736]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, -2201.7368)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport56" type="MeshInstance3D" parent="AllRoads" unique_id=220406451]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, -1947.4816)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport57" type="MeshInstance3D" parent="AllRoads" unique_id=387036648]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, -3214.624)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport58" type="MeshInstance3D" parent="AllRoads" unique_id=1910290020]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, -2960.3687)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport59" type="MeshInstance3D" parent="AllRoads" unique_id=569138169]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, -2706.1133)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport60" type="MeshInstance3D" parent="AllRoads" unique_id=1659427766]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, -2451.858)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport61" type="MeshInstance3D" parent="AllRoads" unique_id=1967750963]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 652.4813, 0, -2201.7368)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport62" type="MeshInstance3D" parent="AllRoads" unique_id=59243665]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 652.4813, 0, -1947.4816)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport63" type="MeshInstance3D" parent="AllRoads" unique_id=492741181]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 652.4813, 0, -3214.624)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport64" type="MeshInstance3D" parent="AllRoads" unique_id=571895536]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 652.4813, 0, -2960.3687)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport65" type="MeshInstance3D" parent="AllRoads" unique_id=450605898]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 652.4813, 0, -2706.1133)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport66" type="MeshInstance3D" parent="AllRoads" unique_id=1100042137]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 652.4813, 0, -2451.858)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport35" type="MeshInstance3D" parent="AllRoads" unique_id=1074345655]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, 324.2796)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport36" type="MeshInstance3D" parent="AllRoads" unique_id=1374348905]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, 578.5349)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport37" type="MeshInstance3D" parent="AllRoads" unique_id=967409927]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, 832.79016)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport38" type="MeshInstance3D" parent="AllRoads" unique_id=1995892412]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, 1087.0454)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport43" type="MeshInstance3D" parent="AllRoads" unique_id=122651365]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 653.02905, 0, -175.96275)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport44" type="MeshInstance3D" parent="AllRoads" unique_id=670214843]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 653.02905, 0, 78.29256)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport45" type="MeshInstance3D" parent="AllRoads" unique_id=132989466]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 653.02905, 0, 324.2796)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport46" type="MeshInstance3D" parent="AllRoads" unique_id=1915767543]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 653.02905, 0, 578.5349)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport47" type="MeshInstance3D" parent="AllRoads" unique_id=715813485]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 653.02905, 0, 832.79016)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport48" type="MeshInstance3D" parent="AllRoads" unique_id=1770359853]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 653.02905, 0, 1087.0454)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport67" type="MeshInstance3D" parent="AllRoads" unique_id=1377605025]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, 1347.502)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport68" type="MeshInstance3D" parent="AllRoads" unique_id=1775344709]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, 1601.7572)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport69" type="MeshInstance3D" parent="AllRoads" unique_id=5094378]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, 1847.7443)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport70" type="MeshInstance3D" parent="AllRoads" unique_id=908766103]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, 2101.9995)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport71" type="MeshInstance3D" parent="AllRoads" unique_id=554776855]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, 2356.255)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport72" type="MeshInstance3D" parent="AllRoads" unique_id=1334157508]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 576.5458, 0, 2610.5098)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport73" type="MeshInstance3D" parent="AllRoads" unique_id=223451899]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 653.02905, 0, 1347.502)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport74" type="MeshInstance3D" parent="AllRoads" unique_id=616690560]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 653.02905, 0, 1601.7572)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport75" type="MeshInstance3D" parent="AllRoads" unique_id=461182424]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 653.02905, 0, 1847.7443)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport76" type="MeshInstance3D" parent="AllRoads" unique_id=1229858481]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 653.02905, 0, 2101.9995)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport77" type="MeshInstance3D" parent="AllRoads" unique_id=487806788]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 653.02905, 0, 2356.255)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport78" type="MeshInstance3D" parent="AllRoads" unique_id=693329252]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, 653.02905, 0, 2610.5098)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport11" type="MeshInstance3D" parent="AllRoads" unique_id=742697995]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, -484.03012, 0, -439.88257)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport12" type="MeshInstance3D" parent="AllRoads" unique_id=859563625]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, -484.03012, 0, -358.9458)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport13" type="MeshInstance3D" parent="AllRoads" unique_id=1794907216]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, -484.03012, 0, -278.3294)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport14" type="MeshInstance3D" parent="AllRoads" unique_id=1909427908]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, -484.03012, 0, -201.38669)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport15" type="MeshInstance3D" parent="AllRoads" unique_id=1864966172]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, -484.03012, 0, -125.03855)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport79" type="MeshInstance3D" parent="AllRoads" unique_id=590082957]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, -484.03012, 0, -45.78353)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport80" type="MeshInstance3D" parent="AllRoads" unique_id=577353247]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, -484.03012, 0, 33.841286)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport83" type="MeshInstance3D" parent="AllRoads" unique_id=789743581]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, -484.03012, 0, 112.51796)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport16" type="MeshInstance3D" parent="AllRoads" unique_id=1895396682]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, -484.03012, 0, -518.8332)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport81" type="MeshInstance3D" parent="AllRoads" unique_id=477655980]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, -484.03012, 0, -597.189)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport82" type="MeshInstance3D" parent="AllRoads" unique_id=1752807425]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, -484.03012, 0, -672.4814)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport84" type="MeshInstance3D" parent="AllRoads" unique_id=2110476299]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, -484.03012, 0, -752.3704)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport6" type="MeshInstance3D" parent="AllRoads" unique_id=651866425]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -114.326294, 0, -657.74347)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport7" type="MeshInstance3D" parent="AllRoads" unique_id=2093033796]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -114.326294, 0, -535.29596)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport8" type="MeshInstance3D" parent="AllRoads" unique_id=1202549507]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -684.40424, 0, -535.29596)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport87" type="MeshInstance3D" parent="AllRoads" unique_id=2034882022]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -684.40424, 0, -804.23096)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport85" type="MeshInstance3D" parent="AllRoads" unique_id=2024745084]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -684.40424, 0, -273.6823)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport86" type="MeshInstance3D" parent="AllRoads" unique_id=142850302]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -684.40424, 0, -4.499069)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport10" type="MeshInstance3D" parent="AllRoads" unique_id=1714405887]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -114.326294, 0, -918.4389)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport20" type="MeshInstance3D" parent="AllRoads" unique_id=1728074233]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -114.326294, 0, -1168.5599)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport9" type="MeshInstance3D" parent="AllRoads" unique_id=2088593212]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -114.326294, 0, 137.71439)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport30" type="MeshInstance3D" parent="AllRoads" unique_id=1097390316]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -114.326294, 0, -117.16643)
+mesh = ExtResource("12_csqee")
+
+[node name="LandingTrack1StraightAirport19" type="MeshInstance3D" parent="AllRoads" unique_id=1919311459]
+transform = Transform3D(0.99999994, 0, 0, 0, 1, 0, 0, 0, 0.99999994, -114.326294, 0, 396.10388)
+mesh = ExtResource("12_csqee")
+
+[node name="06TunnelAirport2" type="MeshInstance3D" parent="." unique_id=833880596]
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, 370.22452, 5.362, -253.96735)
+mesh = ExtResource("2_g5bj2")
+
+[node name="183AirplaneAirport1" type="MeshInstance3D" parent="." unique_id=445674466]
+transform = Transform3D(-0.99958634, 0, -0.028759032, 0, 1, 0, 0.028759032, 0, -0.99958634, 385.28516, 8.677814, -272.66373)
+mesh = ExtResource("14_57blr")
+
+[node name="183AirplaneAirport2" type="MeshInstance3D" parent="." unique_id=200676675]
+transform = Transform3D(0.03287609, 0, 0.99945956, 0, 1, 0, -0.99945956, 0, 0.03287609, 548.02783, 8.677814, 191.76143)
+mesh = ExtResource("14_57blr")
+
+[node name="184AirplaneAirport0" type="MeshInstance3D" parent="." unique_id=1017531815]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 479.20657, 6.786957, 181.07863)
+mesh = ExtResource("15_un7pw")
+
+[node name="19FiretruckAirport0" type="MeshInstance3D" parent="." unique_id=1131121951]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 513.7115, 1.997439, -439.64746)
+mesh = ExtResource("16_gbodw")
+
+[node name="20PassengerBusAirport0" type="MeshInstance3D" parent="." unique_id=2105547189]
+transform = Transform3D(-0.021622933, 0, -0.9997662, 0, 1, 0, 0.9997662, 0, -0.021622933, 278.524, 2.146893, -220.92322)
+mesh = ExtResource("17_csqee")
+
+[node name="182AirplaneAirport1" type="MeshInstance3D" parent="." unique_id=1423566328]
+transform = Transform3D(-0.99999994, 0, -8.742277e-08, 0, 1, 0, 8.742277e-08, 0, -0.99999994, 403.44058, 9.657, -47.300655)
+mesh = ExtResource("18_3qk8v")
+
+[node name="06TunnelAirport4" type="MeshInstance3D" parent="." unique_id=1477216698]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 370.41605, 5.362, -419.58542)
+mesh = ExtResource("2_g5bj2")
+
+[node name="06TunnelAirport5" type="MeshInstance3D" parent="." unique_id=562011397]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 370.41605, 5.362, -477.09613)
+mesh = ExtResource("2_g5bj2")
+
+[node name="07Modulo2Airport7" type="MeshInstance3D" parent="." unique_id=651013843]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 355.18497, 16.551, -448.49268)
+mesh = ExtResource("6_n5die")
+
+[node name="182AirplaneAirport2" type="MeshInstance3D" parent="." unique_id=153077368]
+transform = Transform3D(-0.99999994, 0, -8.742277e-08, 0, 1, 0, 8.742277e-08, 0, -0.99999994, 404.878, 9.657, -401.06073)
+mesh = ExtResource("18_3qk8v")
+
+[node name="182AirplaneAirport4" type="MeshInstance3D" parent="." unique_id=416263852]
+transform = Transform3D(-4.7313492e-08, -1.6476598e-09, 0.9999997, -0.41596326, 0.9093814, -1.818233e-08, -0.9093811, -0.41596338, -4.3711374e-08, 1500.4215, 748.66516, 1887.4998)
+mesh = ExtResource("18_3qk8v")
+
+[node name="182AirplaneAirport3" type="MeshInstance3D" parent="." unique_id=852528489]
+transform = Transform3D(-0.99999994, 0, -8.742277e-08, 0, 1, 0, 8.742277e-08, 0, -0.99999994, 403.44058, 9.657, -495.32602)
+mesh = ExtResource("18_3qk8v")
+
+[node name="181AirplaneAirport0" type="MeshInstance3D" parent="." unique_id=1324812760]
+transform = Transform3D(-0.9960162, 0, 0.08917241, 0, 1, 0, -0.08917241, 0, -0.9960162, 385.28516, 8.677814, -178.57513)
+mesh = ExtResource("19_57blr")
+
+[node name="05Container2Airport0" type="MeshInstance3D" parent="." unique_id=185062246]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 433.74158, 1.896641, 6.4763794)
+mesh = ExtResource("18_ijc6k")
+
+[node name="05Container3Airport0" type="MeshInstance3D" parent="." unique_id=234757267]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 437.00943, 1.896641, -5.997669)
+mesh = ExtResource("19_lnjah")
+
+[node name="05Container4Airport0" type="MeshInstance3D" parent="." unique_id=396478542]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 471.46216, 3.0201163, -6.5358453)
+mesh = ExtResource("20_shiv6")
+
+[node name="05Container5Airport0" type="MeshInstance3D" parent="." unique_id=1542876684]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 434.84204, 1.896641, -0.14130783)
+mesh = ExtResource("21_sje4t")
+
+[node name="05ContainerAirport0" type="MeshInstance3D" parent="." unique_id=968176598]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 423.34265, 1.896641, -7.274804)
+mesh = ExtResource("22_n4ytj")
+
+[node name="19FiretruckAirport1" type="MeshInstance3D" parent="." unique_id=1656921140]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 466.30383, 1.997439, -1.4689188)
+mesh = ExtResource("16_gbodw")
+
+[node name="20PassengerBusAirport1" type="MeshInstance3D" parent="." unique_id=1285024536]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 455.8393, 2.146893, -14.230823)
+mesh = ExtResource("17_csqee")
+
+[node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="." unique_id=1634452865]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 485.97836, 2.303051, -6.5968046)
+mesh = ExtResource("23_rii0k")
+
+[node name="212BaggageTruckAirport0" type="MeshInstance3D" parent="." unique_id=1628481006]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 478.88278, 2.336695, -6.5984855)
+mesh = ExtResource("24_q2irx")
+
+[node name="213BaggageTruckAirport0" type="MeshInstance3D" parent="." unique_id=1859166922]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 472.32654, 0.575361, -6.5357294)
+mesh = ExtResource("25_p3idx")

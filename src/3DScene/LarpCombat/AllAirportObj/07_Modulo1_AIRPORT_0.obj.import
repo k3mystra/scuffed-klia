@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://d06jr5u2rci0"
+path="res://.godot/imported/07_Modulo1_AIRPORT_0.obj-719a1277b1e8b507194801ae8d38c507.mesh"
+
+[deps]
+
+files=["res://.godot/imported/07_Modulo1_AIRPORT_0.obj-719a1277b1e8b507194801ae8d38c507.mesh"]
+
+source_file="res://AllAirportObj/07_Modulo1_AIRPORT_0.obj"
+dest_files=["res://.godot/imported/07_Modulo1_AIRPORT_0.obj-719a1277b1e8b507194801ae8d38c507.mesh", "res://.godot/imported/07_Modulo1_AIRPORT_0.obj-719a1277b1e8b507194801ae8d38c507.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false
