@@ -10,6 +10,8 @@
 
 #include <string>
 
+#include "InputManager.h"
+#include "CameraControl.h"
 #include "Render.h"
 #include "Transform.h"
 #include "World.h"
@@ -23,19 +25,17 @@ int main (int argc, char *argv[]) {
     // Data init
     World world = loadFromFile("3DScene/LarpCombat/world.txt");
 
-    RenderSystem renderer = RenderSystem();
-    renderer.renderSystemInit(world, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
+    RenderSystem renderer = RenderSystem(world, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
+    InputManager::init(world.window);
 
     // Actual game loop
     // ==== ECS Migration ====
 
-    float deltaTime, aggregateDeltaTime = 0;
+    float deltaTime = 0;
     float lastFrameTime = 0, currentFrameTime = 0;
-    float phyTimeAccumulator = 0.0;
-    int frameCount = 0;
 
     // Main render loop
-    while(!glfwWindowShouldClose(renderer.getWindowPointer()))
+    while(!glfwWindowShouldClose(world.window))
     {
         // Delta time calculations
         currentFrameTime = glfwGetTime();
@@ -44,24 +44,16 @@ int main (int argc, char *argv[]) {
 
         world.deltaTime = deltaTime;
 
-        phyTimeAccumulator += deltaTime;
+        processGlobalInputEvent(world);
+        processCameraControl(world);
 
         updateTransform(world);
         // skybox.render(cam->getProjectionMatrix(), cam->getInvTransform());
 
-        // Physics shit
-        // while (phyTimeAccumulator >= PHYSICS_TIMESTEP) {
-        //     for (Model &model : allModels) {
-        //         glm::vec3 deltaPos = Physics::updateState(&model.physicsState, PHYSICS_TIMESTEP);
-        //         model.setPosition(model.getPosition() + deltaPos);
-        //     }
-        //
-        //
-        //     phyTimeAccumulator -= PHYSICS_TIMESTEP;
-        // }
         renderer.render(world);
+        InputManager::clearInputQueue();
 
-        glfwSwapBuffers(renderer.getWindowPointer());
+        glfwSwapBuffers(world.window);
         glfwPollEvents();    
     }
 

@@ -15,13 +15,13 @@ struct EntityData {
 };
 
 struct Transform {
-    bool isDirty = false;
+    bool isDirty = true;
 
-    glm::mat4 matrix;
-    glm::mat4 invMatrix;
-    glm::vec3 position;
-    glm::quat rotation;
-    glm::vec3 scale;
+    glm::mat4 matrix = glm::mat4(1);
+    glm::mat4 invMatrix = glm::mat4(1);
+    glm::vec3 position = glm::vec3(0);
+    glm::quat rotation = glm::quat();
+    glm::vec3 scale = glm::vec3(0);
 };
 
 struct Material {

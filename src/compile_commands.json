@@ -7,12 +7,18 @@
    "-Wall",
    "-D",
    "GLM_ENABLE_EXPERIMENTAL",
+   "-D",
+   "GLM_FORCE_QUAT_DATA_WXYZ",
+   "-D",
+   "ENABLE_OPENGL_DEBUG",
+   "-include",
+   "include/pch.h",
    "-c",
-   "AmbientLight.cpp",
+   "CameraControl.cpp",
    "-o",
-   "build/AmbientLight.o"
+   "build/CameraControl.o"
   ],
-  "file": "AmbientLight.cpp"
+  "file": "CameraControl.cpp"
  },
  {
   "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
@@ -22,12 +28,18 @@
    "-Wall",
    "-D",
    "GLM_ENABLE_EXPERIMENTAL",
+   "-D",
+   "GLM_FORCE_QUAT_DATA_WXYZ",
+   "-D",
+   "ENABLE_OPENGL_DEBUG",
+   "-include",
+   "include/pch.h",
    "-c",
-   "Camera.cpp",
+   "InputManager.cpp",
    "-o",
-   "build/Camera.o"
+   "build/InputManager.o"
   ],
-  "file": "Camera.cpp"
+  "file": "InputManager.cpp"
  },
  {
   "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
@@ -37,12 +49,18 @@
    "-Wall",
    "-D",
    "GLM_ENABLE_EXPERIMENTAL",
+   "-D",
+   "GLM_FORCE_QUAT_DATA_WXYZ",
+   "-D",
+   "ENABLE_OPENGL_DEBUG",
+   "-include",
+   "include/pch.h",
    "-c",
-   "GameObject.cpp",
+   "LoadOBJ.cpp",
    "-o",
-   "build/GameObject.o"
+   "build/LoadOBJ.o"
   ],
-  "file": "GameObject.cpp"
+  "file": "LoadOBJ.cpp"
  },
  {
   "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
@@ -52,36 +70,12 @@
    "-Wall",
    "-D",
    "GLM_ENABLE_EXPERIMENTAL",
-   "-c",
-   "InputSystem.cpp",
-   "-o",
-   "build/InputSystem.o"
-  ],
-  "file": "InputSystem.cpp"
- },
- {
-  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
-  "arguments": [
-   "g++",
-   "-g",
-   "-Wall",
    "-D",
-   "GLM_ENABLE_EXPERIMENTAL",
-   "-c",
-   "Light.cpp",
-   "-o",
-   "build/Light.o"
-  ],
-  "file": "Light.cpp"
- },
- {
-  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
-  "arguments": [
-   "g++",
-   "-g",
-   "-Wall",
+   "GLM_FORCE_QUAT_DATA_WXYZ",
    "-D",
-   "GLM_ENABLE_EXPERIMENTAL",
+   "ENABLE_OPENGL_DEBUG",
+   "-include",
+   "include/pch.h",
    "-c",
    "main.cpp",
    "-o",
@@ -97,21 +91,12 @@
    "-Wall",
    "-D",
    "GLM_ENABLE_EXPERIMENTAL",
-   "-c",
-   "MeshObject.cpp",
-   "-o",
-   "build/MeshObject.o"
-  ],
-  "file": "MeshObject.cpp"
- },
- {
-  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
-  "arguments": [
-   "g++",
-   "-g",
-   "-Wall",
    "-D",
-   "GLM_ENABLE_EXPERIMENTAL",
+   "GLM_FORCE_QUAT_DATA_WXYZ",
+   "-D",
+   "ENABLE_OPENGL_DEBUG",
+   "-include",
+   "include/pch.h",
    "-c",
    "Model.cpp",
    "-o",
@@ -127,12 +112,18 @@
    "-Wall",
    "-D",
    "GLM_ENABLE_EXPERIMENTAL",
+   "-D",
+   "GLM_FORCE_QUAT_DATA_WXYZ",
+   "-D",
+   "ENABLE_OPENGL_DEBUG",
+   "-include",
+   "include/pch.h",
    "-c",
-   "Physics.cpp",
+   "Render.cpp",
    "-o",
-   "build/Physics.o"
+   "build/Render.o"
   ],
-  "file": "Physics.cpp"
+  "file": "Render.cpp"
  },
  {
   "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
@@ -142,51 +133,12 @@
    "-Wall",
    "-D",
    "GLM_ENABLE_EXPERIMENTAL",
-   "-c",
-   "RenderSystem.cpp",
-   "-o",
-   "build/RenderSystem.o"
-  ],
-  "file": "RenderSystem.cpp"
- },
- {
-  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
-  "arguments": [
-   "g++",
-   "-g",
-   "-Wall",
    "-D",
-   "GLM_ENABLE_EXPERIMENTAL",
-   "-c",
-   "Scene.cpp",
-   "-o",
-   "build/Scene.o"
-  ],
-  "file": "Scene.cpp"
- },
- {
-  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
-  "arguments": [
-   "g++",
-   "-g",
-   "-Wall",
+   "GLM_FORCE_QUAT_DATA_WXYZ",
    "-D",
-   "GLM_ENABLE_EXPERIMENTAL",
-   "-c",
-   "SeaPlane.cpp",
-   "-o",
-   "build/SeaPlane.o"
-  ],
-  "file": "SeaPlane.cpp"
- },
- {
-  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
-  "arguments": [
-   "g++",
-   "-g",
-   "-Wall",
-   "-D",
-   "GLM_ENABLE_EXPERIMENTAL",
+   "ENABLE_OPENGL_DEBUG",
+   "-include",
+   "include/pch.h",
    "-c",
    "Shader.cpp",
    "-o",
@@ -202,41 +154,59 @@
    "-Wall",
    "-D",
    "GLM_ENABLE_EXPERIMENTAL",
-   "-c",
-   "SkyCube.cpp",
-   "-o",
-   "build/SkyCube.o"
-  ],
-  "file": "SkyCube.cpp"
- },
- {
-  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
-  "arguments": [
-   "g++",
-   "-g",
-   "-Wall",
    "-D",
-   "GLM_ENABLE_EXPERIMENTAL",
-   "-c",
-   "SunLight.cpp",
-   "-o",
-   "build/SunLight.o"
-  ],
-  "file": "SunLight.cpp"
- },
- {
-  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
-  "arguments": [
-   "g++",
-   "-g",
-   "-Wall",
+   "GLM_FORCE_QUAT_DATA_WXYZ",
    "-D",
-   "GLM_ENABLE_EXPERIMENTAL",
+   "ENABLE_OPENGL_DEBUG",
+   "-include",
+   "include/pch.h",
    "-c",
    "TextureLoader.cpp",
    "-o",
    "build/TextureLoader.o"
   ],
   "file": "TextureLoader.cpp"
+ },
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-D",
+   "GLM_FORCE_QUAT_DATA_WXYZ",
+   "-D",
+   "ENABLE_OPENGL_DEBUG",
+   "-include",
+   "include/pch.h",
+   "-c",
+   "Transform.cpp",
+   "-o",
+   "build/Transform.o"
+  ],
+  "file": "Transform.cpp"
+ },
+ {
+  "directory": "/home/k3mystra/Coding_Projects/cpp/scuffed-klia/src",
+  "arguments": [
+   "g++",
+   "-g",
+   "-Wall",
+   "-D",
+   "GLM_ENABLE_EXPERIMENTAL",
+   "-D",
+   "GLM_FORCE_QUAT_DATA_WXYZ",
+   "-D",
+   "ENABLE_OPENGL_DEBUG",
+   "-include",
+   "include/pch.h",
+   "-c",
+   "World.cpp",
+   "-o",
+   "build/World.o"
+  ],
+  "file": "World.cpp"
  }
 ]

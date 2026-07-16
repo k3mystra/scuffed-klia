@@ -236,15 +236,7 @@ void RenderSystem::initializeComponents(World& world) {
     cam->projectionMatrix = glm::perspective(glm::radians(cam->fov), cam->aspectRatio, cam->nearPlane, cam->farPlane);
 }
 
-// Thank god for cpp
-// gotta love this
-RenderSystem::RenderSystem() {}
-
-GLFWwindow* RenderSystem::getWindowPointer() {
-    return window;
-}
-
-void RenderSystem::renderSystemInit(World& world, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
+RenderSystem::RenderSystem(World& world, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
      // By default already set to screen size, but useful if we resize the windows later
     glViewport(0, 0, initialWindowWidth, initialWindowHeight);
     // Pass WindowCallbackData for use by any callbacks
@@ -257,7 +249,7 @@ void RenderSystem::renderSystemInit(World& world, unsigned int initialWindowWidt
         .deltaTime = 0
     };
 
-    window = setupGlfwWindow(&windowCallbackData, initialWindowWidth, initialWindowHeight);
+    world.window = setupGlfwWindow(&windowCallbackData, initialWindowWidth, initialWindowHeight);
 
     // Init. GLEW to query the driver and actually load OpenGL library
     if (glewInit() != GLEW_OK) {
