@@ -3,11 +3,6 @@
 #include <GLFW/glfw3.h>
 
 
-// Static member initialization
-std::array<bool, GLFW_KEY_LAST + 1> InputManager::keyState = {};
-glm::vec2 lastMousePos = glm::vec2(-1, -1);
-std::vector<InputEvent> inputEventQueue = {};
-
 void InputManager::init(GLFWwindow* window) {
     // Use raw mouse motion if supported
     if (glfwRawMouseMotionSupported())
@@ -63,6 +58,6 @@ const bool InputManager::isKeyPressed(int key) {
     return key >= 0 && keyState[key];
 }
 
-const std::vector<InputEvent>& InputManager::getInputQueue() {
+const InputEventQueue& InputManager::getInputQueue() {
     return inputEventQueue;
 }

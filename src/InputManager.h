@@ -1,12 +1,11 @@
 #pragma once
 
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 #include <array>
-#include <glm/glm.hpp>
 #include <vector>
 
- 
 struct InputEvent {
     enum class Type {
         KeyPress,
@@ -30,6 +29,9 @@ struct InputEvent {
     // glm::vec2 scroll = glm::vec2(0);
 };
 
+typedef std::vector<InputEvent> InputEventQueue;
+
+
 class InputManager {
 public:
     static void init(GLFWwindow* window);
@@ -40,7 +42,7 @@ public:
     static const bool isKeyPressed(int key);
     
 private:
-    static std::array<bool, GLFW_KEY_LAST + 1> keyState;
-    static glm::vec2 lastMousePos;
-    static std::vector<InputEvent> inputEventQueue;
+    static inline std::array<bool, GLFW_KEY_LAST + 1> keyState = {};
+    static inline glm::vec2 lastMousePos = glm::vec2(-1, -1);
+    static inline InputEventQueue inputEventQueue = {};
 };
