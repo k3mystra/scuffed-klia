@@ -42,11 +42,9 @@ void InputManager::_handleMousePos(GLFWwindow *window, double xpos, double ypos)
         .mousePos = newMousePos
     };
 
-    if (lastMousePos == glm::vec2(-1, -1)) {
-        lastMousePos = newMousePos;
-    }
-
     inputEvent.mousePosDelta = newMousePos - lastMousePos;
+    lastMousePos = newMousePos;
+
     inputEventQueue.push_back(inputEvent);
 }
 
