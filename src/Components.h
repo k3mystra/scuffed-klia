@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <vector>
 #include <string>
 
@@ -8,6 +9,8 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include "Color.h"
+
+typedef uint16_t EntityID;
 
 
 struct EntityData {
@@ -75,4 +78,37 @@ struct Camera {
     float farPlane = 1000;
 
     glm::mat4 projectionMatrix = glm::mat4(1);
+};
+
+struct Track {
+    enum class Type {
+        POSITION, ROTATION, SCALE
+    };
+
+    Type type = Track::Type::POSITION;
+
+    size_t currentKeyframeIdx = 0;
+    size_t nextKeyframeIdx = 1;
+
+    EntityID cachedEntityID = 0;
+
+    std::string actorEntityName = "";
+
+    std::vector<float> keyframeTimestamps = {};
+    std::vector<float> keyframeData = {};
+};
+
+struct Animation {
+    enum class LoopMode {
+        LOOP_NONE,
+        LOOP_LINEAR,
+        LOOP_PINGPONG
+    };
+
+    LoopMode loopMode = Animation::LoopMode::LOOP_NONE;
+    float duration = 0.0;
+
+    std::string name;
+
+    std::vector<Track> tracks = {};
 };

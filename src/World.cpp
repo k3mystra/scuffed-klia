@@ -7,21 +7,38 @@
 #include "InputManager.h"
 
 #include <GLFW/glfw3.h>
-#include <cstdlib>
+#include <glm/glm.hpp>
+
+#include <cstdio>
 #include <fstream>
+#include <istream>
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <unordered_map>
 
 
-static void loadEntityDataComponent(const std::string& line, World& world) {
+const std::unordered_map<int, Animation::LoopMode> NUM_TO_LOOPMODE = {
+    { 0, Animation::LoopMode::LOOP_NONE },
+    { 1, Animation::LoopMode::LOOP_LINEAR },
+    { 2, Animation::LoopMode::LOOP_PINGPONG }
+};
+
+const std::unordered_map<std::string, Track::Type> STR_TO_TRACK_TYPE = {
+    { "POS", Track::Type::POSITION },
+    { "ROT", Track::Type::ROTATION },
+    { "ROT_EULER", Track::Type::ROTATION },
+    { "SCL", Track::Type::SCALE }
+};
+
+static EntityData loadEntityDataComponent(const std::string& line, World& world) {
     EntityData data = EntityData();
     data.name = line.substr(2, std::string::npos);
 
-    world.entityDataList.push_back(data);
+    return data;
 }
 
-static void loadTransformComponent(const std::string& line, World& world) {
+static Transform loadTransformComponent(const std::string& line, World& world) {
     Transform transform = Transform();
 
     std::istringstream stream(line);
@@ -44,22 +61,107 @@ static void loadTransformComponent(const std::string& line, World& world) {
 
     transform_utils::recalcTransform(transform);
 
-    world.transformList.push_back(transform);
+    return transform;
 }
 
-static void loadModelComponent(const std::string& line, World& world) {
+static Model loadModelComponent(const std::string& line, World& world) {
     std::string filename = line.substr(2, std::string::npos);
     Model model = loadObjFile(filename);
     model.srcPath = filename;
 
     model_utils::printModel(model);
 
-    world.modelList.push_back(model);
+    return model;
 }
 
-static void loadCameraComponent(const std::string& line, World& world) {
-    Camera cam = Camera();
-    world.cameraList.push_back(cam);
+static Camera loadCameraComponent(const std::string& line, World& world) {
+    return Camera();
+}
+
+static void convertEulerRotation(Track& track) {
+    glm::vec3 eulerRotation = glm::vec3(
+        track.keyframeData.end()[-1],
+        track.keyframeData.end()[-2],
+        track.keyframeData.end()[-3]
+    );
+
+    glm::quat q = glm::quat(eulerRotation);
+
+    // Remove previous data
+    track.keyframeData.pop_back();
+    track.keyframeData.pop_back();
+    track.keyframeData.pop_back();
+
+    track.keyframeData.push_back(q.w);
+    track.keyframeData.push_back(q.x);
+    track.keyframeData.push_back(q.y);
+    track.keyframeData.push_back(q.z);
+}
+
+static void addTracks(std::istringstream& stream, Animation& anim) {
+    char trackCheck;
+    stream >> trackCheck;
+    if (trackCheck != 'Z')
+        return;
+
+    Track track = Track();
+    stream >> track.actorEntityName;
+
+    std::string trackTypeStr;
+    stream >> trackTypeStr;
+    track.type = STR_TO_TRACK_TYPE.at(trackTypeStr);
+
+    int totalKeyframes;
+    stream >> totalKeyframes;
+
+    int keyFrameCount = 0;
+    while (!stream.eof() && stream.peek() != 'Z') {
+        std::string nextStr;
+        stream >> nextStr;
+        
+        if (nextStr == "K") {
+            if (trackTypeStr == "ROT_EULER" && keyFrameCount != 0)
+                convertEulerRotation(track);
+
+            float timestamp;
+            stream >> timestamp;
+            track.keyframeTimestamps.push_back(timestamp);
+
+            continue;
+        }
+
+        float value = std::stof(nextStr, nullptr);
+        track.keyframeData.push_back(value);
+
+        stream >> std::ws;
+        keyFrameCount++;
+    }
+
+    if (keyFrameCount != totalKeyframes)
+        std::cerr << "Unexpected number of keyframes (expected: " << totalKeyframes << ", got: " << keyFrameCount << ")\n";
+
+    anim.tracks.push_back(track);
+
+    // Check for additional tracks
+    addTracks(stream, anim);
+}
+
+static Animation loadAnimComponent(const std::string& line, World& world) {
+    Animation anim = Animation();
+
+    std::istringstream stream(line);
+    stream.seekg(2);
+
+    stream >> anim.name;
+    stream >> anim.duration;
+
+    int loopModeNum;
+    stream >> loopModeNum;
+    anim.loopMode = NUM_TO_LOOPMODE.at(loopModeNum);
+
+    addTracks(stream, anim);
+
+    return anim;
 }
 
 World loadFromFile(std::string filename) {
@@ -79,21 +181,25 @@ World loadFromFile(std::string filename) {
     while (std::getline(worldSetupFile, line)) {
         switch (line[0]) {
             case '#':
-                loadEntityDataComponent(line, world);
-                world.totalEntity++;
+                world.entityDataList.push_back(loadEntityDataComponent(line, world));
                 world.entityDataIndex.insert({ world.totalEntity - 1, world.entityDataList.size() - 1 });
+                world.totalEntity++;
                 break;
             case 'T':
-                loadTransformComponent(line, world);
+                world.transformList.push_back(loadTransformComponent(line, world));
                 world.transformIndex.insert({ world.totalEntity - 1, world.transformList.size() - 1 });
                 break;
             case 'M':
-                loadModelComponent(line, world);
+                world.modelList.push_back(loadModelComponent(line, world));
                 world.modelIndex.insert({ world.totalEntity - 1, world.modelList.size() - 1 });
                 break;
             case 'C':
-                loadCameraComponent(line, world);
+                world.cameraList.push_back(loadCameraComponent(line, world));
                 world.cameraIndex.insert({ world.totalEntity - 1, world.cameraList.size() - 1 });
+                break;
+            case 'A':
+                world.animList.push_back(loadAnimComponent(line, world));
+                world.animIndex.insert({ world.totalEntity - 1, world.animList.size() - 1 });
                 break;
             default:
                 continue;
