@@ -16,12 +16,9 @@ struct WindowCallbackData {
 
 class RenderSystem {
 public:
-    RenderSystem();
-    void renderSystemInit(World& world, unsigned int initialWindowWidth, unsigned int initialWindowHeight);
-    GLFWwindow* getWindowPointer();
+    RenderSystem(World& world, unsigned int initialWindowWidth, unsigned int initialWindowHeight);
     void render(World& world);
 private:
-    GLFWwindow* window;
     WindowCallbackData windowCallbackData;
     Shader _defaultShader = Shader();
 

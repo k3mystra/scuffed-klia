@@ -21,8 +21,6 @@ static void loadEntityDataComponent(const std::string& line, World& world) {
 
 static void loadTransformComponent(const std::string& line, World& world) {
     Transform transform = Transform();
-    transform.isDirty = false;
-    transform.matrix = glm::mat4(1);
 
     std::istringstream stream(line);
     stream.seekg(2);
