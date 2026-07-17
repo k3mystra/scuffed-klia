@@ -9,13 +9,13 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#include <cstdio>
 #include <fstream>
 #include <istream>
 #include <sstream>
 #include <string>
 #include <iostream>
 #include <unordered_map>
+#include <vector>
 
 
 const std::unordered_map<int, Animation::LoopMode> NUM_TO_LOOPMODE = {
@@ -78,24 +78,25 @@ static Camera loadCameraComponent(const std::string& line, World& world) {
     return Camera();
 }
 
-static void convertEulerRotation(Track& track) {
-    glm::vec3 eulerRotation = glm::vec3(
-        track.keyframeData.end()[-1],
-        track.keyframeData.end()[-2],
-        track.keyframeData.end()[-3]
-    );
+static void convertEulerRotationData(Track& track) {
+    std::vector<float> result;
+    result.reserve(track.keyframeTimestamps.size() * 4);
 
-    glm::quat q = glm::quat(eulerRotation);
+    for (size_t i = 0; i < track.keyframeTimestamps.size(); i++) {
+        glm::vec3 eulerRot = glm::vec3(
+            track.keyframeData[(3 * i) + 0],
+            track.keyframeData[(3 * i) + 1],
+            track.keyframeData[(3 * i) + 2]
+        );
 
-    // Remove previous data
-    track.keyframeData.pop_back();
-    track.keyframeData.pop_back();
-    track.keyframeData.pop_back();
+        glm::quat q = glm::quat(eulerRot);
+        result.push_back(q.w);
+        result.push_back(q.x);
+        result.push_back(q.y);
+        result.push_back(q.z);
+    }
 
-    track.keyframeData.push_back(q.w);
-    track.keyframeData.push_back(q.x);
-    track.keyframeData.push_back(q.y);
-    track.keyframeData.push_back(q.z);
+    track.keyframeData = std::move(result);
 }
 
 static void addTracks(std::istringstream& stream, Animation& anim) {
@@ -120,9 +121,6 @@ static void addTracks(std::istringstream& stream, Animation& anim) {
         stream >> nextStr;
         
         if (nextStr == "K") {
-            if (trackTypeStr == "ROT_EULER" && keyFrameCount != 0)
-                convertEulerRotation(track);
-
             float timestamp;
             stream >> timestamp;
             track.keyframeTimestamps.push_back(timestamp);
@@ -136,6 +134,9 @@ static void addTracks(std::istringstream& stream, Animation& anim) {
 
         stream >> std::ws;
     }
+
+    if (trackTypeStr == "ROT_EULER")
+        convertEulerRotationData(track);
 
     if (keyFrameCount != totalKeyframes)
         std::cerr << "Unexpected number of keyframes (expected: " << totalKeyframes << ", got: " << keyFrameCount << ")\n";
@@ -204,6 +205,15 @@ World loadFromFile(std::string filename) {
             default:
                 continue;
         };
+    }
+
+    // populate name->ID mapping
+    for (EntityID e = 0; e < world.totalEntity; e++) {
+        auto search = world.entityDataIndex.find(e);
+        if (search == world.entityDataIndex.end())
+            continue;
+
+        world.nameToIdMapping.insert({ world.entityDataList[search->second].name, e });
     }
 
     return world;

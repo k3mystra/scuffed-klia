@@ -1,10 +1,7 @@
 #include "Transform.h"
 
-#include <iostream>
-
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include <glm/gtc/quaternion.hpp>
 
 namespace transform_utils {
     void recalcTransform(Transform& transform) {
@@ -30,6 +27,11 @@ namespace transform_utils {
 
     void setRotation(Transform& transform, glm::quat rotation) {
         transform.rotation = rotation;
+        transform.isDirty = true;
+    }
+
+    void setScale(Transform& transform, glm::vec3 scale) {
+        transform.scale = scale;
         transform.isDirty = true;
     }
 }

@@ -5,7 +5,6 @@
 #include <string>
 
 #include <glm/fwd.hpp>
-#include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/quaternion.hpp>
 
 #include "Color.h"
@@ -107,6 +106,7 @@ struct Animation {
 
     LoopMode loopMode = Animation::LoopMode::LOOP_NONE;
     float duration = 0.0;
+    float currentTime = 0.0;
 
     std::string name;
 

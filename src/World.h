@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GLFW/glfw3.h>
+#include <string>
 #include <vector>
 #include <unordered_map>
 
@@ -20,6 +21,8 @@ struct World {
 
     AmbientLight ambientLight = AmbientLight();
     SunLight sunlight = SunLight();
+
+    std::unordered_map<std::string, EntityID> nameToIdMapping = {};
 
     std::vector<EntityData> entityDataList = {};
     std::vector<Transform> transformList = {};

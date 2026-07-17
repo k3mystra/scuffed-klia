@@ -13,8 +13,9 @@
 #include "InputManager.h"
 #include "CameraControl.h"
 #include "Render.h"
-#include "Transform.h"
 #include "World.h"
+#include "Animation.h"
+#include "Transform.h"
 
 
 const unsigned int INITIAL_WINDOW_WIDTH = 640;
@@ -27,6 +28,7 @@ int main (int argc, char *argv[]) {
 
     RenderSystem renderer = RenderSystem(world, INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT);
     InputManager::init(world.window);
+    animationSystemInit(world);
 
     // Actual game loop
     // ==== ECS Migration ====
@@ -46,6 +48,7 @@ int main (int argc, char *argv[]) {
 
         processGlobalInputEvent(world);
         processCameraControl(world);
+        processAnimation(world);
 
         updateTransform(world);
         // skybox.render(cam->getProjectionMatrix(), cam->getInvTransform());
