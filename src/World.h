@@ -11,6 +11,7 @@ typedef uint16_t EntityID;
 
 struct World {
     int totalEntity = 0;
+    bool isCursorLocked = true;
     float deltaTime = 0;
 
     GLFWwindow* window = nullptr;
@@ -31,3 +32,5 @@ struct World {
 };
 
 World loadFromFile(std::string filename);
+
+void processGlobalInputEvent(World& world);
