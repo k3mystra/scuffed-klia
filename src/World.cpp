@@ -127,6 +127,7 @@ static void addTracks(std::istringstream& stream, Animation& anim) {
             stream >> timestamp;
             track.keyframeTimestamps.push_back(timestamp);
 
+            keyFrameCount++;
             continue;
         }
 
@@ -134,7 +135,6 @@ static void addTracks(std::istringstream& stream, Animation& anim) {
         track.keyframeData.push_back(value);
 
         stream >> std::ws;
-        keyFrameCount++;
     }
 
     if (keyFrameCount != totalKeyframes)
