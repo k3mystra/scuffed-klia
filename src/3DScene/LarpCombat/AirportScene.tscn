@@ -168,7 +168,7 @@ point_count = 7
 script = ExtResource("1_g5bj2")
 
 [node name="02ControlTowerAirport0" type="MeshInstance3D" parent="." unique_id=1393510959]
-transform = Transform3D(0.98639494, -0.16439342, 0, 0.16439342, 0.98639494, 0, 0, 0, 1, 106.82825, 47.904205, 45.32083)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 106.82825, 47.904205, 45.32083)
 mesh = ExtResource("1_pitgv")
 
 [node name="06TunnelAirport0" type="MeshInstance3D" parent="." unique_id=180191624]
@@ -191,7 +191,7 @@ mesh = ExtResource("1_pitgv")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 235, 210)
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=855623862]
-transform = Transform3D(1, 0, 0, 0, 0.9688128, 0.24779384, 0, -0.24779384, 0.9688128, 282.9624, 73, 169)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 282.9624, 73, 169)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2010793360]
 libraries/ = SubResource("AnimationLibrary_e8og4")
@@ -202,6 +202,7 @@ mesh = ExtResource("4_qec78")
 
 [node name="floor" type="CSGBox3D" parent="." unique_id=863255073]
 transform = Transform3D(10000, 0, 0, 0, 2, 0, 0, 0, 10000, 0, -1, 0)
+visible = false
 use_collision = true
 metadata/_edit_lock_ = true
 
@@ -678,7 +679,7 @@ transform = Transform3D(-0.99999994, 0, -8.742277e-08, 0, 1, 0, 8.742277e-08, 0,
 mesh = ExtResource("18_3qk8v")
 
 [node name="182AirplaneAirport4" type="MeshInstance3D" parent="." unique_id=416263852]
-transform = Transform3D(-4.731349e-08, -1.6476598e-09, 0.99999964, -0.41596323, 0.9093814, -1.8182329e-08, -0.9093811, -0.41596338, -4.3711374e-08, 1500.4215, 748.66516, 1887.4998)
+transform = Transform3D(-4.7313492e-08, -1.6476616e-09, 0.99999964, -0.41596323, 0.9093814, -1.8182325e-08, -0.9093811, -0.41596335, -4.3711374e-08, 1500.4215, 748.66516, 1887.4998)
 mesh = ExtResource("18_3qk8v")
 
 [node name="Path3D2" type="Path3D" parent="." unique_id=1071812615]
@@ -690,7 +691,7 @@ metadata/end_of_reverse = 2
 transform = Transform3D(-0.05574209, -4.6216886e-07, 0.9982863, 1.4208602e-14, 0.9999703, 4.6282906e-07, -0.9982863, 2.5806496e-08, -0.05574209, -0.014007568, -0.043935776, 0.23114014)
 
 [node name="Plane1" type="MeshInstance3D" parent="Path3D2/PathFollow3D" unique_id=1575685215]
-transform = Transform3D(-0.73444027, 0.6769295, 0.04861974, 0.6774303, 0.7355454, -0.007820679, -0.04105607, 0.027192663, -0.99878675, -2577.0059, 834.99493, -1267.289)
+transform = Transform3D(-0.73444027, 0.6769295, 0.04861974, 0.6774302, 0.73554546, -0.007820677, -0.04105607, 0.027192663, -0.99878675, -2577.0059, 834.99493, -1267.289)
 mesh = ExtResource("18_3qk8v")
 
 [node name="181AirplaneAirport0" type="MeshInstance3D" parent="." unique_id=1324812760]
@@ -748,8 +749,8 @@ visible = false
 curve = SubResource("Curve3D_ijc6k")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Path3D" unique_id=1951737533]
-transform = Transform3D(-8.36732e-09, 0.81497085, -0.579179, -5.956623e-08, 0.57917833, 0.8149718, 0.9993556, 4.134524e-08, 4.3726796e-08, -489.94507, -4.069336, -1.982544)
+transform = Transform3D(-8.36732e-09, 0.81497085, -0.579179, -5.956623e-08, 0.57917833, 0.8149718, 0.9993556, 4.1345235e-08, 4.3726796e-08, -489.94507, -4.069336, -1.982544)
 
 [node name="Airplane1" type="MeshInstance3D" parent="Path3D/PathFollow3D" unique_id=580011685]
-transform = Transform3D(-0.99908936, -5.0429255e-05, 0.042667244, 0.0347791, 0.57832414, 0.81506544, -0.024716597, 0.8158071, -0.57779574, -1119.9646, 1320.0935, -1437.8179)
+transform = Transform3D(-0.99908936, -5.041808e-05, 0.042667236, 0.034779105, 0.578324, 0.8150655, -0.024716582, 0.81580716, -0.5777956, -1119.9646, 1320.0935, -1437.8179)
 mesh = ExtResource("18_3qk8v")

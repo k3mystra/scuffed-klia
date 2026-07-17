@@ -11,8 +11,8 @@
 #include <iostream>
 #include <vector>
 
-const float MOVE_SPEED = 10;
-const float PAN_SPEED = 5;
+const float MOVE_SPEED = 100;
+const float PAN_SPEED = 15;
 
 static void removeVectorElevation(glm::vec3 vec) {
     vec.y = 0.0;
