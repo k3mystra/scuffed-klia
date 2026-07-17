@@ -1761,10 +1761,10 @@ curve = SubResource("Curve3D_wkbt1")
 metadata/_edit_lock_ = true
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Arrival/T1Arrival" unique_id=1139347748]
-transform = Transform3D(-8.372078e-09, 0.81497735, -0.5791808, -5.96001e-08, 0.5791829, 0.8149743, 0.9999239, 4.1345565e-08, 4.372693e-08, -1490.1356, -4.069336, -1.982544)
+transform = Transform3D(-8.372048e-09, 0.81498295, -0.579181, -5.9599884e-08, 0.5791869, 0.8149746, 0.99992025, 4.1345853e-08, 4.372695e-08, -1490.1356, -4.069336, -1.982544)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Arrival/T1Arrival/PathFollow3D" unique_id=606947961]
-transform = Transform3D(-0.9729982, -4.3421984e-05, 0.23081301, 0.18814127, 0.579137, 0.79322326, -0.13370681, 0.81523025, -0.5634911, -626.31433, 1568.313, -1614.2196)
+transform = Transform3D(-4.371139e-08, 1.4684028e-14, 1, -2.9813386e-08, 1, -1.5987212e-14, -1, -2.9813386e-08, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("18_3qk8v")
 
 [node name="T2Arrival" type="Path3D" parent="Arrival" unique_id=776996325]
@@ -1773,10 +1773,10 @@ curve = SubResource("Curve3D_d8pwk")
 metadata/_edit_lock_ = true
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Arrival/T2Arrival" unique_id=1097399222]
-transform = Transform3D(-8.372198e-09, 0.81497824, -0.57918113, -5.9600954e-08, 0.5791836, 0.8149748, 0.9999382, 4.134561e-08, 4.372696e-08, -1490.1356, -4.069336, -1.982544)
+transform = Transform3D(-8.372169e-09, 0.81498295, -0.57918054, -5.9600744e-08, 0.5791869, 0.814974, 0.9999347, 4.1345853e-08, 4.3726914e-08, -1490.1356, -4.069336, -1.982544)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Arrival/T2Arrival/PathFollow3D" unique_id=760309947]
-transform = Transform3D(-0.4631961, -0.00016729534, 0.8862558, 0.72240865, 0.5792148, 0.37767172, -0.51339567, 0.81517494, -0.26816916, -673.7091, 1597.282, -1634.8057)
+transform = Transform3D(-4.371139e-08, 2.2619466e-14, 1, 2.9813382e-08, 1, -2.1316282e-14, -1, 2.9813382e-08, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("18_3qk8v")
 
 [node name="T3Arrival" type="Path3D" parent="Arrival" unique_id=1769928174]
@@ -1785,10 +1785,10 @@ curve = SubResource("Curve3D_mst4x")
 metadata/_edit_lock_ = true
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Arrival/T3Arrival" unique_id=1413306193]
-transform = Transform3D(-0.9967271, 0.06282434, -0.04772642, -3.7247119e-09, 0.60483664, 0.7961568, 0.07889647, 0.79368216, -0.6029447, -1386.7512, 515.5639, -2848.8416)
+transform = Transform3D(-0.9967273, 0.062824346, -0.047726396, -3.7247125e-09, 0.60483676, 0.79615647, 0.078896485, 0.7936823, -0.60294443, -1386.7512, 515.5639, -2848.8416)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Arrival/T3Arrival/PathFollow3D" unique_id=1329368201]
-transform = Transform3D(-0.9996222, 0.0009539351, -0.027468031, -0.021887287, 0.5768457, 0.81655985, 0.01662376, 0.81685257, -0.5766069, -518.89545, 1208.2104, -1577.2865)
+transform = Transform3D(-4.3711385e-08, 1.2081255e-15, 1, -1.261624e-12, 1, -1.2081807e-15, -0.99999994, -1.2616242e-12, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("18_3qk8v")
 
 [node name="T4Arrival" type="Path3D" parent="Arrival" unique_id=2081748264]
@@ -1797,11 +1797,11 @@ curve = SubResource("Curve3D_d54c7")
 metadata/_edit_lock_ = true
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Arrival/T4Arrival" unique_id=506294113]
-transform = Transform3D(-0.9969099, 0.059347235, -0.04833834, 0.002955073, 0.660765, 0.75036246, 0.076486416, 0.7479923, -0.6590235, -1384.1222, 473.24777, -2814.286)
+transform = Transform3D(-0.99690855, 0.059347212, -0.048338432, 0.002955069, 0.66076475, 0.7503639, 0.07648631, 0.747992, -0.65902483, -1384.1222, 473.24777, -2814.286)
 progress = 54.708252
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Arrival/T4Arrival/PathFollow3D" unique_id=1220864225]
-transform = Transform3D(-0.99983346, 0.00052609853, -0.018241465, -0.014530752, 0.58176905, 0.8132242, 0.011040159, 0.81335384, -0.5816645, -461.91608, 1292.882, -1641.6528)
+transform = Transform3D(-4.3711385e-08, 1.951386e-12, 1, -5.9623e-08, 0.99999994, -1.9539925e-12, -0.99999994, -5.9623e-08, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("18_3qk8v")
 
 [node name="T5Arrival" type="Path3D" parent="Arrival" unique_id=541330220]
@@ -1810,11 +1810,11 @@ curve = SubResource("Curve3D_p3idx")
 metadata/_edit_lock_ = true
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Arrival/T5Arrival" unique_id=925129871]
-transform = Transform3D(0.024337877, -0.00037591136, -0.9995419, 0.015460578, 0.99958706, 4.4913813e-07, 0.9993873, -0.015454512, 0.024341634, -2.5676882, -9.646906, 11.9946575)
+transform = Transform3D(0.024337936, -0.00037591325, -0.9995444, 0.015460616, 0.9995921, 4.4913926e-07, 0.99938977, -0.01545459, 0.024341693, -2.5676882, -9.646906, 11.9946575)
 progress = 4027.4514
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Arrival/T5Arrival/PathFollow3D" unique_id=150143431]
-transform = Transform3D(-0.9745884, -0.003499508, 0.22397593, 0.18178822, 0.5718655, 0.7999518, -0.13088356, 0.82033986, -0.5566973, -563.2369, 1513.9675, -1736.9208)
+transform = Transform3D(-4.3711392e-08, -2.98267e-08, 1, 8.936877e-08, 0.99999994, 2.9826708e-08, -1, 8.936876e-08, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("18_3qk8v")
 
 [node name="T6Arrival" type="Path3D" parent="Arrival" unique_id=2080822741]
@@ -1823,10 +1823,11 @@ curve = SubResource("Curve3D_ijc6k")
 metadata/_edit_lock_ = true
 
 [node name="PathFollow3D" type="PathFollow3D" parent="Arrival/T6Arrival" unique_id=1951737533]
-transform = Transform3D(-8.3721625e-09, 0.81497884, -0.5791828, -5.96007e-08, 0.579184, 0.81497717, 0.99993396, 4.1345643e-08, 4.3727088e-08, -1490.1356, -4.069336, -1.982544)
+transform = Transform3D(0.9990215, -0.00018939794, -0.042640153, 0.0001895901, 0.9998274, -4.5466487e-13, 0.04264495, -8.084776e-06, 0.9989091, 1419.3606, -411.43082, -1122.6692)
+progress = 3862.4404
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Arrival/T6Arrival/PathFollow3D" unique_id=2015174048]
-transform = Transform3D(-0.44314545, -0.00016978383, 0.89644974, 0.7307176, 0.57921827, 0.36132813, -0.5193014, 0.81517255, -0.2565539, -675.99554, 1599.0505, -1636.0667)
+transform = Transform3D(-4.371139e-08, 4.499089e-15, 1, -5.962607e-08, 1, -7.1054274e-15, -1, -5.962607e-08, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("18_3qk8v")
 
 [node name="departure" type="Node3D" parent="." unique_id=1018938669]
@@ -1840,10 +1841,10 @@ metadata/end_of_reverse = 2
 metadata/_edit_lock_ = true
 
 [node name="PathFollow3D" type="PathFollow3D" parent="departure/T1Departure" unique_id=61441535]
-transform = Transform3D(-0.01713533, 0.002683497, 0.9997076, -1.1639607e-10, 0.9998299, -0.002683957, -0.9996878, -4.599708e-05, -0.017135669, 0.3592224, -9.737393, -0.02166748)
+transform = Transform3D(-0.017135307, 0.002683492, 0.99970853, -1.1639592e-10, 0.9998279, -0.0026839597, -0.9996865, -4.599699e-05, -0.017135683, 0.3592224, -9.737393, -0.02166748)
 
 [node name="BigCommercial1" type="MeshInstance3D" parent="departure/T1Departure/PathFollow3D" unique_id=1551977955]
-transform = Transform3D(-0.03179936, -0.00093092606, 0.99949384, 1.0677613e-06, 0.9999996, 0.0009314311, -0.99949425, 3.0686137e-05, -0.031799346, -734.1984, -0.031094829, -1142.5625)
+transform = Transform3D(-4.3711385e-08, -2.1833183e-11, -1, 4.5523765e-10, 1, -2.1833202e-11, 0.99999994, -4.5523768e-10, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("18_3qk8v")
 
 [node name="T2Departure" type="Path3D" parent="departure" unique_id=879331971]
@@ -1853,10 +1854,10 @@ metadata/end_of_reverse = 2
 metadata/_edit_lock_ = true
 
 [node name="PathFollow3D" type="PathFollow3D" parent="departure/T2Departure" unique_id=1836141540]
-transform = Transform3D(-0.06851421, -0.0026806823, 0.9974837, 0, 0.9998309, 0.002687007, -0.99747646, 0.0001841295, -0.06851472, 0.5445862, 0.078840256, -74.539215)
+transform = Transform3D(-0.068514235, -0.0026806772, 0.99748164, 0, 0.999829, 0.0026870016, -0.99747676, 0.00018412915, -0.06851458, 0.5445862, 0.078840256, -74.539215)
 
 [node name="BigCommercial2" type="MeshInstance3D" parent="departure/T2Departure/PathFollow3D" unique_id=618116483]
-transform = Transform3D(0.069997594, -0.0006990854, 0.9975469, 0.0026808472, 0.9999963, 0.0005126876, -0.9975435, 0.002638384, 0.06999922, -860.7224, 2.2540662, -884.4273)
+transform = Transform3D(-4.3711385e-08, 9.1027216e-14, -1, 4.8264375e-09, 1, 9.0816243e-14, 0.99999994, -4.826438e-09, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("18_3qk8v")
 
 [node name="T3Depature" type="Path3D" parent="departure" unique_id=584534016]
@@ -1866,10 +1867,10 @@ metadata/end_of_reverse = 2
 metadata/_edit_lock_ = true
 
 [node name="PathFollow3D" type="PathFollow3D" parent="departure/T3Depature" unique_id=169426046]
-transform = Transform3D(-0.062534615, -3.0359385e-07, 0.9978826, 1.4208627e-14, 0.9998408, 3.041892e-07, -0.9978856, 1.9025366e-08, -0.06253443, -0.06265259, -8.677814, -0.3453369)
+transform = Transform3D(-0.06253461, -3.0359388e-07, 0.9978821, 1.42086245e-14, 0.99984086, 3.0418906e-07, -0.9978854, 1.9025366e-08, -0.0625344, -0.06265259, -8.677814, -0.3453369)
 
 [node name="183AirplaneAirport1" type="MeshInstance3D" parent="departure/T3Depature/PathFollow3D" unique_id=445674466]
-transform = Transform3D(0.18228579, 7.048142e-08, 0.98324555, 2.7576036e-07, 1, -1.2280616e-07, -0.98324555, 2.93526e-07, 0.18228579, -1005.454, -0.97602683, -833.3691)
+transform = Transform3D(-0.062552154, -5.6632032e-11, -0.9980416, -3.04098e-07, 1, 1.9002568e-08, 0.9980416, 3.0469116e-07, -0.062552154, -0.34706885, -0.97629935, 0.04074232)
 mesh = ExtResource("14_57blr")
 
 [node name="T4Departure" type="Path3D" parent="departure" unique_id=1943091796]
@@ -1878,10 +1879,10 @@ metadata/end_of_reverse = 2
 metadata/_edit_lock_ = true
 
 [node name="PathFollow3D" type="PathFollow3D" parent="departure/T4Departure" unique_id=1001770019]
-transform = Transform3D(0.046916768, 0.0059065153, 0.9987173, 2.327942e-10, 0.9998653, -0.005912753, -0.998742, 0.00027746387, 0.04691561, 1.1764832, -7.915497e-05, 0.36967468)
+transform = Transform3D(0.04691675, 0.0059065125, 0.998718, 2.3279412e-10, 0.9998649, -0.005912757, -0.9987416, 0.00027746375, 0.046915643, 1.1764832, -7.915497e-05, 0.36967468)
 
 [node name="181AirplaneAirport0" type="MeshInstance3D" parent="departure/T4Departure/PathFollow3D" unique_id=1324812760]
-transform = Transform3D(-0.99148494, 0.0099166185, 0.12984236, 0.006231339, 0.9995668, -0.028758291, -0.13007133, -0.027704325, -0.99111736, -1095.5527, -1.7600825, -297.66052)
+transform = Transform3D(0.046954937, -5.0943333e-07, -0.99889684, 0.005912669, 0.9999823, 0.00027742557, 0.9988794, -0.0059191743, 0.046954114, 0.31296164, -0.00695109, -1.1875284)
 mesh = ExtResource("19_57blr")
 
 [node name="T5Departure" type="Path3D" parent="departure" unique_id=1202249645]
@@ -1892,10 +1893,10 @@ metadata/end_of_reverse = 2
 metadata/_edit_lock_ = true
 
 [node name="PathFollow3D" type="PathFollow3D" parent="departure/T5Departure" unique_id=1527074538]
-transform = Transform3D(0.21523857, -0.0004977136, 0.97640395, 0, 0.99984354, 0.00050966453, -0.97640216, -0.00010971623, 0.21523896, 2.3469543, -9.989572, 12.678186)
+transform = Transform3D(0.21523716, -0.0004977113, 0.97640043, 0, 0.9998389, 0.00050966267, -0.9763958, -0.00010971572, 0.21523817, 2.3469543, -9.989572, 12.678186)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="departure/T5Departure/PathFollow3D" unique_id=1668250998]
-transform = Transform3D(-0.9787259, 0.0012531823, -0.20516838, -0.00015100674, 0.9999767, 0.0068282806, 0.20517215, 0.0067139966, -0.97870284, -1036.8193, 1.7085079, -290.52292)
+transform = Transform3D(-4.371139e-08, -1.8810071e-16, -0.99999994, -4.3032427e-09, 1, 0, 1, 4.3032427e-09, -4.3711385e-08, 0, 0, 0)
 mesh = ExtResource("18_3qk8v")
 
 [node name="T6Departure" type="Path3D" parent="departure" unique_id=888468147]
@@ -1905,10 +1906,10 @@ metadata/end_of_reverse = 2
 metadata/_edit_lock_ = true
 
 [node name="PathFollow3D" type="PathFollow3D" parent="departure/T6Departure" unique_id=2066862015]
-transform = Transform3D(-0.010792871, 0.0026866612, 0.99977857, -2.3279349e-10, 0.9998273, -0.002686843, -0.99978226, -2.9003335e-05, -0.010792832, 0.716156, -9.738417, 1.1983948)
+transform = Transform3D(-0.01079285, 0.0026866647, 0.99977756, -2.3279302e-10, 0.99982864, -0.0026868405, -0.99978024, -2.9003373e-05, -0.010792821, 0.716156, -9.738417, 1.1983948)
 
 [node name="BudgetPlane3" type="MeshInstance3D" parent="departure/T6Departure/PathFollow3D" unique_id=672081604]
-transform = Transform3D(-0.99416745, 0.0017089732, 0.10783303, 0.0017161329, 0.99999833, -2.6406065e-05, -0.1078329, 0.00015880374, -0.994169, -826.1866, 0.56964475, -467.69962)
+transform = Transform3D(-2.1894762e-06, 3.1219956e-09, -0.99999994, 0.0017449297, 0.9999982, -6.984919e-10, 0.99999833, -0.0017449295, -2.1894784e-06, 1.0447013, 0.593691, -0.920147)
 mesh = ExtResource("18_3qk8v")
 
 [node name="Camera3D" type="Camera3D" parent="departure/T6Departure/PathFollow3D/BudgetPlane3" unique_id=2078254689]
@@ -1939,10 +1940,10 @@ transform = Transform3D(0.9998628, 0, 0, 0, 0.99995077, 0, 0, 0, 0.9998591, -77.
 curve = SubResource("Curve3D_02nnr")
 
 [node name="PathFollow3D" type="PathFollow3D" parent="PassengerTruckPath" unique_id=218837808]
-transform = Transform3D(0.02497546, -7.612541e-08, -0.9994996, 3.5520447e-15, 1, -7.6134825e-08, 0.9994996, 1.9022155e-09, 0.02497546, -0.37879944, -1.997657, -0.07763672)
+transform = Transform3D(0.024975466, -7.612541e-08, -0.9994998, 3.5520454e-15, 1, -7.613484e-08, 0.9994998, 1.9022155e-09, 0.024975466, -0.37879944, -1.997657, -0.07763672)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="PassengerTruckPath/PathFollow3D" unique_id=1545200353]
-transform = Transform3D(-0.9999447, 2.422369e-07, 0.010520415, 2.3572902e-07, 1, -6.1983604e-07, -0.010520415, -6.173218e-07, -0.9999447, -487.90927, -3.0007788e-05, -361.95386)
+transform = Transform3D(-4.371139e-08, -1.7665034e-21, 1, -1.1346103e-14, 1, 1.2705494e-21, -1, -1.1346103e-14, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("17_csqee")
 
 [node name="T1BaggageTruck" type="Path3D" parent="." unique_id=1552490145]
@@ -1950,18 +1951,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, -1, 384.5431, 4.606051, -450.355
 curve = SubResource("Curve3D_hagi8")
 
 [node name="BaggageTruck" type="PathFollow3D" parent="T1BaggageTruck" unique_id=1883430303]
-transform = Transform3D(-0.0673961, 0, -0.9975565, 0, 1, 0, 0.9975565, 0, -0.0673961, -18.419708, -2.3030725, -4.0229936)
+transform = Transform3D(0.0025384394, 0, 0.99982595, 0, 1, 0, -0.99982595, 0, 0.0025384394, -19.157099, -2.3030725, 3.1283777)
+progress = 271.04742
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T1BaggageTruck/BaggageTruck" unique_id=1432696281]
-transform = Transform3D(0.09668822, 4.171669e-08, -0.9953147, -6.42067e-07, 1, -2.0459481e-08, 0.9953147, 6.4103693e-07, 0.09668822, 7.2503805, 5.1021576e-05, 0.24960859)
+transform = Transform3D(-0.031914342, -4.2089e-11, 0.9994906, -6.4206705e-07, 1, -2.0459481e-08, -0.9994906, -6.4239293e-07, -0.031914342, -0.06690601, 5.1021576e-05, -0.00033534938)
 mesh = ExtResource("23_rii0k")
 
 [node name="Pulley" type="PathFollow3D" parent="T1BaggageTruck" unique_id=1832579221]
-transform = Transform3D(0.11490316, 0, -0.99320513, 0, 0.9999868, 0, 0.99320513, 0, 0.11490316, -25.376812, -2.3030725, -3.2504537)
-progress = 336.23322
+transform = Transform3D(0.0069154794, 0, 0.99980503, 0, 0.9999868, 0, -0.99980503, 0, 0.0069154794, -12.609734, -2.3030725, 3.1598732)
+progress = 264.5
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T1BaggageTruck/Pulley" unique_id=1754454447]
-transform = Transform3D(-0.12179061, 0, -0.9925558, 0, 1, 0, 0.9925558, 0, -0.12179061, 7.833748, 0, -11.943763)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T1BaggageTruck/Pulley" unique_id=1267002758]
@@ -1969,11 +1971,11 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 2
 mesh = ExtResource("19_lnjah")
 
 [node name="Pulley2" type="PathFollow3D" parent="T1BaggageTruck" unique_id=731529845]
-transform = Transform3D(0.12458905, 0, -0.9920352, 0, 0.9999868, 0, 0.9920352, 0, 0.12458905, -32.326637, -2.3030725, -2.4135058)
-progress = 329.23322
+transform = Transform3D(0.010480621, 0, 0.99977213, 0, 0.9999868, 0, -0.99977213, 0, 0.010480621, -5.6099715, -2.3030725, 3.2214575)
+progress = 257.5
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T1BaggageTruck/Pulley2" unique_id=1599600915]
-transform = Transform3D(-0.13500424, 0, -0.990845, 0, 1, 0, 0.990845, 0, -0.13500424, 8.918687, 0, -25.801823)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T1BaggageTruck/Pulley2" unique_id=1133047527]
@@ -1981,10 +1983,11 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 2
 mesh = ExtResource("18_ijc6k")
 
 [node name="Pulley3" type="PathFollow3D" parent="T1BaggageTruck" unique_id=1113457435]
-transform = Transform3D(-0.067395814, 0, -0.9975523, 0, 1, 0, 0.9975523, 0, -0.067395814, -18.419708, -2.3030725, -4.0229936)
+transform = Transform3D(0.012833237, 0, 0.99974406, 0, 1, 0, -0.99974406, 0, 0.012833237, 1.3895086, -2.3030725, 3.3038015)
+progress = 250.5
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T1BaggageTruck/Pulley3" unique_id=1986044503]
-transform = Transform3D(0.054595925, 0, -0.9985085, 0, 1, 0, 0.9985085, 0, 0.054595925, 5.973802, 0, -20.254524)
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T1BaggageTruck/Pulley3" unique_id=22201480]
@@ -1996,18 +1999,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 384.5431, 4.606051, -450.3556
 curve = SubResource("Curve3D_hagi8")
 
 [node name="BaggageTruck" type="PathFollow3D" parent="T2BaggageTruck" unique_id=1965130223]
-transform = Transform3D(-0.0673961, 0, -0.9975565, 0, 1, 0, 0.9975565, 0, -0.0673961, -18.419708, -2.3030725, -4.0229936)
+transform = Transform3D(0.0025384394, 0, 0.99982595, 0, 1, 0, -0.99982595, 0, 0.0025384394, -19.157099, -2.3030725, 3.1283777)
+progress = 271.04742
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T2BaggageTruck/BaggageTruck" unique_id=1384018544]
-transform = Transform3D(0.09668822, 4.171669e-08, -0.9953147, -6.42067e-07, 1, -2.0459481e-08, 0.9953147, 6.4103693e-07, 0.09668822, 7.2503805, 5.1021576e-05, 0.24960859)
+transform = Transform3D(-0.031914342, -4.2089e-11, 0.9994906, -6.4206705e-07, 1, -2.0459481e-08, -0.9994906, -6.4239293e-07, -0.031914342, -0.06690601, 5.1021576e-05, -0.00033534938)
 mesh = ExtResource("23_rii0k")
 
 [node name="Pulley" type="PathFollow3D" parent="T2BaggageTruck" unique_id=168888119]
-transform = Transform3D(0.11490316, 0, -0.99320513, 0, 0.9999868, 0, 0.99320513, 0, 0.11490316, -25.376812, -2.3030725, -3.2504537)
-progress = 336.23322
+transform = Transform3D(0.0069154794, 0, 0.99980503, 0, 0.9999868, 0, -0.99980503, 0, 0.0069154794, -12.609734, -2.3030725, 3.1598732)
+progress = 264.5
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T2BaggageTruck/Pulley" unique_id=1928717679]
-transform = Transform3D(-0.12179061, 0, -0.9925558, 0, 1, 0, 0.9925558, 0, -0.12179061, 7.833748, 0, -11.943763)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T2BaggageTruck/Pulley" unique_id=1304311246]
@@ -2015,11 +2019,11 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 2
 mesh = ExtResource("19_lnjah")
 
 [node name="Pulley2" type="PathFollow3D" parent="T2BaggageTruck" unique_id=2046237914]
-transform = Transform3D(0.12458905, 0, -0.9920352, 0, 0.9999868, 0, 0.9920352, 0, 0.12458905, -32.326637, -2.3030725, -2.4135058)
-progress = 329.23322
+transform = Transform3D(0.010480621, 0, 0.99977213, 0, 0.9999868, 0, -0.99977213, 0, 0.010480621, -5.6099715, -2.3030725, 3.2214575)
+progress = 257.5
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T2BaggageTruck/Pulley2" unique_id=437369069]
-transform = Transform3D(-0.13500424, 0, -0.990845, 0, 1, 0, 0.990845, 0, -0.13500424, 8.918687, 0, -25.801823)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T2BaggageTruck/Pulley2" unique_id=1176782511]
@@ -2027,10 +2031,11 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 2
 mesh = ExtResource("18_ijc6k")
 
 [node name="Pulley3" type="PathFollow3D" parent="T2BaggageTruck" unique_id=969995562]
-transform = Transform3D(-0.06739607, 0, -0.997556, 0, 1, 0, 0.997556, 0, -0.06739607, -18.419708, -2.3030725, -4.0229936)
+transform = Transform3D(0.012833287, 0, 0.999748, 0, 1, 0, -0.999748, 0, 0.012833287, 1.3895086, -2.3030725, 3.3038015)
+progress = 250.5
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T2BaggageTruck/Pulley3" unique_id=754066371]
-transform = Transform3D(0.054595925, 0, -0.9985085, 0, 1, 0, 0.9985085, 0, 0.054595925, 5.973824, 0, -20.254597)
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T2BaggageTruck/Pulley3" unique_id=283697270]
@@ -2042,18 +2047,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 384.5431, 4.606051, -225.4865
 curve = SubResource("Curve3D_hagi8")
 
 [node name="BaggageTruck" type="PathFollow3D" parent="T3BaggageTruck" unique_id=1668331346]
-transform = Transform3D(-0.0673961, 0, -0.9975565, 0, 1, 0, 0.9975565, 0, -0.0673961, -18.419708, -2.3030725, -4.0229936)
+transform = Transform3D(0.0025384394, 0, 0.99982595, 0, 1, 0, -0.99982595, 0, 0.0025384394, -19.157099, -2.3030725, 3.1283777)
+progress = 271.04742
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T3BaggageTruck/BaggageTruck" unique_id=187146842]
-transform = Transform3D(0.09668822, 4.171669e-08, -0.9953147, -6.42067e-07, 1, -2.0459481e-08, 0.9953147, 6.4103693e-07, 0.09668822, 7.2503805, 5.1021576e-05, 0.24960859)
+transform = Transform3D(-0.031914342, -4.2089e-11, 0.9994906, -6.4206705e-07, 1, -2.0459481e-08, -0.9994906, -6.4239293e-07, -0.031914342, -0.06690601, 5.1021576e-05, -0.00033534938)
 mesh = ExtResource("23_rii0k")
 
 [node name="Pulley" type="PathFollow3D" parent="T3BaggageTruck" unique_id=17505245]
-transform = Transform3D(0.11490316, 0, -0.99320513, 0, 0.9999868, 0, 0.99320513, 0, 0.11490316, -25.376812, -2.3030725, -3.2504537)
-progress = 336.23322
+transform = Transform3D(0.0069154794, 0, 0.99980503, 0, 0.9999868, 0, -0.99980503, 0, 0.0069154794, -12.609734, -2.3030725, 3.1598732)
+progress = 264.5
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T3BaggageTruck/Pulley" unique_id=2137545986]
-transform = Transform3D(-0.12179061, 0, -0.9925558, 0, 1, 0, 0.9925558, 0, -0.12179061, 7.833748, 0, -11.943763)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T3BaggageTruck/Pulley" unique_id=1978370910]
@@ -2061,11 +2067,11 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 2
 mesh = ExtResource("19_lnjah")
 
 [node name="Pulley2" type="PathFollow3D" parent="T3BaggageTruck" unique_id=1909100467]
-transform = Transform3D(0.12458905, 0, -0.9920352, 0, 0.9999868, 0, 0.9920352, 0, 0.12458905, -32.326637, -2.3030725, -2.4135058)
-progress = 329.23322
+transform = Transform3D(0.010480621, 0, 0.99977213, 0, 0.9999868, 0, -0.99977213, 0, 0.010480621, -5.6099715, -2.3030725, 3.2214575)
+progress = 257.5
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T3BaggageTruck/Pulley2" unique_id=505359602]
-transform = Transform3D(-0.13500424, 0, -0.990845, 0, 1, 0, 0.990845, 0, -0.13500424, 8.918687, 0, -25.801823)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T3BaggageTruck/Pulley2" unique_id=1618631425]
@@ -2073,10 +2079,11 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 2
 mesh = ExtResource("18_ijc6k")
 
 [node name="Pulley3" type="PathFollow3D" parent="T3BaggageTruck" unique_id=1711131]
-transform = Transform3D(-0.06739607, 0, -0.997556, 0, 1, 0, 0.997556, 0, -0.06739607, -18.419708, -2.3030725, -4.0229936)
+transform = Transform3D(0.012833287, 0, 0.999748, 0, 1, 0, -0.999748, 0, 0.012833287, 1.3895086, -2.3030725, 3.3038015)
+progress = 250.5
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T3BaggageTruck/Pulley3" unique_id=1902919816]
-transform = Transform3D(0.054595925, 0, -0.9985085, 0, 1, 0, 0.9985085, 0, 0.054595925, 5.973824, 0, -20.254597)
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T3BaggageTruck/Pulley3" unique_id=319923128]
@@ -2088,18 +2095,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, -1, 384.5431, 4.606051, -225.486
 curve = SubResource("Curve3D_hagi8")
 
 [node name="BaggageTruck" type="PathFollow3D" parent="T4BaggageTruck" unique_id=449327379]
-transform = Transform3D(-0.0673961, 0, -0.9975565, 0, 1, 0, 0.9975565, 0, -0.0673961, -18.419708, -2.3030725, -4.0229936)
+transform = Transform3D(0.0025384394, 0, 0.99982595, 0, 1, 0, -0.99982595, 0, 0.0025384394, -19.157099, -2.3030725, 3.1283777)
+progress = 271.04742
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T4BaggageTruck/BaggageTruck" unique_id=1222219325]
-transform = Transform3D(0.09668822, 4.171669e-08, -0.9953147, -6.42067e-07, 1, -2.0459481e-08, 0.9953147, 6.4103693e-07, 0.09668822, 7.2503805, 5.1021576e-05, 0.24960859)
+transform = Transform3D(-0.031914342, -4.2089e-11, 0.9994906, -6.4206705e-07, 1, -2.0459481e-08, -0.9994906, -6.4239293e-07, -0.031914342, -0.06690601, 5.1021576e-05, -0.00033534938)
 mesh = ExtResource("23_rii0k")
 
 [node name="Pulley" type="PathFollow3D" parent="T4BaggageTruck" unique_id=977045374]
-transform = Transform3D(0.11490316, 0, -0.99320513, 0, 0.9999868, 0, 0.99320513, 0, 0.11490316, -25.376812, -2.3030725, -3.2504537)
-progress = 336.23322
+transform = Transform3D(0.0069154794, 0, 0.99980503, 0, 0.9999868, 0, -0.99980503, 0, 0.0069154794, -12.609734, -2.3030725, 3.1598732)
+progress = 264.5
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T4BaggageTruck/Pulley" unique_id=1610230186]
-transform = Transform3D(-0.12179061, 0, -0.9925558, 0, 1, 0, 0.9925558, 0, -0.12179061, 7.833748, 0, -11.943763)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T4BaggageTruck/Pulley" unique_id=1153472020]
@@ -2107,11 +2115,11 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 2
 mesh = ExtResource("19_lnjah")
 
 [node name="Pulley2" type="PathFollow3D" parent="T4BaggageTruck" unique_id=739302445]
-transform = Transform3D(0.12458905, 0, -0.9920352, 0, 0.9999868, 0, 0.9920352, 0, 0.12458905, -32.326637, -2.3030725, -2.4135058)
-progress = 329.23322
+transform = Transform3D(0.010480621, 0, 0.99977213, 0, 0.9999868, 0, -0.99977213, 0, 0.010480621, -5.6099715, -2.3030725, 3.2214575)
+progress = 257.5
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T4BaggageTruck/Pulley2" unique_id=1803908902]
-transform = Transform3D(-0.13500424, 0, -0.990845, 0, 1, 0, 0.990845, 0, -0.13500424, 8.918687, 0, -25.801823)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T4BaggageTruck/Pulley2" unique_id=991880833]
@@ -2119,10 +2127,11 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 2
 mesh = ExtResource("18_ijc6k")
 
 [node name="Pulley3" type="PathFollow3D" parent="T4BaggageTruck" unique_id=463292247]
-transform = Transform3D(-0.067395814, 0, -0.9975523, 0, 1, 0, 0.9975523, 0, -0.067395814, -18.419708, -2.3030725, -4.0229936)
+transform = Transform3D(0.012833237, 0, 0.99974406, 0, 1, 0, -0.99974406, 0, 0.012833237, 1.3895086, -2.3030725, 3.3038015)
+progress = 250.5
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T4BaggageTruck/Pulley3" unique_id=1543614046]
-transform = Transform3D(0.054595925, 0, -0.9985085, 0, 1, 0, 0.9985085, 0, 0.054595925, 5.973802, 0, -20.254524)
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T4BaggageTruck/Pulley3" unique_id=233698410]
@@ -2134,17 +2143,17 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 384.5431, 4.606051, -0.606572
 curve = SubResource("Curve3D_hagi8")
 
 [node name="BaggageTruck" type="PathFollow3D" parent="T5BaggageTruck" unique_id=291483436]
-transform = Transform3D(-0.0673961, 0, -0.9975565, 0, 1, 0, 0.9975565, 0, -0.0673961, -18.419708, -2.3030725, -4.0229936)
+transform = Transform3D(-0.067396, 0, -0.99755514, 0, 1, 0, 0.99755514, 0, -0.067396, -18.419708, -2.3030725, -4.0229936)
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T5BaggageTruck/BaggageTruck" unique_id=1634452865]
-transform = Transform3D(0.09668822, 4.1716532e-08, -0.9953147, -6.4206563e-07, 1, -2.045951e-08, 0.9953147, 6.4103557e-07, 0.09668822, 7.2503805, 5.1021576e-05, 0.24960859)
+transform = Transform3D(-0.031914342, -4.2014392e-11, 0.9994906, -6.4206563e-07, 1, -2.045951e-08, -0.9994906, -6.423915e-07, -0.031914342, -0.06690617, 5.1021576e-05, -0.00033535014)
 mesh = ExtResource("23_rii0k")
 
 [node name="Pulley" type="PathFollow3D" parent="T5BaggageTruck" unique_id=1376371630]
-transform = Transform3D(-0.06739605, 0, -0.9975558, 0, 0.9999868, 0, 0.9975558, 0, -0.06739605, -18.419708, -2.3030725, -4.0229936)
+transform = Transform3D(-0.067396015, 0, -0.99755526, 0, 0.9999868, 0, 0.99755526, 0, -0.067396015, -18.419708, -2.3030725, -4.0229936)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T5BaggageTruck/Pulley" unique_id=944177212]
-transform = Transform3D(-0.12179061, 0, -0.9925558, 0, 1, 0, 0.9925558, 0, -0.12179061, 7.8337507, 0, -11.943765)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T5BaggageTruck/Pulley" unique_id=632389576]
@@ -2152,10 +2161,10 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 2
 mesh = ExtResource("19_lnjah")
 
 [node name="Pulley2" type="PathFollow3D" parent="T5BaggageTruck" unique_id=2085748956]
-transform = Transform3D(-0.067396164, 0, -0.99755746, 0, 0.9999868, 0, 0.99755746, 0, -0.067396164, -18.419708, -2.3030725, -4.0229936)
+transform = Transform3D(-0.06739611, 0, -0.9975566, 0, 0.9999868, 0, 0.9975566, 0, -0.06739611, -18.419708, -2.3030725, -4.0229936)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T5BaggageTruck/Pulley2" unique_id=1422057494]
-transform = Transform3D(-0.13500424, 0, -0.990845, 0, 1, 0, 0.990845, 0, -0.13500424, 8.918717, 0, -25.80191)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T5BaggageTruck/Pulley2" unique_id=1924033952]
@@ -2163,11 +2172,11 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 2
 mesh = ExtResource("18_ijc6k")
 
 [node name="Pulley3" type="PathFollow3D" parent="T5BaggageTruck" unique_id=1453018836]
-transform = Transform3D(0.012941605, 0, 0.99974537, 0, 1, 0, -0.99974537, 0, 0.012941605, 1.842047, -2.3030727, 3.3096356)
+transform = Transform3D(0.012941607, 0, 0.99974555, 0, 1, 0, -0.99974555, 0, 0.012941607, 1.842047, -2.3030727, 3.3096356)
 progress = 250.04742
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T5BaggageTruck/Pulley3" unique_id=332764093]
-transform = Transform3D(0.054595925, 0, -0.9985085, 0, 1, 0, 0.9985085, 0, 0.054595925, 5.9738197, 0, -20.254581)
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T5BaggageTruck/Pulley3" unique_id=2067343748]
@@ -2179,18 +2188,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, -1, 384.5431, 4.606051, -0.60657
 curve = SubResource("Curve3D_hagi8")
 
 [node name="BaggageTruck" type="PathFollow3D" parent="T6BaggageTruck" unique_id=1329922115]
-transform = Transform3D(-0.06739595, 0, -0.9975543, 0, 1, 0, 0.9975543, 0, -0.06739595, -18.419708, -2.3030725, -4.0229936)
+transform = Transform3D(0.002538435, 0, 0.99982417, 0, 1, 0, -0.99982417, 0, 0.002538435, -19.157099, -2.3030725, 3.1283777)
+progress = 271.04742
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T6BaggageTruck/BaggageTruck" unique_id=779944732]
-transform = Transform3D(0.0966881, 4.1717534e-08, -0.9953147, -6.4207416e-07, 1, -2.0459254e-08, 0.9953147, 6.41044e-07, 0.0966881, 7.2503653, 5.1021576e-05, 0.24960673)
+transform = Transform3D(-0.03191434, -4.2509996e-11, 0.99949056, -6.42074e-07, 1, -2.045928e-08, -0.99949056, -6.423999e-07, -0.03191434, -0.06690528, 5.1021576e-05, -0.0003353457)
 mesh = ExtResource("23_rii0k")
 
 [node name="Pulley" type="PathFollow3D" parent="T6BaggageTruck" unique_id=1953994938]
-transform = Transform3D(0.11490316, 0, -0.99320513, 0, 0.9999868, 0, 0.99320513, 0, 0.11490316, -25.376812, -2.3030725, -3.2504537)
-progress = 336.23322
+transform = Transform3D(0.0069154794, 0, 0.99980503, 0, 0.9999868, 0, -0.99980503, 0, 0.0069154794, -12.609734, -2.3030725, 3.1598732)
+progress = 264.5
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T6BaggageTruck/Pulley" unique_id=1452342798]
-transform = Transform3D(-0.12179061, 0, -0.9925558, 0, 1, 0, 0.9925558, 0, -0.12179061, 7.833748, 0, -11.943763)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T6BaggageTruck/Pulley" unique_id=543746177]
@@ -2198,11 +2208,11 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 2
 mesh = ExtResource("19_lnjah")
 
 [node name="Pulley2" type="PathFollow3D" parent="T6BaggageTruck" unique_id=541638313]
-transform = Transform3D(0.12458905, 0, -0.9920352, 0, 0.9999868, 0, 0.9920352, 0, 0.12458905, -32.326637, -2.3030725, -2.4135058)
-progress = 329.23322
+transform = Transform3D(0.010480621, 0, 0.99977213, 0, 0.9999868, 0, -0.99977213, 0, 0.010480621, -5.6099715, -2.3030725, 3.2214575)
+progress = 257.5
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T6BaggageTruck/Pulley2" unique_id=1798885782]
-transform = Transform3D(-0.13500424, 0, -0.990845, 0, 1, 0, 0.990845, 0, -0.13500424, 8.918687, 0, -25.801823)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T6BaggageTruck/Pulley2" unique_id=6097065]
@@ -2210,10 +2220,11 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 2
 mesh = ExtResource("18_ijc6k")
 
 [node name="Pulley3" type="PathFollow3D" parent="T6BaggageTruck" unique_id=1989081798]
-transform = Transform3D(-0.067395814, 0, -0.9975523, 0, 1, 0, 0.9975523, 0, -0.067395814, -18.419708, -2.3030725, -4.0229936)
+transform = Transform3D(0.012833237, 0, 0.99974406, 0, 1, 0, -0.99974406, 0, 0.012833237, 1.3895086, -2.3030725, 3.3038015)
+progress = 250.5
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="T6BaggageTruck/Pulley3" unique_id=144189671]
-transform = Transform3D(0.054595925, 0, -0.9985085, 0, 1, 0, 0.9985085, 0, 0.054595925, 5.973802, 0, -20.254524)
+transform = Transform3D(-4.3711385e-08, 0, 0.99999994, 0, 1, 0, -0.99999994, 0, -4.3711385e-08, 0, 0, 0)
 mesh = ExtResource("25_p3idx")
 
 [node name="211BaggageTruckAirport0" type="MeshInstance3D" parent="T6BaggageTruck/Pulley3" unique_id=267937930]
