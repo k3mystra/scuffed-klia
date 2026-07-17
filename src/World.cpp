@@ -4,7 +4,9 @@
 #include "Model.h"
 #include "Transform.h"
 #include "LoadOBJ.h"
+#include "InputManager.h"
 
+#include <GLFW/glfw3.h>
 #include <cstdlib>
 #include <fstream>
 #include <sstream>
@@ -98,4 +100,33 @@ World loadFromFile(std::string filename) {
     }
 
     return world;
+}
+
+static void handleKeyInput(const InputEvent& event, World& world) {
+    if (event.key == GLFW_KEY_Q && event.type == InputEvent::Type::KeyPress)
+        glfwSetWindowShouldClose(world.window, true);
+    
+    if (event.key == GLFW_KEY_ESCAPE && event.type == InputEvent::Type::KeyPress) {
+        if (world.isCursorLocked)
+            glfwSetInputMode(world.window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        else
+            glfwSetInputMode(world.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+        world.isCursorLocked = !world.isCursorLocked;
+    }
+}
+
+void processGlobalInputEvent(World& world) {
+    const InputEventQueue& inputEventQueue = InputManager::getInputQueue();
+
+    for (const InputEvent& event: inputEventQueue) {
+        switch (event.type) {
+            case InputEvent::Type::KeyPress:
+            case InputEvent::Type::KeyRelease:
+                handleKeyInput(event, world);
+                break;
+            default:
+                continue;
+        }
+    }
 }
