@@ -1,4 +1,4 @@
-# Handoff: Physics-Based AutoAnimator & Bezier Path Transition
+# Handoff: PathFollow3D Transform Animator Baking (Mesh Target Redirection)
 
 ## Table of Contents
 
@@ -7,49 +7,39 @@
 - [Codebase Understanding](#codebase-understanding)
   - [Architecture Overview](#architecture-overview)
   - [Critical Files](#critical-files)
-  - [Key Patterns Discovered](#key-patterns-discovered)
 - [Work Completed](#work-completed)
   - [Tasks Finished](#tasks-finished)
   - [Files Modified](#files-modified)
   - [Decisions Made](#decisions-made)
-- [Pending Work](#pending-work)
-  - [Immediate Next Steps](#immediate-next-steps)
-  - [Blockers/Open Questions](#blockersopen-questions)
-  - [Deferred Items](#deferred-items)
 - [Context for Resuming Agent](#context-for-resuming-agent)
   - [Important Context](#important-context)
   - [Assumptions Made](#assumptions-made)
   - [Potential Gotchas](#potential-gotchas)
-- [Environment State](#environment-state)
-- [Related Resources](#related-resources)
 
 ---
 
 ## Session Metadata
-- Created: 2026-07-17T01:05:45+08:00
+- Created: 2026-07-17T03:55:00+08:00
 - Project: `c:\Users\tan yu kai\Documents\GitHub\scuffed-klia`
 - Branch: `main`
-- Session duration: ~2 hours
+- Session duration: ~5 hours
 
 ## Current State Summary
 
-Completed the implementation of physics-based path baking inside `AutoAnimator.gd`. Instead of using hardcoded travel times per segment, the animator now simulates vehicle kinematics (acceleration, top speed, and deceleration) to generate a smooth, high-density keyframe profile (20 FPS). Clamping via a `min_y` metadata check was added, and track target paths are resolved relative to the AnimationPlayer's `root_node`. The current state left off after discussing the potential transition from using separate `Marker3D` nodes to Godot's built-in `Path3D` / `Curve3D` editor workflow.
+The `PathFollow3D` progress track baking feature inside `AutoAnimator.gd` has been updated to support child target redirection and verified to be compatible with `SceneExporter.gd`. Instead of writing keyframes directly onto `PathFollow3D`, the script redirects the baked position and rotation tracks to the first child node of `PathFollow3D` (the actual vehicle mesh). It computes the local transforms of the child relative to the starting state of `PathFollow3D` while preserving the design-time local transform offsets.
 
 ## Codebase Understanding
 
 ### Architecture Overview
 
-`AutoAnimator.gd` is an `@tool` editor script designed to automatically generate 3D translation and rotation keyframes on vehicle nodes. It traverses the scene tree, identifies qualifying nodes (which currently have `Marker3D` children), and writes the baked keyframes into a shared `AnimationPlayer` library clip.
+The tool script functions as an editor constraint baker. It reads a source animation, samples progress tracks, updates the `PathFollow3D` node, and computes the relative transforms required for the child node to follow the curve when `PathFollow3D` is stationary.
 
 ### Critical Files
 
 | File | Purpose | Relevance |
 |------|---------|-----------|
-| [AutoAnimator.gd](file:///c:/Users/tan%20yu%20kai/Documents/GitHub/scuffed-klia/src/3DScene/LarpCombat/AutoAnimator.gd) | Editor tool script mapping waypoints to animations. | Core script modified and containing the path generation logic. |
-
-### Key Patterns Discovered
-
-* **AnimationPlayer Tracks**: 3D position and rotation tracks in Godot 4 target the Node3D itself, meaning the track path must be relative to the AnimationPlayer's root node without trailing property specifiers (e.g. `Path/To/Vehicle`, not `Path/To/Vehicle:position`).
+| [AutoAnimator.gd](file:///c:/Users/tan%20yu%20kai/Documents/GitHub/scuffed-klia/src/3DScene/LarpCombat/AutoAnimator.gd) | Editor tool script. | Contains the baking and child redirection implementation. |
+| [SceneExporter.gd](file:///c:/Users/tan%20yu%20kai/Documents/GitHub/scuffed-klia/src/3DScene/LarpCombat/SceneExporter.gd) | Scene layout and animation exporter. | Exports parsed scene structures and matching animation clips to C++ engine file. |
 
 ---
 
@@ -57,39 +47,18 @@ Completed the implementation of physics-based path baking inside `AutoAnimator.g
 
 ### Tasks Finished
 
-- [x] **Track NodePath Fix**: Updated track target paths to resolve relatively from the `AnimationPlayer.root_node` so nested vehicles do not default back to the origin when playing.
-- [x] **Min Y Clamping**: Removed the bounding-box math and implemented direct clamping to a user-defined `min_y` metadata float on the vehicle.
-- [x] **Physics Kinematics**: Added support for vehicle metadata (`acceleration`, `top_speed`) and a marker metadata (`deceleration_point` boolean) to dynamically calculate speed-up and slow-down curves.
-- [x] **Dense Keyframe Interpolation**: Implemented high-density keyframe sampling (`SAMPLE_DELTA = 0.05` seconds) using linear interpolation for position and spherical-linear interpolation (slerp) for rotation tangent values.
+- [x] **Child Node Redirection**: Automatically detects the first child of `PathFollow3D` (e.g. `Path3D/PathFollow3D/Mesh`) and bakes position and rotation tracks onto it instead of `PathFollow3D`.
+- [x] **Transform Space Alignment**: Evaluates child transforms relative to the parent's starting state ($T_{start}^{-1} * T_{follow}(t) * T_{design}$) to preserve local design alignment offsets and keep the mesh positioned accurately when `PathFollow3D` stays at progress `0` at runtime.
+- [x] **Reversing with Model Offset**: Flipping (offsetting) the rotation by 180 degrees during the *forward* phase, keeping it unflipped during the *reversing* phase.
+- [x] **Smart Re-baking**: Cleans up previous baked tracks of child target nodes.
+- [x] **Input & Output Animation separation**: Separates input and output animation processing.
+- [x] **SceneExporter Compatibility Verification**: Checked `SceneExporter.gd` parsing loops to ensure that baked child tracks match target mesh entities, and that unhandled progress value/bezier tracks are automatically skipped.
 
 ### Files Modified
 
 | File | Changes | Rationale |
 |------|---------|-----------|
-| [AutoAnimator.gd](file:///c:/Users/tan%20yu%20kai/Documents/GitHub/scuffed-klia/src/3DScene/LarpCombat/AutoAnimator.gd) | Replaced `bake_path_for_node` implementation. | Integrated relative track path resolution, `min_y` clamping, and the physics kinematic interpolation. |
-
-### Decisions Made
-
-| Decision | Options Considered | Rationale |
-|----------|-------------------|-----------|
-| Use `deceleration_point` boolean on Marker3D | Vehicle metadata specifying marker name vs. marker boolean metadata | Placing the boolean metadata directly on the marker node is simpler and cleaner for the user to configure in the inspector. |
-
----
-
-## Pending Work
-
-### Immediate Next Steps
-
-1. **Design/Implement Path3D Integration**: Modify the script to search for a child `Path3D` node (containing a `Curve3D`) rather than discrete `Marker3D` nodes.
-2. **Refactor Deceleration Point Logic**: Change deceleration point specification to a percentage/fraction of the path length (e.g. `decel_percent = 80.0` metadata on the vehicle) or a single offset marker since individual waypoint markers won't exist anymore.
-
-### Blockers/Open Questions
-
-- [ ] Question: Confirm if the user prefers to define the deceleration point using a percentage of the path (e.g., `decel_percent = 80.0` metadata) or by checking proximity to a separate marker node when moving to `Path3D`.
-
-### Deferred Items
-
-- None.
+| [AutoAnimator.gd](file:///c:/Users/tan%20yu%20kai/Documents/GitHub/scuffed-klia/src/3DScene/LarpCombat/AutoAnimator.gd) | Rewrite of sampling logic. | Correctly offset the child's baked transform relative to the starting state of PathFollow3D. |
 
 ---
 
@@ -97,21 +66,5 @@ Completed the implementation of physics-based path baking inside `AutoAnimator.g
 
 ### Important Context
 
-* The user wants the speed transitions to feel realistic. Straight segments and sudden rotation snaps are currently avoided by doing dense time-grid sampling, but transitioning to a Bezier path (via Godot's `Path3D`) will fully smooth out the physical curves and rotation tangents.
-* `Marker3D` nodes were originally chosen to store metadata at each waypoint (which isn't directly supported on individual control points of a `Curve3D` in Godot). Now that travel time is automated using centralized physics, `Path3D` is the preferred workflow going forward.
-
-### Assumptions Made
-
-* It is assumed that the parent node being animated has the metadata fields `acceleration` (float) and `top_speed` (float) defined, falling back to safe defaults of `5.0` and `10.0` respectively if they are absent.
-
-### Potential Gotchas
-
-* When using `Path3D`, Godot's `Curve3D` has built-in caching methods (`sample_baked` and `get_baked_length`). Use these baked queries to easily compute constant-speed arc lengths along the curve instead of writing complex custom numerical Bezier integration.
-
----
-
-## Environment State
-
-### Tools/Services Used
-
-- Godot Engine 4 editor (tool scripts execute in `@tool` context).
+* The vehicle hierarchy is `Path3D` -> `PathFollow3D` -> `Mesh/Vehicle`. The position/rotation tracks are baked directly onto the `Mesh/Vehicle` node.
+* At runtime, the `PathFollow3D` node remains stationary at `progress_ratio = 0.0`.
