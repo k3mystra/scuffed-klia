@@ -1,4 +1,5 @@
 #include <cstddef>
+#include <glm/fwd.hpp>
 #include <iostream>
 
 #include <GL/glew.h>
@@ -22,7 +23,7 @@ const std::string VERTEX_SHADER_SRC_PATH = "default_shaders/vertex_shader.glsl";
 const std::string SKYBOX_FRAGMENT_SHADER_SRC_PATH = "default_shaders/skybox_fragment.glsl";
 const std::string SKYBOX_VERTEX_SHADER_SRC_PATH = "default_shaders/skybox_vertex.glsl";
 
-const glm::vec3 DEFAULT_BG = COLOR::GREY;
+const glm::vec3 DEFAULT_BG = glm::vec3(0.2, 0.2, 0.2);
 
 typedef std::pair<Camera, Transform> CameraTransformData;
 typedef std::pair<Model, Transform> ModelTransformData;
@@ -207,6 +208,9 @@ static void initializeMesh(Mesh& mesh) {
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
     // === Load Textures ===
     if (!mesh.material.diffuseTexturePath.empty()) {
         std::cout << "Loading texture: " << mesh.material.diffuseTexturePath << "\n";
@@ -228,19 +232,11 @@ void RenderSystem::initializeComponents(World& world) {
     }
 
     // Assume only 1 exists
-    Camera cam = world.cameraList[0];
-    cam.projectionMatrix = glm::perspective(cam.fov, cam.aspectRatio, cam.nearPlane, cam.farPlane);
+    Camera* cam = &world.cameraList[0];
+    cam->projectionMatrix = glm::perspective(glm::radians(cam->fov), cam->aspectRatio, cam->nearPlane, cam->farPlane);
 }
 
-// Thank god for cpp
-// gotta love this
-RenderSystem::RenderSystem() {}
-
-GLFWwindow* RenderSystem::getWindowPointer() {
-    return window;
-}
-
-void RenderSystem::renderSystemInit(World& world, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
+RenderSystem::RenderSystem(World& world, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
      // By default already set to screen size, but useful if we resize the windows later
     glViewport(0, 0, initialWindowWidth, initialWindowHeight);
     // Pass WindowCallbackData for use by any callbacks
@@ -253,7 +249,7 @@ void RenderSystem::renderSystemInit(World& world, unsigned int initialWindowWidt
         .deltaTime = 0
     };
 
-    window = setupGlfwWindow(&windowCallbackData, initialWindowWidth, initialWindowHeight);
+    world.window = setupGlfwWindow(&windowCallbackData, initialWindowWidth, initialWindowHeight);
 
     // Init. GLEW to query the driver and actually load OpenGL library
     if (glewInit() != GLEW_OK) {
@@ -269,6 +265,8 @@ void RenderSystem::renderSystemInit(World& world, unsigned int initialWindowWidt
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(openGLDebugCallback, 0);
     #endif
+
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     initializeComponents(world);
 }

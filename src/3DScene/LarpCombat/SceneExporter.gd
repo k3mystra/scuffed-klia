@@ -8,7 +8,7 @@ const TRANSFORM_PREFIX = "T"
 const MODEL_PREFIX = "M"
 const CAMERA_PREFIX = "C"
 const ANIMATION_PREFIX = "A"      # marks the start of an animation clip block
-const TRACK_PREFIX = "TR"         # marks a track within a clip (which entity + property)
+const TRACK_PREFIX = "Z"         # marks a track within a clip (which entity + property)
 const KEYFRAME_PREFIX = "K"       # one keyframe: time + value
 
 func _run():
@@ -53,7 +53,7 @@ func parse_cam(node: Camera3D):
 	entityStr += parse_entity_data_comp(node)
 	entityStr += parse_transform_comp(node)
 	entityStr += parse_camera_comp(node)
-	return entityStr
+	return entityStr + "\n"
 
 func parse_transform_comp(node: Node3D) -> String:
 	var pos = node.position
@@ -101,7 +101,7 @@ func parse_camera_comp(node: Camera3D) -> String:
 # Skinned/bone animation is intentionally NOT handled -- your assets are
 # static meshes, not armatures, so there is nothing to support there yet.
 func parse_anim_player(node: AnimationPlayer) -> String:
-	var out = ""
+	var out = parse_entity_data_comp(node)
 
 	# Track paths are resolved relative to the player's root_node (usually
 	# its parent, ".."), NOT relative to the AnimationPlayer node itself.
@@ -114,7 +114,7 @@ func parse_anim_player(node: AnimationPlayer) -> String:
 		if anim_name == "RESET":
 			continue
 		var anim: Animation = node.get_animation(anim_name)
-		out += ANIMATION_PREFIX + " " + anim_name + " %f %d\n" % [anim.length, anim.loop_mode]
+		out += ANIMATION_PREFIX + " " + anim_name + " %f %d " % [anim.length, anim.loop_mode]
 
 		for track_idx in range(anim.get_track_count()):
 			var track_type = anim.track_get_type(track_idx)
@@ -148,30 +148,32 @@ func parse_anim_player(node: AnimationPlayer) -> String:
 				print("Warning: could not resolve animation track target: ", track_path)
 				continue
 
-			out += TRACK_PREFIX + " " + target_node.name + " " + track_type_str + " %d\n" % anim.track_get_key_count(track_idx)
+			out += TRACK_PREFIX + " " + target_node.name + " " + track_type_str + " %d " % anim.track_get_key_count(track_idx)
 
 			for key_idx in range(anim.track_get_key_count(track_idx)):
 				var time = anim.track_get_key_time(track_idx, key_idx)
 				var value = anim.track_get_key_value(track_idx, key_idx)
 				out += KEYFRAME_PREFIX + " " + format_key_value(track_type_str, time, value)
 
-	return out
+		out += "\n"
+
+	return out + "\n"
 
 func format_key_value(track_type_str: String, time: float, value) -> String:
 	match track_type_str:
 		"POS", "SCL":
-			return "%f %f %f %f\n" % [time, value.x, value.y, value.z]
+			return "%f %f %f %f " % [time, value.x, value.y, value.z]
 		"ROT":
 			# Quaternion (from a dedicated ROTATION_3D track, or a Value
 			# track targeting the "quaternion" property)
-			return "%f %f %f %f %f\n" % [time, value.w, value.x, value.y, value.z]
+			return "%f %f %f %f %f " % [time, value.w, value.x, value.y, value.z]
 		"ROT_EULER":
 			# Euler angles in radians (from a Value track targeting
 			# "rotation" directly) -- C++ side should convert to quaternion
 			# on load if it needs to combine with other rotation data.
-			return "%f %f %f %f\n" % [time, value.x, value.y, value.z]
+			return "%f %f %f %f " % [time, value.x, value.y, value.z]
 		"OPACITY":
 			# Single float, 0 = fully opaque, 1 = fully invisible
 			# (GeometryInstance3D.transparency)
-			return "%f %f\n" % [time, value]
+			return "%f %f " % [time, value]
 	return "%f\n" % time

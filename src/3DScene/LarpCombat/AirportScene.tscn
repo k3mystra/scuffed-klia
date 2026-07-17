@@ -1254,6 +1254,7 @@ libraries/ = SubResource("AnimationLibrary_e8og4")
 
 [node name="floor" type="CSGBox3D" parent="." unique_id=863255073]
 transform = Transform3D(10000, 0, 0, 0, 2, 0, 0, 0, 10000, 0, -1, 0)
+visible = false
 use_collision = true
 metadata/_edit_lock_ = true
 
