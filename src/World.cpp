@@ -81,6 +81,7 @@ World loadFromFile(std::string filename) {
             case '#':
                 loadEntityDataComponent(line, world);
                 world.totalEntity++;
+                world.entityDataIndex.insert({ world.totalEntity - 1, world.entityDataList.size() - 1 });
                 break;
             case 'T':
                 loadTransformComponent(line, world);

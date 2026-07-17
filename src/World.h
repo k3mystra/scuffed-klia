@@ -26,6 +26,7 @@ struct World {
     std::vector<Model> modelList = {};
     std::vector<Camera> cameraList = {};
 
+    std::unordered_map<EntityID, size_t> entityDataIndex = {};
     std::unordered_map<EntityID, size_t> transformIndex = {};
     std::unordered_map<EntityID, size_t> modelIndex = {};
     std::unordered_map<EntityID, size_t> cameraIndex = {};
