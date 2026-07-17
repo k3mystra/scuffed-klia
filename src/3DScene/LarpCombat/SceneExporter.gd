@@ -53,7 +53,7 @@ func parse_cam(node: Camera3D):
 	entityStr += parse_entity_data_comp(node)
 	entityStr += parse_transform_comp(node)
 	entityStr += parse_camera_comp(node)
-	return entityStr
+	return entityStr + "\n"
 
 func parse_transform_comp(node: Node3D) -> String:
 	var pos = node.position
@@ -101,7 +101,7 @@ func parse_camera_comp(node: Camera3D) -> String:
 # Skinned/bone animation is intentionally NOT handled -- your assets are
 # static meshes, not armatures, so there is nothing to support there yet.
 func parse_anim_player(node: AnimationPlayer) -> String:
-	var out = ""
+	var out = parse_entity_data_comp(node)
 
 	# Track paths are resolved relative to the player's root_node (usually
 	# its parent, ".."), NOT relative to the AnimationPlayer node itself.
@@ -155,7 +155,7 @@ func parse_anim_player(node: AnimationPlayer) -> String:
 				var value = anim.track_get_key_value(track_idx, key_idx)
 				out += KEYFRAME_PREFIX + " " + format_key_value(track_type_str, time, value)
 
-	return out
+	return out + "\n"
 
 func format_key_value(track_type_str: String, time: float, value) -> String:
 	match track_type_str:
