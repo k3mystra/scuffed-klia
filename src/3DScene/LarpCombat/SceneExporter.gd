@@ -73,13 +73,27 @@ func write_animations(root: Node, file: FileAccess) -> void:
 func write_animation(animation: Animation, name: String, animation_root: Node, file: FileAccess) -> void:
 	var tracks := ""
 	for track_index in animation.get_track_count():
-		var type_name := track_type_name(animation.track_get_type(track_index))
+		var track_path := animation.track_get_path(track_index)
+		var track_path_str := String(track_path)
+		var is_transparency := false
+		if track_path_str.ends_with(":transparency"):
+			track_path_str = track_path_str.split(":")[0]
+			is_transparency = true
+		
+		var type_name := ""
+		if is_transparency:
+			type_name = "OPA"
+		else:
+			type_name = track_type_name(animation.track_get_type(track_index))
+		
 		if type_name.is_empty():
 			continue
-		var target = animation_root.get_node_or_null(animation.track_get_path(track_index))
+			
+		var target = animation_root.get_node_or_null(NodePath(track_path_str))
 		if not (target is MeshInstance3D):
-			push_warning("Skipping non-mesh animation target: " + String(animation.track_get_path(track_index)))
+			push_warning("Skipping non-mesh animation target: " + track_path_str)
 			continue
+			
 		tracks += "Z %s %s %d " % [entity_id(target), type_name, animation.track_get_key_count(track_index)]
 		for key_index in animation.track_get_key_count(track_index):
 			tracks += key_string(type_name, animation.track_get_key_time(track_index, key_index), animation.track_get_key_value(track_index, key_index))
@@ -96,6 +110,9 @@ func track_type_name(type: int) -> String:
 func key_string(type_name: String, time: float, value: Variant) -> String:
 	if type_name == "ROT":
 		return "K %f %f %f %f %f " % [time, value.w, value.x, value.y, value.z]
+	elif type_name == "OPA":
+		var opacity : float = 1.0 - (value as float)
+		return "K %f %f " % [time, opacity]
 	return "K %f %f %f %f " % [time, value.x, value.y, value.z]
 
 func entity_id(node: Node) -> String:

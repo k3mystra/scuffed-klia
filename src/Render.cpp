@@ -233,7 +233,75 @@ void RenderSystem::initializeComponents(World& world) {
 
     // Assume only 1 exists
     Camera* cam = &world.cameraList[0];
+    cam->aspectRatio = (float)windowCallbackData.viewportWidth / (float)windowCallbackData.viewportHeight;
     cam->projectionMatrix = glm::perspective(glm::radians(cam->fov), cam->aspectRatio, cam->nearPlane, cam->farPlane);
+
+    // Initialize skybox
+    float skyboxVertices[] = {
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
+    };
+
+    glGenVertexArrays(1, &world.skybox.VAO);
+    glGenBuffers(1, &world.skybox.VBO);
+    glBindVertexArray(world.skybox.VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, world.skybox.VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glBindVertexArray(0);
+
+    std::vector<std::string> faces = {
+        "3DScene/LarpCombat/skybox_left.png",
+        "3DScene/LarpCombat/skybox_right.png",
+        "3DScene/LarpCombat/skybox_top.png",
+        "3DScene/LarpCombat/skybox_bottom.png",
+        "3DScene/LarpCombat/skybox_back.png",
+        "3DScene/LarpCombat/skybox_front.png"
+    };
+    world.skybox.textureID = loadCubemap(faces);
+    world.skybox.shader.vertexShaderSrcPath = SKYBOX_VERTEX_SHADER_SRC_PATH;
+    world.skybox.shader.fragmentShaderSrcPath = SKYBOX_FRAGMENT_SHADER_SRC_PATH;
+    shader_utils::initializeShader(world.skybox.shader);
 }
 
 
@@ -260,6 +328,8 @@ RenderSystem::RenderSystem(World& world, unsigned int initialWindowWidth, unsign
 
     // OpenGL Functions to enable
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     #ifdef ENABLE_OPENGL_DEBUG
     // Debugging
@@ -321,11 +391,16 @@ static void renderObj(
         shader_utils::setMat4(modelData.first.shader, "projection", camData.first.projectionMatrix);
 
         shader_utils::setVec3(modelData.first.shader, "matColor", mesh.material.color);
+        shader_utils::setFloat(modelData.first.shader, "opacity", modelData.second.opacity);
+
+        bool isGrass = modelData.first.srcPath == "3DScene/LarpCombat/grass_texture.jpg";
+        shader_utils::setBool(modelData.first.shader, "isGrass", isGrass);
 
         shader_utils::setVec3(modelData.first.shader, "ambientLightColor", world.ambientLight.color);
 
         shader_utils::setVec3(modelData.first.shader, "sunLightColor", world.sunlight.color);
         shader_utils::setVec3(modelData.first.shader, "sunLightDir", world.sunlight.direction);
+        shader_utils::setVec3(modelData.first.shader, "viewPos", camData.second.position);
 
         bool hasTexture = mesh.material.textureID != 0;
         shader_utils::setBool(modelData.first.shader, "hasTexture", hasTexture);
@@ -364,6 +439,27 @@ void RenderSystem::render(World& world) {
         camObjectData.first = world.cameraList[camSearch->second];
         camObjectData.second = world.transformList[transformSearch->second];
         break;
+    }
+
+    // Render skybox
+    if (world.skybox.textureID != 0) {
+        glDepthMask(GL_FALSE);
+        glDepthFunc(GL_LEQUAL);
+        glUseProgram(world.skybox.shader.programID);
+
+        // Remove translation from view matrix
+        glm::mat4 view = glm::mat4(glm::mat3(camObjectData.second.invMatrix));
+        shader_utils::setMat4(world.skybox.shader, "view", view);
+        shader_utils::setMat4(world.skybox.shader, "projection", camObjectData.first.projectionMatrix);
+
+        glBindVertexArray(world.skybox.VAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, world.skybox.textureID);
+        shader_utils::setInt(world.skybox.shader, "skybox", 0);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glDepthMask(GL_TRUE);
+        glDepthFunc(GL_LESS);
     }
 
     // Iterate thru all entity, since we need multiple components from each entity

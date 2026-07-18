@@ -24,6 +24,7 @@ struct Transform {
     glm::vec3 position = glm::vec3(0);
     glm::quat rotation = glm::quat();
     glm::vec3 scale = glm::vec3(0);
+    float opacity = 1.0f;
 };
 
 struct Material {
@@ -68,20 +69,25 @@ struct SunLight {
     glm::vec3 direction = glm::vec3(-0.1961, -0.7845, 0.5883);
 };
 
-struct Skybox {};
+struct Skybox {
+    unsigned int VAO = 0;
+    unsigned int VBO = 0;
+    unsigned int textureID = 0;
+    Shader shader;
+};
 
 struct Camera {
     float fov = 45;
     float aspectRatio = 16.0/9.0;
     float nearPlane = 0.5;
-    float farPlane = 1000;
+    float farPlane = 10000;
 
     glm::mat4 projectionMatrix = glm::mat4(1);
 };
 
 struct Track {
     enum class Type {
-        POSITION, ROTATION, SCALE
+        POSITION, ROTATION, SCALE, OPACITY
     };
 
     Type type = Track::Type::POSITION;
@@ -112,6 +118,7 @@ struct Animation {
     bool isPlaying = false;
 
     std::string name;
+    std::string nextAnimationName = "";
 
     std::vector<Track> tracks = {};
 };

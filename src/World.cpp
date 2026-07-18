@@ -28,7 +28,8 @@ const std::unordered_map<std::string, Track::Type> STR_TO_TRACK_TYPE = {
     { "POS", Track::Type::POSITION },
     { "ROT", Track::Type::ROTATION },
     { "ROT_EULER", Track::Type::ROTATION },
-    { "SCL", Track::Type::SCALE }
+    { "SCL", Track::Type::SCALE },
+    { "OPA", Track::Type::OPACITY }
 };
 
 static EntityData loadEntityDataComponent(const std::string& line, World& world) {

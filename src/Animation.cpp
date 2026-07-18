@@ -47,6 +47,72 @@ bool scheduleAnimation(World& world, const std::string& animationName, float sta
     return true;
 }
 
+void chainAnimations(World& world, const std::string& first, const std::string& second) {
+    auto firstIt = std::find_if(world.animList.begin(), world.animList.end(),
+        [&first](const Animation& animation) { return animation.name == first; });
+    if (firstIt == world.animList.end()) {
+        std::cerr << "Animation not found for chaining: " << first << "\n";
+        return;
+    }
+
+    auto secondIt = std::find_if(world.animList.begin(), world.animList.end(),
+        [&second](const Animation& animation) { return animation.name == second; });
+    if (secondIt == world.animList.end()) {
+        std::cerr << "Chained target animation not found: " << second << "\n";
+        return;
+    }
+
+    firstIt->nextAnimationName = second;
+}
+
+void redirectAnimationTarget(World& world, const std::string& animationName, const std::string& oldTargetName, const std::string& newTargetName) {
+    auto newTargetSearch = world.nameToIdMapping.find(newTargetName);
+    if (newTargetSearch == world.nameToIdMapping.end()) {
+        std::cerr << "New target for redirection not found: " << newTargetName << "\n";
+        return;
+    }
+    EntityID newTargetID = newTargetSearch->second;
+
+    auto animIt = std::find_if(world.animList.begin(), world.animList.end(),
+        [&animationName](const Animation& anim) { return anim.name == animationName; });
+    if (animIt == world.animList.end()) {
+        std::cerr << "Animation not found for redirection: " << animationName << "\n";
+        return;
+    }
+
+    for (Track& track : animIt->tracks) {
+        if (track.actorEntityName == oldTargetName) {
+            track.cachedEntityID = newTargetID;
+        }
+    }
+
+    auto oldTargetSearch = world.nameToIdMapping.find(oldTargetName);
+    if (oldTargetSearch != world.nameToIdMapping.end()) {
+        world.modelIndex.erase(oldTargetSearch->second);
+    }
+}
+
+void setEntityOpacity(World& world, const std::string& entityName, float opacity) {
+    auto search = world.nameToIdMapping.find(entityName);
+    if (search != world.nameToIdMapping.end()) {
+        auto transformSearch = world.transformIndex.find(search->second);
+        if (transformSearch != world.transformIndex.end()) {
+            world.transformList[transformSearch->second].opacity = opacity;
+        }
+    }
+}
+
+static float lerpKeyframeDataFloat(const Track& track, float currentTime) {
+    float initial = track.keyframeData[track.nextKeyframeIdx - 1];
+    float final = track.keyframeData[track.nextKeyframeIdx];
+
+    float nextTimestamp = track.keyframeTimestamps[track.nextKeyframeIdx];
+    float prevTimestamp = track.keyframeTimestamps[track.nextKeyframeIdx - 1];
+    float value = (currentTime - prevTimestamp) / (nextTimestamp - prevTimestamp);
+
+    return initial + value * (final - initial);
+}
+
 static glm::vec3 lerpKeyframeDataVec3(const Track& track, float currentTime) {
     // Get necessary keyframe data
     // Need to interpolate between nextKeyframe and the one just before it
@@ -124,6 +190,15 @@ static void processScaleChange(const Track& track, float currentTime, World& wor
     transform_utils::setScale(transform, newScale);
 }
 
+static void processOpacityChange(const Track& track, float currentTime, World& world) {
+    auto transformSearch = world.transformIndex.find(track.cachedEntityID);
+    if (transformSearch == world.transformIndex.end())
+        return;
+
+    Transform& transform = world.transformList[transformSearch->second];
+    transform.opacity = lerpKeyframeDataFloat(track, currentTime);
+}
+
 static size_t searchForNextKeyframe(float currentTime, const std::vector<float>& timestamps) {
     for (size_t i = 0; i < timestamps.size(); i++) {
         if (timestamps[i] > currentTime)
@@ -151,7 +226,9 @@ static void processTrack(Track& track, float currentTime, World& world) {
         case Track::Type::SCALE:
             processScaleChange(track, currentTime, world);
             break;
-        break;
+        case Track::Type::OPACITY:
+            processOpacityChange(track, currentTime, world);
+            break;
     }
 }
 
@@ -168,6 +245,10 @@ void processAnimation(World& world) {
         if (anim.currentTime >= anim.duration) {
             if (anim.loopMode == Animation::LoopMode::LOOP_NONE) {
                 anim.isPlaying = false;
+                anim.isScheduled = false;
+                if (!anim.nextAnimationName.empty()) {
+                    scheduleAnimation(world, anim.nextAnimationName, world.elapsedTime);
+                }
                 continue;
             }
             if (anim.loopMode == Animation::LoopMode::LOOP_LINEAR) {
@@ -179,8 +260,8 @@ void processAnimation(World& world) {
         }
 
         for (Track& track : anim.tracks) {
-			if (track.keyframeTimestamps.size() < 2)
-				continue;
+            if (track.keyframeTimestamps.size() < 2)
+                continue;
             processTrack(track, anim.currentTime, world);
         }
     }
