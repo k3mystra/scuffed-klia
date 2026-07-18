@@ -107,6 +107,9 @@ struct Animation {
     LoopMode loopMode = Animation::LoopMode::LOOP_NONE;
     float duration = 0.0;
     float currentTime = 0.0;
+    float startTime = 0.0;
+    bool isScheduled = false;
+    bool isPlaying = false;
 
     std::string name;
 

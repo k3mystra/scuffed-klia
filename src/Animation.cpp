@@ -6,6 +6,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/compatibility.hpp>
 
+#include <algorithm>
+#include <cmath>
+#include <iostream>
 #include <vector>
 
 
@@ -13,12 +16,35 @@ void animationSystemInit(World& world) {
     for (Animation& anim : world.animList) {
         for (Track& track : anim.tracks) {
             auto idSearch = world.nameToIdMapping.find(track.actorEntityName);
-            if (idSearch == world.nameToIdMapping.end())
-                return;
+            if (idSearch == world.nameToIdMapping.end()) {
+                std::cerr << "Animation '" << anim.name << "' target was not exported: "
+                          << track.actorEntityName << "\n";
+                continue;
+            }
 
             track.cachedEntityID = idSearch->second;
         }
     }
+}
+
+bool scheduleAnimation(World& world, const std::string& animationName, float startTime) {
+    auto animationIt = std::find_if(world.animList.begin(), world.animList.end(),
+        [&animationName](const Animation& animation) { return animation.name == animationName; });
+    if (animationIt == world.animList.end()) {
+        std::cerr << "Animation not found: " << animationName << "\n";
+        return false;
+    }
+
+    Animation& animation = *animationIt;
+    animation.startTime = startTime;
+    animation.currentTime = 0.0f;
+    animation.isScheduled = true;
+    animation.isPlaying = false;
+    for (Track& track : animation.tracks) {
+        track.currentKeyframeIdx = 0;
+        track.nextKeyframeIdx = track.keyframeTimestamps.size() > 1 ? 1 : 0;
+    }
+    return true;
 }
 
 static glm::vec3 lerpKeyframeDataVec3(const Track& track, float currentTime) {
@@ -109,12 +135,11 @@ static size_t searchForNextKeyframe(float currentTime, const std::vector<float>&
 }
 
 static void processTrack(Track& track, float currentTime, World& world) {
-    float nextTimestamp = track.keyframeTimestamps[track.nextKeyframeIdx];
-
-    // Current time already surpass the predicted next keyframe timestamp
-    // Find actual next keyframe
-    if (currentTime > nextTimestamp)
-        track.nextKeyframeIdx = searchForNextKeyframe(currentTime, track.keyframeTimestamps);
+    // Recompute every frame so a loop or ping-pong clip can safely move time
+    // backwards without retaining the previous cycle's keyframe index.
+    track.nextKeyframeIdx = searchForNextKeyframe(currentTime, track.keyframeTimestamps);
+    if (track.nextKeyframeIdx == 0)
+        track.nextKeyframeIdx = 1;
 
     switch (track.type) {
         case Track::Type::POSITION:
@@ -132,12 +157,30 @@ static void processTrack(Track& track, float currentTime, World& world) {
 
 void processAnimation(World& world) {
     for (Animation& anim : world.animList) {
-        anim.currentTime += world.deltaTime;
-
-        if (anim.currentTime >= anim.duration)
+        if (!anim.isScheduled || world.elapsedTime < anim.startTime)
             continue;
 
+        anim.isPlaying = true;
+        anim.currentTime = world.elapsedTime - anim.startTime;
+        if (anim.duration <= 0.0f)
+            continue;
+
+        if (anim.currentTime >= anim.duration) {
+            if (anim.loopMode == Animation::LoopMode::LOOP_NONE) {
+                anim.isPlaying = false;
+                continue;
+            }
+            if (anim.loopMode == Animation::LoopMode::LOOP_LINEAR) {
+                anim.currentTime = std::fmod(anim.currentTime, anim.duration);
+            } else {
+                const float cycleTime = std::fmod(anim.currentTime, anim.duration * 2.0f);
+                anim.currentTime = cycleTime <= anim.duration ? cycleTime : anim.duration * 2.0f - cycleTime;
+            }
+        }
+
         for (Track& track : anim.tracks) {
+			if (track.keyframeTimestamps.size() < 2)
+				continue;
             processTrack(track, anim.currentTime, world);
         }
     }

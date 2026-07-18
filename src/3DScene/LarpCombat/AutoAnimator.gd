@@ -1,284 +1,214 @@
 @tool
 extends EditorScript
 
-# ==================== HOW TO USE ====================
-# 1. Under any Path3D node, add a PathFollow3D child node, and under that
-#    add your vehicle/mesh node.
-# 2. In the AnimationPlayer, create an animation and add a track to animate
-#    the "progress" or "progress_ratio" of the PathFollow3D node.
-# 3. If you want to specify a reversing segment:
-#    Add Metadata "end_of_reverse" (int) on the Path3D grandparent node,
-#    specifying the index of the Curve3D point where the reversing ends.
-#    All movement along the curve before this point will be automatically
-#    reversed (rotated 180 degrees around Y).
-# 4. If you want height constraints:
-#    Add Metadata "min_y" (float) on the PathFollow3D or Path3D node.
-# 5. Set INPUT_ANIMATION_NAME and OUTPUT_ANIMATION_NAME below.
-# 6. Run this script (File > Run). It reads the progress tracks from the input
-#    animation, bakes the corresponding 3D Position and 3D Rotation tracks on the
-#    PathFollow3D node in the output animation, and disables the progress track
-#    in the output animation if they are the same.
-# =======================================================
+# Bakes the progress/progress_ratio tracks in SOURCE_ANIMATION into one clip
+# per Path3D. Each generated clip is named after that Path3D. A Path3D may
+# contain several PathFollow3D children (the baggage truck and its carts); all
+# of them are baked into the same clip.
+#
+# The C++ renderer has a flat scene graph, so generated keys deliberately hold
+# world-space position/rotation values. These clips are export-only; play the
+# source animation in Godot if you want to preview it there.
 
-const INPUT_ANIMATION_NAME = "ScriptTest"
-const OUTPUT_ANIMATION_NAME = "ScriptTest_baked"
-const SAMPLE_DELTA = 1.0                  # Time step (seconds) for keyframe baking
+const SOURCE_ANIMATION = "ScriptTest"
+const SAMPLE_DELTA = 1.0
 
-func _run():
+func _run() -> void:
 	var scene_root = EditorInterface.get_edited_scene_root()
 	if not scene_root:
-		print("Error: open a scene first!")
+		push_error("Open the airport scene before running AutoAnimator.")
 		return
 
-	var anim_player = find_in_tree(scene_root)
-	if not anim_player:
-		print("Error: no AnimationPlayer found anywhere in the scene")
+	var player = find_animation_player(scene_root)
+	if not player:
+		push_error("No AnimationPlayer exists in the open scene.")
 		return
 
-	var lib = anim_player.get_animation_library("")
-	if not lib:
-		lib = AnimationLibrary.new()
-		anim_player.add_animation_library("", lib)
-
-	if not lib.has_animation(INPUT_ANIMATION_NAME):
-		print("Error: Input animation '", INPUT_ANIMATION_NAME, "' not found in library")
+	var library = player.get_animation_library("")
+	if not library or not library.has_animation(SOURCE_ANIMATION):
+		push_error("Animation '%s' was not found." % SOURCE_ANIMATION)
 		return
 
-	var input_anim = lib.get_animation(INPUT_ANIMATION_NAME)
-	var output_anim: Animation
-
-	if INPUT_ANIMATION_NAME == OUTPUT_ANIMATION_NAME:
-		output_anim = input_anim
-	else:
-		if lib.has_animation(OUTPUT_ANIMATION_NAME):
-			output_anim = lib.get_animation(OUTPUT_ANIMATION_NAME)
-		else:
-			output_anim = Animation.new()
-			lib.add_animation(OUTPUT_ANIMATION_NAME, output_anim)
-		
-		# Match length to input animation
-		output_anim.length = input_anim.length
-
-	bake_path_follow_tracks(anim_player, input_anim, output_anim)
-	print("\nDone. Baked '", OUTPUT_ANIMATION_NAME, "' (length ", output_anim.length, "s)")
-
-
-func bake_path_follow_tracks(anim_player: AnimationPlayer, input_anim: Animation, output_anim: Animation):
-	var root_node = anim_player.get_node(anim_player.root_node)
-	if not root_node:
-		print("Error: root_node of AnimationPlayer not found")
+	var source = library.get_animation(SOURCE_ANIMATION)
+	var animation_root = player.get_node_or_null(player.root_node)
+	if not animation_root:
+		push_error("Could not resolve AnimationPlayer.root_node.")
 		return
 
-	print("Animation tracks count: ", input_anim.get_track_count())
-	# Collect all progress tracks to process from the input animation
-	var tracks_to_process: Array[Dictionary] = []
-	for i in range(input_anim.get_track_count()):
-		var path_str = String(input_anim.track_get_path(i))
-		var track_type = input_anim.track_get_type(i)
-		print("Track ", i, ": path='", path_str, "', type=", track_type)
-		if track_type == Animation.TYPE_VALUE or track_type == Animation.TYPE_BEZIER:
-			if ":" in path_str:
-				var parts = path_str.split(":")
-				var node_path_str = parts[0]
-				var property_name = parts[1]
-				var node_path = NodePath(node_path_str)
-				var path_follow = root_node.get_node_or_null(node_path)
-				print("  -> property: '", property_name, "', resolved node: ", path_follow)
-				if path_follow:
-					print("  -> node class: ", path_follow.get_class())
-				
-				if property_name == "progress" or property_name == "progress_ratio":
-					if path_follow and path_follow is PathFollow3D:
-						tracks_to_process.append({
-							"track_idx": i,
-							"track_type": track_type,
-							"node_path": node_path,
-							"property_name": property_name,
-							"path_follow": path_follow
-						})
-
-	if tracks_to_process.is_empty():
-		print("No PathFollow3D progress/progress_ratio tracks found in input animation '", INPUT_ANIMATION_NAME, "'")
+	var routes := collect_route_tracks(source, animation_root)
+	if routes.is_empty():
+		push_warning("No PathFollow3D progress tracks were found in '%s'." % SOURCE_ANIMATION)
 		return
 
-	# Process in reverse order to keep track indices valid when editing in-place
-	tracks_to_process.reverse()
+	for route_name in routes:
+		bake_route(library, route_name, routes[route_name], source, animation_root, scene_root)
 
-	for info in tracks_to_process:
-		var track_idx = info["track_idx"]
-		var node_path = info["node_path"]
-		var property_name = info["property_name"]
-		var path_follow = info["path_follow"] as PathFollow3D
-		var path_3d = path_follow.get_parent() as Path3D
+	print("Baked ", routes.size(), " route animations from '", SOURCE_ANIMATION, "'.")
 
-		if not path_3d:
-			print("Warning: Parent of PathFollow3D '", path_follow.name, "' is not a Path3D node. Skipping.")
+func collect_route_tracks(source: Animation, animation_root: Node) -> Dictionary:
+	var routes := {}
+	for track_index in source.get_track_count():
+		var property_path := String(source.track_get_path(track_index))
+		var track_type := source.track_get_type(track_index)
+		if track_type != Animation.TYPE_VALUE and track_type != Animation.TYPE_BEZIER:
 			continue
 
-		print("Baking path for '", path_follow.name, "' using grandparent '", path_3d.name, "'")
-
-		# Calculate total curve length
-		var curve = path_3d.curve
-		if not curve:
-			print("Warning: Path3D '", path_3d.name, "' has no Curve3D. Skipping.")
+		var separator := property_path.find(":")
+		if separator < 0:
 			continue
-		var total_length = curve.get_baked_length()
+		var property_name := property_path.substr(separator + 1)
+		if property_name != "progress" and property_name != "progress_ratio":
+			continue
 
-		# Determine the reverse end distance if end_of_reverse metadata is defined
-		var has_reverse = false
-		var reverse_end_dist = 0.0
-		if path_3d.has_meta("end_of_reverse"):
-			var end_idx = int(path_3d.get_meta("end_of_reverse"))
-			if end_idx >= 0 and end_idx < curve.point_count:
-				var end_pos = curve.get_point_position(end_idx)
-				reverse_end_dist = curve.get_closest_offset(end_pos)
-				has_reverse = true
-				print("   Reverse mode enabled. End of reverse point index: ", end_idx, " (offset: ", reverse_end_dist, " units)")
-			else:
-				print("   Warning: end_of_reverse index ", end_idx, " is out of bounds (0 to ", curve.point_count - 1, ").")
+		var follow = animation_root.get_node_or_null(NodePath(property_path.substr(0, separator))) as PathFollow3D
+		if not follow or not follow.get_parent() is Path3D:
+			continue
+		var route = follow.get_parent() as Path3D
+		if routes.has(route.name) and routes[route.name]["route"] != route:
+			push_error("Path3D name '%s' is not unique; route animation names must be unique." % route.name)
+			continue
+		if not routes.has(route.name):
+			routes[route.name] = {"route": route, "tracks": []}
+		routes[route.name]["tracks"].append({
+			"index": track_index,
+			"type": track_type,
+			"property": property_name,
+			"follow": follow
+		})
+	return routes
 
-		# Fetch min_y constraint
-		var min_y = -INF
-		if path_follow.has_meta("min_y"):
-			min_y = path_follow.get_meta("min_y")
-		elif path_3d.has_meta("min_y"):
-			min_y = path_3d.get_meta("min_y")
+func get_scene_relative_transform(node: Node, scene_root: Node) -> Transform3D:
+	var t := Transform3D.IDENTITY
+	var curr := node
+	while curr and curr != scene_root:
+		if curr is Node3D:
+			t = curr.transform * t
+		curr = curr.get_parent()
+	return t
 
-		# Collect times to sample from input_anim
-		var times: Array[float] = []
-		var key_count = input_anim.track_get_key_count(track_idx)
-		for k in range(key_count):
-			times.append(input_anim.track_get_key_time(track_idx, k))
+func bake_route(library: AnimationLibrary, route_name: String, route_info: Dictionary, source: Animation, animation_root: Node, scene_root: Node) -> void:
+	if library.has_animation(route_name):
+		library.remove_animation(route_name)
 
-		var t_sample = 0.0
-		while t_sample < input_anim.length:
-			times.append(t_sample)
-			t_sample += SAMPLE_DELTA
-		times.append(input_anim.length)
+	var output := Animation.new()
+	output.length = source.length
+	output.loop_mode = source.loop_mode
+	output.set_meta("route_animation", true)
+	library.add_animation(route_name, output)
 
-		times.sort()
+	for track_info in route_info["tracks"]:
+		bake_path_follow_track(output, source, route_info["route"], track_info, animation_root, scene_root)
+	print("  ", route_name, ": ", route_info["tracks"].size(), " PathFollow3D track(s)")
 
-		# Deduplicate times
-		var unique_times: Array[float] = []
-		for time in times:
-			if unique_times.is_empty():
-				unique_times.append(time)
-			else:
-				if time - unique_times[-1] > 0.0001:
-					unique_times.append(time)
+func bake_path_follow_track(output: Animation, source: Animation, route: Path3D, track_info: Dictionary, animation_root: Node, scene_root: Node) -> void:
+	var follow := track_info["follow"] as PathFollow3D
+	var target := first_mesh_child(follow)
+	if not target:
+		push_warning("Skipping '%s': it has no MeshInstance3D child." % follow.get_path())
+		return
 
-		var track_type = info["track_type"]
+	var times := sample_times(source, track_info["index"])
+	var original_value = follow.get(track_info["property"])
+	# Preserve the original baker's reference frame: generated mesh keys are
+	# relative to the PathFollow3D state at time zero, not route world-space.
+	var start_value := interpolated_value(source, track_info, 0.0)
+	follow.set(track_info["property"], start_value)
+	var follow_at_start := follow.transform
+	var mesh_design_transform := target.transform
+	# C++ has no parent hierarchy. This is the world transform represented by
+	# the old baker's local reference frame at time zero.
+	var route_transform := get_scene_relative_transform(route, scene_root)
+	var start_frame_in_world := route_transform * follow_at_start
+	var positions: Array[Vector3] = []
+	var rotations: Array[Quaternion] = []
+	var reverse_end_distance := reverse_end_distance_for(route)
+	var min_y := minimum_y_for(route, follow)
+	var curve_length := route.curve.get_baked_length() if route.curve else 0.0
 
-		# Store original value to restore it in the editor afterwards
-		var original_val = path_follow.get(property_name)
+	for time in times:
+		var progress_value := interpolated_value(source, track_info, time)
+		follow.set(track_info["property"], progress_value)
+		var transform := follow.transform
 
-		# Get start transform of the PathFollow3D node (T_start) at the beginning of the animation (time = 0.0)
-		var start_val = 0.0
-		if track_type == Animation.TYPE_VALUE:
-			start_val = input_anim.value_track_interpolate(track_idx, 0.0)
-		elif track_type == Animation.TYPE_BEZIER:
-			start_val = input_anim.bezier_track_interpolate(track_idx, 0.0)
-		path_follow.set(property_name, start_val)
-		var T_start = path_follow.transform
+		# Preserve the original reverse convention: before end_of_reverse the
+		# vehicle is reversing, while the remainder faces the opposite direction.
+		# The 180-degree turn is applied about the vehicle's local Y axis.
+		var distance := progress_value * curve_length if track_info["property"] == "progress_ratio" else progress_value
+		var is_reversing := reverse_end_distance >= 0.0 and distance < reverse_end_distance
+		if reverse_end_distance >= 0.0 and not is_reversing:
+			transform.basis = transform.basis * Basis(Quaternion(Vector3.UP, PI))
 
-		# Find the child node that is the mesh node
-		var child = path_follow.get_child(0) as Node3D
-		var T_child_design = Transform3D.IDENTITY
-		var target_path = node_path
-		
-		if child:
-			T_child_design = child.transform
-			target_path = NodePath(String(node_path) + "/" + child.name)
-			print("   Target redirected to child mesh node: '", child.name, "' (path: ", target_path, ")")
+		if min_y != -INF and transform.origin.y < min_y:
+			transform.origin.y = min_y
 
-		# Sample transforms
-		var positions: Array[Vector3] = []
-		var rotations: Array[Quaternion] = []
+		# Preserve the original start-relative calculation, then convert it to
+		# world space for the flattened C++ scene. At t = 0 this exactly equals
+		# target.global_transform, so the animation cannot jump on its first key.
+		var mesh_relative_to_start := follow_at_start.inverse() * transform * mesh_design_transform
+		var mesh_transform := start_frame_in_world * mesh_relative_to_start
+		positions.append(mesh_transform.origin)
+		rotations.append(mesh_transform.basis.get_rotation_quaternion())
 
-		for time in unique_times:
-			var val = 0.0
-			if track_type == Animation.TYPE_VALUE:
-				val = input_anim.value_track_interpolate(track_idx, time)
-			elif track_type == Animation.TYPE_BEZIER:
-				val = input_anim.bezier_track_interpolate(track_idx, time)
-			path_follow.set(property_name, val)
-			
-			var T_follow = path_follow.transform
+	follow.set(track_info["property"], original_value)
 
-			# Apply reverse logic based on distance along curve
-			var current_dist = val
-			if property_name == "progress_ratio":
-				current_dist = val * total_length
+	var target_path := animation_root.get_path_to(target)
+	var pos_track := output.add_track(Animation.TYPE_POSITION_3D)
+	output.track_set_path(pos_track, target_path)
+	var rot_track := output.add_track(Animation.TYPE_ROTATION_3D)
+	output.track_set_path(rot_track, target_path)
+	for key_index in times.size():
+		output.track_insert_key(pos_track, times[key_index], positions[key_index])
+		output.track_insert_key(rot_track, times[key_index], rotations[key_index])
 
-			var is_reversing = has_reverse and current_dist < reverse_end_dist
-			var euler_before = T_follow.basis.get_rotation_quaternion().get_euler()
+func reverse_end_distance_for(route: Path3D) -> float:
+	if not route.has_meta("end_of_reverse") or not route.curve:
+		return -1.0
+	var point_index := int(route.get_meta("end_of_reverse"))
+	if point_index < 0 or point_index >= route.curve.point_count:
+		push_warning("Invalid end_of_reverse on " + String(route.get_path()))
+		return -1.0
+	return route.curve.get_closest_offset(route.curve.get_point_position(point_index))
 
-			# Since the model naturally faces backwards (towards the curve's trails),
-			# if we have a reverse segment, we need to flip (offset) the rotation by 180 degrees
-			# during the forward phase, and keep it unflipped during the reversing phase.
-			var should_flip = has_reverse and not is_reversing
+func minimum_y_for(route: Path3D, follow: PathFollow3D) -> float:
+	if follow.has_meta("min_y"):
+		return float(follow.get_meta("min_y"))
+	if route.has_meta("min_y"):
+		return float(route.get_meta("min_y"))
+	return -INF
 
-			if should_flip:
-				# Rotate 180 degrees around local Y axis
-				var reverse_rot = Quaternion(Vector3.UP, PI)
-				T_follow.basis = T_follow.basis * Basis(reverse_rot)
+func sample_times(source: Animation, track_index: int) -> Array[float]:
+	var times: Array[float] = []
+	for key_index in source.track_get_key_count(track_index):
+		times.append(source.track_get_key_time(track_index, key_index))
+	var time := 0.0
+	while time < source.length:
+		times.append(time)
+		time += SAMPLE_DELTA
+	times.append(source.length)
+	times.sort()
 
-			# Apply min_y clamping if specified
-			if min_y != -INF and T_follow.origin.y < min_y:
-				T_follow.origin.y = min_y
+	var unique_times: Array[float] = []
+	for sample in times:
+		if unique_times.is_empty() or sample - unique_times.back() > 0.0001:
+			unique_times.append(sample)
+	return unique_times
 
-			# Calculate child's final local transform relative to PathFollow3D's starting state
-			var pos: Vector3
-			var rot: Quaternion
-			if child:
-				var T_child_final = T_start.inverse() * T_follow * T_child_design
-				pos = T_child_final.origin
-				rot = T_child_final.basis.get_rotation_quaternion()
-			else:
-				pos = T_follow.origin
-				rot = T_follow.basis.get_rotation_quaternion()
+func interpolated_value(source: Animation, track_info: Dictionary, time: float) -> float:
+	if track_info["type"] == Animation.TYPE_BEZIER:
+		return source.bezier_track_interpolate(track_info["index"], time)
+	return source.value_track_interpolate(track_info["index"], time)
 
-			var euler_after = rot.get_euler()
-			print("   Time: ", time, " | val: ", val, " | is_reversing: ", is_reversing, " | should_flip: ", should_flip, " | Euler Before (deg): ", rad_to_deg(euler_before.y), " | Euler After (deg): ", rad_to_deg(euler_after.y))
+func first_mesh_child(node: Node) -> MeshInstance3D:
+	for child in node.get_children():
+		if child is MeshInstance3D:
+			return child
+	return null
 
-			positions.append(pos)
-			rotations.append(rot)
-
-		# Restore original value
-		path_follow.set(property_name, original_val)
-
-		# Remove any existing position/rotation tracks for this target node path in output_anim
-		var k = output_anim.get_track_count() - 1
-		while k >= 0:
-			var t_path = output_anim.track_get_path(k)
-			var t_type = output_anim.track_get_type(k)
-			if t_path == target_path and (t_type == Animation.TYPE_POSITION_3D or t_type == Animation.TYPE_ROTATION_3D):
-				output_anim.remove_track(k)
-			k -= 1
-
-		# Create new position and rotation tracks in output_anim
-		var pos_track = output_anim.add_track(Animation.TYPE_POSITION_3D)
-		output_anim.track_set_path(pos_track, target_path)
-		var rot_track = output_anim.add_track(Animation.TYPE_ROTATION_3D)
-		output_anim.track_set_path(rot_track, target_path)
-
-		# Write keys to tracks in output_anim
-		for idx in range(unique_times.size()):
-			var time = unique_times[idx]
-			output_anim.track_insert_key(pos_track, time, positions[idx])
-			output_anim.track_insert_key(rot_track, time, rotations[idx])
-
-		# Disable original track in output_anim (or input_anim if in-place) to prevent double-animation
-		if input_anim == output_anim:
-			output_anim.track_set_enabled(track_idx, false)
-		print("   Successfully baked ", unique_times.size(), " keyframes onto '", path_follow.name, "'")
-
-
-func find_in_tree(node: Node) -> AnimationPlayer:
+func find_animation_player(node: Node) -> AnimationPlayer:
 	if node is AnimationPlayer:
 		return node
 	for child in node.get_children():
-		var result = find_in_tree(child)
+		var result := find_animation_player(child)
 		if result:
 			return result
 	return null

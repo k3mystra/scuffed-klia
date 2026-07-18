@@ -51,9 +51,12 @@ static Transform loadTransformComponent(const std::string& line, World& world) {
     for (int i = 0; i < glm::vec3::length(); i++)
         stream >> transform.position[i];
 
-    transform.rotation = glm::quat(0, 0, 0, 0);
+    transform.rotation = glm::quat(1, 0, 0, 0);
     for (int i = 0; i < glm::quat::length(); i++)
         stream >> transform.rotation[i];
+    // Note: GLM_FORCE_QUAT_DATA_WXYZ is defined in the Makefile, so
+    // operator[] indexes as [0]=w [1]=x [2]=y [3]=z — matching the
+    // file format (w x y z), so this loop is correct.
 
     transform.scale = glm::vec3(0);
     for (int i = 0; i < glm::vec3::length(); i++)
@@ -183,7 +186,7 @@ World loadFromFile(std::string filename) {
         switch (line[0]) {
             case '#':
                 world.entityDataList.push_back(loadEntityDataComponent(line, world));
-                world.entityDataIndex.insert({ world.totalEntity - 1, world.entityDataList.size() - 1 });
+                world.entityDataIndex.insert({ world.totalEntity, world.entityDataList.size() - 1 });
                 world.totalEntity++;
                 break;
             case 'T':
@@ -224,10 +227,13 @@ static void handleKeyInput(const InputEvent& event, World& world) {
         glfwSetWindowShouldClose(world.window, true);
     
     if (event.key == GLFW_KEY_ESCAPE && event.type == InputEvent::Type::KeyPress) {
-        if (world.isCursorLocked)
+        if (world.isCursorLocked) {
             glfwSetInputMode(world.window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        else
+        } else {
             glfwSetInputMode(world.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            // Re-seed mouse position so re-entry doesn't produce a junk delta
+            InputManager::resetMousePos(world.window);
+        }
 
         world.isCursorLocked = !world.isCursorLocked;
     }

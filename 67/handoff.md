@@ -1,4 +1,4 @@
-# Handoff: PathFollow3D Transform Animator Baking (Mesh Target Redirection)
+# Handoff: C++ Animation System and Godot Exporter Alignment
 
 ## Table of Contents
 
@@ -9,8 +9,7 @@
   - [Critical Files](#critical-files)
 - [Work Completed](#work-completed)
   - [Tasks Finished](#tasks-finished)
-  - [Files Modified](#files-modified)
-  - [Decisions Made](#decisions-made)
+  - [Decisions & Implementations](#decisions--implementations)
 - [Context for Resuming Agent](#context-for-resuming-agent)
   - [Important Context](#important-context)
   - [Assumptions Made](#assumptions-made)
@@ -19,27 +18,37 @@
 ---
 
 ## Session Metadata
-- Created: 2026-07-17T03:55:00+08:00
+- Updated: 2026-07-18T18:25:00+08:00
 - Project: `c:\Users\tan yu kai\Documents\GitHub\scuffed-klia`
-- Branch: `main`
-- Session duration: ~5 hours
+- Branch: `Jason`
 
 ## Current State Summary
 
-The `PathFollow3D` progress track baking feature inside `AutoAnimator.gd` has been updated to support child target redirection and verified to be compatible with `SceneExporter.gd`. Instead of writing keyframes directly onto `PathFollow3D`, the script redirects the baked position and rotation tracks to the first child node of `PathFollow3D` (the actual vehicle mesh). It computes the local transforms of the child relative to the starting state of `PathFollow3D` while preserving the design-time local transform offsets.
+The animation rendering pipeline has been fully implemented and aligned between Godot and the C++ application. The program compiles cleanly, controls smoothly without camera roll, and plays all route animations starting from their correct positions with correct model mappings.
+
+---
 
 ## Codebase Understanding
 
 ### Architecture Overview
 
-The tool script functions as an editor constraint baker. It reads a source animation, samples progress tracks, updates the `PathFollow3D` node, and computes the relative transforms required for the child node to follow the curve when `PathFollow3D` is stationary.
+1. **Godot Editor constraints baking**:
+   - `AutoAnimator.gd` samples Path3D curve progress and transforms them into absolute mesh local tracks.
+   - `SceneExporter.gd` serializes static entities and animation clips to `world.txt`.
+2. **C++ Game Engine**:
+   - **Parser**: `World.cpp` parses the layout and animation tracks.
+   - **Animation System**: `Animation.cpp` schedules clips, interpolates keys, and updates entity `Transform` vectors.
+   - **Camera System**: `CameraControl.cpp` manages first-person panning using absolute yaw/pitch angles.
 
 ### Critical Files
 
-| File | Purpose | Relevance |
-|------|---------|-----------|
-| [AutoAnimator.gd](file:///c:/Users/tan%20yu%20kai/Documents/GitHub/scuffed-klia/src/3DScene/LarpCombat/AutoAnimator.gd) | Editor tool script. | Contains the baking and child redirection implementation. |
-| [SceneExporter.gd](file:///c:/Users/tan%20yu%20kai/Documents/GitHub/scuffed-klia/src/3DScene/LarpCombat/SceneExporter.gd) | Scene layout and animation exporter. | Exports parsed scene structures and matching animation clips to C++ engine file. |
+| File | Purpose | Key Details |
+|------|---------|-------------|
+| [AutoAnimator.gd](file:///c:/Users/tan%20yu%20kai/Documents/GitHub/scuffed-klia/src/3DScene/LarpCombat/AutoAnimator.gd) | Baking tool script | Replaces `global_transform` with manual ancestor multiplication to bypass Godot's lazy viewport update in editor scripts. |
+| [SceneExporter.gd](file:///c:/Users/tan%20yu%20kai/Documents/GitHub/scuffed-klia/src/3DScene/LarpCombat/SceneExporter.gd) | Layout and animation exporter | Exports parsed scene structures and animation keyframe tracks to `world.txt`. |
+| [World.cpp](file:///c:/Users/tan%20yu%20kai/Documents/GitHub/scuffed-klia/src/World.cpp) | Resource Loader | Parses `world.txt` and aligns model, transform, and entity name mapping. |
+| [Animation.cpp](file:///c:/Users/tan%20yu%20kai/Documents/GitHub/scuffed-klia/src/Animation.cpp) | Animation System | Handles `LOOP_LINEAR` and `LOOP_PINGPONG` interpolation (LERP for POS/SCL, SLERP for ROT). |
+| [CameraControl.cpp](file:///c:/Users/tan%20yu%20kai/Documents/GitHub/scuffed-klia/src/CameraControl.cpp) | Camera Control | Implements yaw/pitch camera angles to prevent camera roll. |
 
 ---
 
@@ -47,24 +56,30 @@ The tool script functions as an editor constraint baker. It reads a source anima
 
 ### Tasks Finished
 
-- [x] **Child Node Redirection**: Automatically detects the first child of `PathFollow3D` (e.g. `Path3D/PathFollow3D/Mesh`) and bakes position and rotation tracks onto it instead of `PathFollow3D`.
-- [x] **Transform Space Alignment**: Evaluates child transforms relative to the parent's starting state ($T_{start}^{-1} * T_{follow}(t) * T_{design}$) to preserve local design alignment offsets and keep the mesh positioned accurately when `PathFollow3D` stays at progress `0` at runtime.
-- [x] **Reversing with Model Offset**: Flipping (offsetting) the rotation by 180 degrees during the *forward* phase, keeping it unflipped during the *reversing* phase.
-- [x] **Smart Re-baking**: Cleans up previous baked tracks of child target nodes.
-- [x] **Input & Output Animation separation**: Separates input and output animation processing.
-- [x] **SceneExporter Compatibility Verification**: Checked `SceneExporter.gd` parsing loops to ensure that baked child tracks match target mesh entities, and that unhandled progress value/bezier tracks are automatically skipped.
+- [x] **C++ Animation System**: Implemented track searching, time modulations (`fmod` loops and ping-pongs), and LERP/SLERP keyframe data math.
+- [x] **Roll-Free Camera Panning**: Refactored first-person rotation to use pitch/yaw integration instead of local axis quat concatenation, preventing horizontal line tilting. Added pitch limits at $\pm89^\circ$.
+- [x] **Escape & Cursor Lock Panning Fixes**: 
+  - Mouse seeding is now done on initialization to prevent initial delta jumps.
+  - Added `InputManager::resetMousePos` called when re-locking the mouse to prevent garbage deltas on window re-entry.
+  - Disabled camera movements while the mouse cursor is unlocked.
+- [x] **Baking Start Coordinates Fix**: Resolved the viewport coordinate bug where the first keyframe snapped to `(0,0,0)`. Used manual scene-relative transform calculation.
+- [x] **Entity Mismatch Fix**: Fixed off-by-one mapping error in `World.cpp` where `#` parsing used `world.totalEntity - 1` before it was incremented. This maps tracks and models to their correct entities.
 
-### Files Modified
+### Decisions & Implementations
 
-| File | Changes | Rationale |
-|------|---------|-----------|
-| [AutoAnimator.gd](file:///c:/Users/tan%20yu%20kai/Documents/GitHub/scuffed-klia/src/3DScene/LarpCombat/AutoAnimator.gd) | Rewrite of sampling logic. | Correctly offset the child's baked transform relative to the starting state of PathFollow3D. |
+1. **Interpolation Lookup**:
+   `searchForNextKeyframe` evaluates indices per frame to accommodate loop or ping-pong playback jumping backwards without keeping state of previous tracks.
+2. **Quaternion Normalization**:
+   `recalcTransform` normalizes quaternion values on modification to prevent scaling degradation over long run periods.
 
 ---
 
 ## Context for Resuming Agent
 
 ### Important Context
+* The C++ engine uses a flat vector structure. Transforms are updated using `transform_utils::setPosition`, `setRotation`, etc., which set flags marking transforms dirty for matrix updates.
+* Names in `world.txt` are serialized using scene-relative paths (e.g. `PassengerTruckPath/PathFollow3D/MeshInstance3D`) to act as the primary lookup keys in `nameToIdMapping`.
 
-* The vehicle hierarchy is `Path3D` -> `PathFollow3D` -> `Mesh/Vehicle`. The position/rotation tracks are baked directly onto the `Mesh/Vehicle` node.
-* At runtime, the `PathFollow3D` node remains stationary at `progress_ratio = 0.0`.
+### Potential Gotchas
+* Re-running baking/exporting in Godot requires running **AutoAnimator** first, then **SceneExporter**, to ensure lookups in `world.txt` are properly synchronized.
+* Rotation tracks in `world.txt` are serialized as quaternions in `w, x, y, z` ordering, matching the C++ parsing loops.

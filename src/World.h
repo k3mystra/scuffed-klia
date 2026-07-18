@@ -14,6 +14,7 @@ struct World {
     int totalEntity = 0;
     bool isCursorLocked = true;
     float deltaTime = 0;
+    float elapsedTime = 0;
 
     GLFWwindow* window = nullptr;
 

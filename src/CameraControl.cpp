@@ -8,16 +8,12 @@
 #include <glm/fwd.hpp>
 #include <glm/geometric.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <cmath>
 #include <iostream>
 #include <vector>
 
 const float MOVE_SPEED = 100;
 const float PAN_SPEED = 15;
-
-static void removeVectorElevation(glm::vec3 vec) {
-    vec.y = 0.0;
-    vec = glm::normalize(vec);
-}
 
 // Minecraft-like control
 static void handleAxisMovement(Transform* transform, float deltaTime) {
@@ -39,41 +35,66 @@ static void handleAxisMovement(Transform* transform, float deltaTime) {
     else if (InputManager::isKeyPressed(GLFW_KEY_LEFT_SHIFT))
         elevationInput = -1;
 
-    glm::vec3 localForwardVector = transform->matrix[2];
-    glm::vec3 localRightVector = transform->matrix[0];
-
-    // Remove elevation added by Y-axis magnitude
-    // Avoid elevation change being applied on moveInput X-Z field-of-view plane
-    // TL;DR: making this feels like Minecraft control
-    removeVectorElevation(localForwardVector);
-    removeVectorElevation(localRightVector);
+    // Extract flat (XZ) forward and right vectors from the transform matrix.
+    // Zero the Y component so WASD stays on the horizontal plane (Minecraft-style).
+    glm::vec3 localForwardVector = glm::vec3(transform->matrix[2]);
+    glm::vec3 localRightVector   = glm::vec3(transform->matrix[0]);
+    localForwardVector.y = 0.0f;
+    localRightVector.y   = 0.0f;
+    if (glm::length(localForwardVector) > 0.0001f) localForwardVector = glm::normalize(localForwardVector);
+    if (glm::length(localRightVector)   > 0.0001f) localRightVector   = glm::normalize(localRightVector);
 
     glm::vec3 moveVector = (localRightVector * moveInput.x) + (-localForwardVector * moveInput.z);
     moveVector *= MOVE_SPEED * deltaTime;
     // Apply elevation
     moveVector.y = elevationInput * MOVE_SPEED * deltaTime;
 
-    glm::vec3 camPos = transform->position;
+    transform_utils::setPosition(*transform, transform->position + moveVector);
+}
 
-    transform_utils::setPosition(*transform, camPos + moveVector);
+// Persistent yaw and pitch state for the camera.
+// Storing them separately and reconstructing the quaternion each frame ensures
+// zero roll regardless of floating-point drift or export imprecision from Godot.
+static float sCameraYaw   = 0.0f;
+static float sCameraPitch = 0.0f;
+static bool  sCameraInitialized = false;
+
+// Extract yaw and pitch from the camera's loaded quaternion, stripping any roll.
+// Camera look direction in this engine = rotation * (0, 0, -1).
+// Given lookDir = (-sin(yaw)*cos(pitch), sin(pitch), -cos(yaw)*cos(pitch)):
+//   pitch = arcsin(lookDir.y)
+//   yaw   = atan2(-lookDir.x, -lookDir.z)
+static void initCameraAngles(const Transform* transform) {
+    glm::vec3 lookDir = transform->rotation * glm::vec3(0.0f, 0.0f, -1.0f);
+    sCameraPitch = std::asin(glm::clamp(lookDir.y, -1.0f, 1.0f));
+    sCameraYaw   = std::atan2(-lookDir.x, -lookDir.z);
+    sCameraInitialized = true;
 }
 
 static void handleCursorPanning(Transform* transform, const InputEvent& event, float deltaTime) {
-    // glm::quat panRotation = glm::quat(glm::vec3(-event.mousePosDelta.y, -event.mousePosDelta.x, 0.0) * PAN_SPEED);
+    if (!sCameraInitialized)
+        initCameraAngles(transform);
 
-    // Divide by 1000 cuz mousePosDelta is pixel-distance, and that's BIG
-    float upDownDelta = -event.mousePosDelta.y * PAN_SPEED * deltaTime / 100;
-    float leftRightDelta = -event.mousePosDelta.x * PAN_SPEED * deltaTime / 100;
+    // Divide by 100 cuz mousePosDelta is pixel-distance, and that's BIG
+    sCameraPitch += -event.mousePosDelta.y * PAN_SPEED * deltaTime / 100;
+    sCameraYaw   += -event.mousePosDelta.x * PAN_SPEED * deltaTime / 100;
 
-    glm::quat panRotation = glm::angleAxis(leftRightDelta, glm::vec3(0.0, 1.0, 0.0));
+    // Clamp pitch so the camera can't flip upside-down
+    const float MAX_PITCH = glm::radians(89.0f);
+    sCameraPitch = glm::clamp(sCameraPitch, -MAX_PITCH, MAX_PITCH);
 
-    glm::vec3 localRightAxis = transform->rotation * glm::vec4(1.0, 0.0, 0.0, 1.0);
-    panRotation = glm::angleAxis(upDownDelta, localRightAxis) * panRotation;
+    // Reconstruct rotation as yaw * pitch — mathematically roll-free
+    glm::quat yawQuat   = glm::angleAxis(sCameraYaw,   glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::quat pitchQuat = glm::angleAxis(sCameraPitch, glm::vec3(1.0f, 0.0f, 0.0f));
 
-    transform_utils::setRotation(*transform, panRotation * transform->rotation);
+    transform_utils::setRotation(*transform, yawQuat * pitchQuat);
 }
 
 void processCameraControl(World& world) {
+    // Don't move the camera while the cursor is unlocked (user pressed Escape)
+    if (!world.isCursorLocked)
+        return;
+
     // Find camera transform data
     Transform* transform = nullptr;
     for (int e = 0; e < world.totalEntity; e++) {
@@ -108,4 +129,3 @@ void processCameraControl(World& world) {
         }
     }
 }
-

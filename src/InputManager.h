@@ -38,11 +38,12 @@ public:
     static void _handleKey(GLFWwindow* window, int key, int scancode, int action, int mods);
     static void _handleMousePos(GLFWwindow* window, double xpos, double ypos);
     static void clearInputQueue();
+    static void resetMousePos(GLFWwindow* window);
     static const std::vector<InputEvent>& getInputQueue();
     static const bool isKeyPressed(int key);
     
 private:
     static inline std::array<bool, GLFW_KEY_LAST + 1> keyState = {};
-    static inline glm::vec2 lastMousePos = glm::vec2(-1, -1);
+    static inline glm::vec2 lastMousePos = glm::vec2(0);
     static inline InputEventQueue inputEventQueue = {};
 };

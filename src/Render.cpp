@@ -236,6 +236,7 @@ void RenderSystem::initializeComponents(World& world) {
     cam->projectionMatrix = glm::perspective(glm::radians(cam->fov), cam->aspectRatio, cam->nearPlane, cam->farPlane);
 }
 
+
 RenderSystem::RenderSystem(World& world, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
      // By default already set to screen size, but useful if we resize the windows later
     glViewport(0, 0, initialWindowWidth, initialWindowHeight);

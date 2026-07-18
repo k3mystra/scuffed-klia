@@ -30,6 +30,12 @@ int main (int argc, char *argv[]) {
     InputManager::init(world.window);
     animationSystemInit(world);
 
+    // Preserve the original scene behaviour: exported routes begin together.
+    // Schedule individual routes at other times by replacing this with calls
+    // such as scheduleAnimation(world, "T1Arrival", 5.0f).
+    for (const Animation& animation : world.animList)
+        scheduleAnimation(world, animation.name, 0.0f);
+
     // Actual game loop
     // ==== ECS Migration ====
 
@@ -45,6 +51,7 @@ int main (int argc, char *argv[]) {
         lastFrameTime = currentFrameTime;
 
         world.deltaTime = deltaTime;
+        world.elapsedTime += deltaTime;
 
         processGlobalInputEvent(world);
         processCameraControl(world);
