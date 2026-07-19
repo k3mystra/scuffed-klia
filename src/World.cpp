@@ -220,6 +220,19 @@ World loadFromFile(std::string filename) {
         world.nameToIdMapping.insert({ world.entityDataList[search->second].name, e });
     }
 
+    int totalVertices = 0;
+    int totalFaces = 0;
+    // Debugging
+    for (Model& model : world.modelList) {
+        for (Mesh& mesh : model.meshes) {
+            totalVertices += mesh.vertices.size();
+            totalFaces += mesh.faceIndices.size();
+        }
+    }
+
+    std::cout << "Total vertices: " << totalVertices << '\n';
+    std::cout << "Total faces: " << totalFaces << '\n';
+
     return world;
 }
 
