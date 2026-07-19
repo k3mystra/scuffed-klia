@@ -25,8 +25,8 @@ const std::string SKYBOX_VERTEX_SHADER_SRC_PATH = "default_shaders/skybox_vertex
 
 const glm::vec3 DEFAULT_BG = glm::vec3(0.2, 0.2, 0.2);
 
-typedef std::pair<Camera, Transform> CameraTransformData;
-typedef std::pair<Model, Transform> ModelTransformData;
+typedef std::pair<Camera*, Transform*> CameraTransformData;
+typedef std::pair<Model*, Transform*> ModelTransformData;
 
 
 void APIENTRY openGLDebugCallback(GLenum source, GLenum type, GLuint id,
@@ -382,32 +382,21 @@ static void renderObj(
     const CameraTransformData& camData,
     const World& world
 ) {
+    shader_utils::setMat4(modelData.first->shader, "model", modelData.second->matrix);
+    shader_utils::setFloat(modelData.first->shader, "opacity", modelData.second->opacity);
 
-    glUseProgram(modelData.first.shader.programID);
+    bool isGrass = modelData.first->srcPath == "3DScene/LarpCombat/grass_texture.jpg";
+    shader_utils::setBool(modelData.first->shader, "isGrass", isGrass);
 
-    for (const Mesh& mesh : modelData.first.meshes) {
-        shader_utils::setMat4(modelData.first.shader, "model", modelData.second.matrix);
-        shader_utils::setMat4(modelData.first.shader, "view", camData.second.invMatrix);
-        shader_utils::setMat4(modelData.first.shader, "projection", camData.first.projectionMatrix);
-
-        shader_utils::setVec3(modelData.first.shader, "matColor", mesh.material.color);
-        shader_utils::setFloat(modelData.first.shader, "opacity", modelData.second.opacity);
-
-        bool isGrass = modelData.first.srcPath == "3DScene/LarpCombat/grass_texture.jpg";
-        shader_utils::setBool(modelData.first.shader, "isGrass", isGrass);
-
-        shader_utils::setVec3(modelData.first.shader, "ambientLightColor", world.ambientLight.color);
-
-        shader_utils::setVec3(modelData.first.shader, "sunLightColor", world.sunlight.color);
-        shader_utils::setVec3(modelData.first.shader, "sunLightDir", world.sunlight.direction);
-        shader_utils::setVec3(modelData.first.shader, "viewPos", camData.second.position);
+    for (const Mesh& mesh : modelData.first->meshes) {
+        shader_utils::setVec3(modelData.first->shader, "matColor", mesh.material.color);
 
         bool hasTexture = mesh.material.textureID != 0;
-        shader_utils::setBool(modelData.first.shader, "hasTexture", hasTexture);
+        shader_utils::setBool(modelData.first->shader, "hasTexture", hasTexture);
         if (hasTexture) {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, mesh.material.textureID);
-            shader_utils::setInt(modelData.first.shader, "diffuseTexture", 0);
+            shader_utils::setInt(modelData.first->shader, "diffuseTexture", 0);
         }
 
         glBindVertexArray(mesh.VAO);
@@ -436,8 +425,8 @@ void RenderSystem::render(World& world) {
         if (transformSearch == world.transformIndex.end())
             continue;
 
-        camObjectData.first = world.cameraList[camSearch->second];
-        camObjectData.second = world.transformList[transformSearch->second];
+        camObjectData.first = &world.cameraList[camSearch->second];
+        camObjectData.second = &world.transformList[transformSearch->second];
         break;
     }
 
@@ -448,9 +437,9 @@ void RenderSystem::render(World& world) {
         glUseProgram(world.skybox.shader.programID);
 
         // Remove translation from view matrix
-        glm::mat4 view = glm::mat4(glm::mat3(camObjectData.second.invMatrix));
+        glm::mat4 view = glm::mat4(glm::mat3(camObjectData.second->invMatrix));
         shader_utils::setMat4(world.skybox.shader, "view", view);
-        shader_utils::setMat4(world.skybox.shader, "projection", camObjectData.first.projectionMatrix);
+        shader_utils::setMat4(world.skybox.shader, "projection", camObjectData.first->projectionMatrix);
 
         glBindVertexArray(world.skybox.VAO);
         glActiveTexture(GL_TEXTURE0);
@@ -462,19 +451,25 @@ void RenderSystem::render(World& world) {
         glDepthFunc(GL_LESS);
     }
 
+    // Since all model uses same shader
+    // gonna hack this to use the same shader as well
+    Shader& shader = world.modelList[0].shader;
+    glUseProgram(shader.programID);
+    shader_utils::setMat4(shader, "view", camObjectData.second->invMatrix);
+    shader_utils::setMat4(shader, "projection", camObjectData.first->projectionMatrix);
+    shader_utils::setVec3(shader, "viewPos", camObjectData.second->position);
+
+    shader_utils::setVec3(shader, "ambientLightColor", world.ambientLight.color);
+
+    shader_utils::setVec3(shader, "sunLightColor", world.sunlight.color);
+    shader_utils::setVec3(shader, "sunLightDir", world.sunlight.direction);
+
     // Iterate thru all entity, since we need multiple components from each entity
     ModelTransformData modelObjectData;
-    for (int e = 0; e < world.totalEntity; e++) {
-        auto modelSearch = world.modelIndex.find(e);
-        if (modelSearch == world.modelIndex.end())
-            continue;
 
-        auto transformSearch = world.transformIndex.find(e);
-        if (transformSearch == world.transformIndex.end())
-            continue;
-
-        modelObjectData.first = world.modelList[modelSearch->second];
-        modelObjectData.second = world.transformList[transformSearch->second];
+    for (const auto& modelIndices : world.modelIndex) {
+        modelObjectData.first = &world.modelList[modelIndices.second];
+        modelObjectData.second = &world.transformList[world.transformIndex.at(modelIndices.first)];
 
         renderObj(modelObjectData, camObjectData, world);
     }
