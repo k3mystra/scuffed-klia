@@ -34,7 +34,7 @@ void createGrassPlane(World& world) {
 
     // Create Transform
     Transform transform;
-    transform.position = glm::vec3(0, 0.0f, 0); // y = 0
+    transform.position = glm::vec3(0, -2, 0); // y = 0
     transform.rotation = glm::quat(1, 0, 0, 0);
     transform.scale = glm::vec3(1, 1, 1);
     transform.matrix = glm::mat4(1.0f);
@@ -77,19 +77,53 @@ int main (int argc, char *argv[]) {
     InputManager::init(world.window);
     animationSystemInit(world);
 
-    // Chain animations: T1Arrival -> T1BaggageTruck -> T1Departure
+    // Chain animations per terminal (Arrival -> BaggageTruck -> Departure)
+    // Terminal 1
     chainAnimations(world, "T1Arrival", "T1BaggageTruck");
     chainAnimations(world, "T1BaggageTruck", "T1Departure");
+    // Terminal 2
+    chainAnimations(world, "T2Arrival", "T2BaggageTruck");
+    chainAnimations(world, "T2BaggageTruck", "T2Departure");
+    // Terminal 3 (Note: Departure is spelled "T3Depature" in world.txt)
+    chainAnimations(world, "T3Arrival", "T3BaggageTruck");
+    chainAnimations(world, "T3BaggageTruck", "T3Depature");
+    // Terminal 4
+    chainAnimations(world, "T4Arrival", "T4BaggageTruck");
+    chainAnimations(world, "T4BaggageTruck", "T4Departure");
+    // Terminal 5
+    chainAnimations(world, "T5Arrival", "T5BaggageTruck");
+    chainAnimations(world, "T5BaggageTruck", "T5Departure");
+    // Terminal 6
+    chainAnimations(world, "T6Arrival", "T6BaggageTruck");
+    chainAnimations(world, "T6BaggageTruck", "T6Departure");
 
-    // Redirect T1Departure to animate the T1Arrival plane mesh instead of the duplicate departure plane.
-    // This hides the duplicate plane so only one model exists in the scene.
+    // Loop Passenger Ground Traffic infinitely by chaining it to itself
+    chainAnimations(world, "PassengerTruckPath", "PassengerTruckPath");
+
+    // Redirect departure animation targets to the arrival plane models to avoid rendering duplicates
     redirectAnimationTarget(world, "T1Departure", "departure/T1Departure/PathFollow3D/MeshInstance3D", "Arrival/T1Arrival/PathFollow3D/MeshInstance3D");
+    redirectAnimationTarget(world, "T2Departure", "departure/T2Departure/PathFollow3D/BigCommercial2", "Arrival/T2Arrival/PathFollow3D/MeshInstance3D");
+    redirectAnimationTarget(world, "T3Depature", "departure/T3Depature/PathFollow3D/183AirplaneAirport1", "Arrival/T3Arrival/PathFollow3D/MeshInstance3D");
+    redirectAnimationTarget(world, "T4Departure", "departure/T4Departure/PathFollow3D/181AirplaneAirport0", "Arrival/T4Arrival/PathFollow3D/MeshInstance3D");
+    redirectAnimationTarget(world, "T5Departure", "departure/T5Departure/PathFollow3D/MeshInstance3D", "Arrival/T5Arrival/PathFollow3D/MeshInstance3D");
+    redirectAnimationTarget(world, "T6Departure", "departure/T6Departure/PathFollow3D/BudgetPlane3", "Arrival/T6Arrival/PathFollow3D/MeshInstance3D");
 
-    // Initially hide the T1Arrival plane so it starts transparent and fades in when its animation begins.
+    // Initially hide all arrival planes so they fade in when their landing sequence begins
     setEntityOpacity(world, "Arrival/T1Arrival/PathFollow3D/MeshInstance3D", 0.0f);
+    setEntityOpacity(world, "Arrival/T2Arrival/PathFollow3D/MeshInstance3D", 0.0f);
+    setEntityOpacity(world, "Arrival/T3Arrival/PathFollow3D/MeshInstance3D", 0.0f);
+    setEntityOpacity(world, "Arrival/T4Arrival/PathFollow3D/MeshInstance3D", 0.0f);
+    setEntityOpacity(world, "Arrival/T5Arrival/PathFollow3D/MeshInstance3D", 0.0f);
+    setEntityOpacity(world, "Arrival/T6Arrival/PathFollow3D/MeshInstance3D", 0.0f);
 
-    // Start the sequence by scheduling T1Arrival immediately at 0.0f seconds
+    // Schedule the ground traffic and staggered terminal arrivals
+    scheduleAnimation(world, "PassengerTruckPath", 0.0f);
     scheduleAnimation(world, "T1Arrival", 0.0f);
+    scheduleAnimation(world, "T3Arrival", 15.0f);
+    scheduleAnimation(world, "T5Arrival", 30.0f);
+    scheduleAnimation(world, "T2Arrival", 45.0f);
+    scheduleAnimation(world, "T4Arrival", 60.0f);
+    scheduleAnimation(world, "T6Arrival", 75.0f);
     // Actual game loop
     // ==== ECS Migration ====
 

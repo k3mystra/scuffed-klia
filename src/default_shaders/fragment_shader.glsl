@@ -16,6 +16,9 @@ out vec4 color;
 
 void main()
 {
+    if (opacity < 0.01) {
+        discard;
+    }
     vec3 baseColor = hasTexture ? vec3(texture(diffuseTexture, geoTexCoord)) : matColor;
 
     // Increased ambient contribution (35%) so models aren't dark
