@@ -11,12 +11,19 @@ out vec3 worldPos;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 model;
+uniform bool isGrass;
 
 void main()
 {
-    fragTexCoord = texCoord;
     vertNormal = mat3(transpose(inverse(model))) * normal;
     worldPos = vec3(model * vec4(pos, 1.0));
+    
+    if (isGrass) {
+        fragTexCoord = worldPos.xz * 0.05;
+    } else {
+        fragTexCoord = texCoord;
+    }
+    
     gl_Position = projection * view * vec4(worldPos, 1.0);
 }
 

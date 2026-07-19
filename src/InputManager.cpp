@@ -11,6 +11,12 @@ void InputManager::init(GLFWwindow* window) {
     // disable cursor at start
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+    // Seed lastMousePos with the actual cursor position so the very first
+    // mouse callback doesn't produce a garbage delta from (realX - (-1)).
+    double mx, my;
+    glfwGetCursorPos(window, &mx, &my);
+    lastMousePos = glm::vec2(mx, my);
+
     glfwSetKeyCallback(window, InputManager::_handleKey);
     glfwSetCursorPosCallback(window, InputManager::_handleMousePos);
 }
@@ -51,6 +57,15 @@ void InputManager::_handleMousePos(GLFWwindow *window, double xpos, double ypos)
 void InputManager::clearInputQueue() {
     inputEventQueue.clear();
 }
+
+void InputManager::resetMousePos(GLFWwindow* window) {
+    // Re-seed lastMousePos with the current cursor position so that the next
+    // mouse callback doesn't produce a large junk delta after cursor re-lock.
+    double mx, my;
+    glfwGetCursorPos(window, &mx, &my);
+    lastMousePos = glm::vec2(mx, my);
+}
+
 
 const bool InputManager::isKeyPressed(int key) {
     return key >= 0 && keyState[key];

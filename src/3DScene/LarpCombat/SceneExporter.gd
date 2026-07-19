@@ -1,177 +1,133 @@
 @tool
 extends EditorScript
 
-# Set the path where your C++ engine expects to read the layout configuration
+# Exports a flattened C++ scene. Run AutoAnimator first: its generated clips
+# contain world-space transforms and are named after their Path3D route.
 const OUTPUT_PATH = "res://world.txt"
-const ENTITY_DATA_PREFIX = "#"
-const TRANSFORM_PREFIX = "T"
-const MODEL_PREFIX = "M"
-const CAMERA_PREFIX = "C"
-const ANIMATION_PREFIX = "A"      # marks the start of an animation clip block
-const TRACK_PREFIX = "TR"         # marks a track within a clip (which entity + property)
-const KEYFRAME_PREFIX = "K"       # one keyframe: time + value
-
-func _run():
-	var root = EditorInterface.get_edited_scene_root()
-	if not root:
-		print("Error: Open a scene first!")
-		return
-
-	var file = FileAccess.open(OUTPUT_PATH, FileAccess.WRITE)
-	if not file:
-		print("Error: Could not create output file!")
-		return
-
-	print("Starting export for scene: ", root.name)
-	parse_entities(root, file)
-	file.close()
-	print("Export complete! Saved to: ", OUTPUT_PATH)
-
-func parse_entities(node: Node, file: FileAccess):
-	var entityStr = ""
-	if node is MeshInstance3D:
-		entityStr = parse_3d_obj(node)
-	elif node is Camera3D:
-		entityStr = parse_cam(node)
-	elif node is AnimationPlayer:
-		entityStr = parse_anim_player(node)
-	file.store_string(entityStr)
-
-	# Recursively check children to support nested nodes/groups
-	for child in node.get_children():
-		parse_entities(child, file)
-
-func parse_3d_obj(node: MeshInstance3D) -> String:
-	var entityStr = ""
-	entityStr += parse_entity_data_comp(node)
-	entityStr += parse_transform_comp(node)
-	entityStr += parse_model_comp(node)
-	return entityStr + "\n"
-
-func parse_cam(node: Camera3D):
-	var entityStr = ""
-	entityStr += parse_entity_data_comp(node)
-	entityStr += parse_transform_comp(node)
-	entityStr += parse_camera_comp(node)
-	return entityStr
-
-func parse_transform_comp(node: Node3D) -> String:
-	var pos = node.position
-	var rot = node.quaternion
-	var scl = node.scale
-
-	# 3. Format line: path pos.x pos.y pos.z rot.w rot.x rot.y rot.z scl.x scl.y scl.z
-	var line = TRANSFORM_PREFIX + " "
-	line += "%f %f %f " % [pos.x, pos.y, pos.z]
-	line += "%f %f %f %f " % [rot.w, rot.x, rot.y, rot.z]
-	line += "%f %f %f\n" % [scl.x, scl.y, scl.z]
-	return line
-
-func parse_entity_data_comp(node: Node) -> String:
-	return ENTITY_DATA_PREFIX + " " + node.name + "\n"
-
-# Offset from your shared "src" folder (where main.cpp lives) down to this
-# Godot project's own root. Since this matches the repo's folder structure,
-# it's identical for every teammate regardless of where they cloned the repo.
+const SOURCE_ANIMATION = "ScriptTest"
 const PROJECT_OFFSET_FROM_SRC = "3DScene/LarpCombat/"
 
-func parse_model_comp(node: MeshInstance3D) -> String:
-	var line = MODEL_PREFIX
-	if not node.mesh or node.mesh.resource_path.get_extension() != "obj":
-		return line + "\n"
-	# Path relative to the shared "src" folder, not to this machine's
-	# absolute filesystem, and not to Godot's own project root either
-	# (since main.cpp lives one level above the Godot project).
-	var relative_path = PROJECT_OFFSET_FROM_SRC + node.mesh.resource_path.trim_prefix("res://")
-	line += " " + relative_path + "\n"
-	return line
+var scene_root: Node
 
-func parse_camera_comp(node: Camera3D) -> String:
-	return CAMERA_PREFIX + "\n"
+func _run() -> void:
+	var root = EditorInterface.get_edited_scene_root()
+	if not root:
+		push_error("Open a scene before exporting.")
+		return
+	scene_root = root
+	var file = FileAccess.open(OUTPUT_PATH, FileAccess.WRITE)
+	if not file:
+		push_error("Could not create " + OUTPUT_PATH)
+		return
 
-# ---- Animation export ----
-#
-# AnimationPlayer tracks reference OTHER nodes by NodePath, not itself, so
-# we resolve each track's target here and emit the target's NODE NAME
-# (matching the "#" entity name used elsewhere) so the C++ side can attach
-# the clip to the correct entity without doing any path resolution itself.
-#
-# Only POSITION_3D / ROTATION_3D / SCALE_3D tracks are handled here, since
-# that covers rigid-body motion (taxiing, pushback, gear, doors, etc).
-# Skinned/bone animation is intentionally NOT handled -- your assets are
-# static meshes, not armatures, so there is nothing to support there yet.
-func parse_anim_player(node: AnimationPlayer) -> String:
-	var out = ""
+	write_entities(root, file)
+	write_animations(root, file)
+	file.close()
+	print("Exported scene and route animations to ", OUTPUT_PATH)
 
-	# Track paths are resolved relative to the player's root_node (usually
-	# its parent, ".."), NOT relative to the AnimationPlayer node itself.
-	var anim_root = node.get_node_or_null(node.root_node)
-	if not anim_root:
-		print("Warning: could not resolve root_node for AnimationPlayer: ", node.name)
-		return out
+func write_entities(node: Node, file: FileAccess) -> void:
+	if node is MeshInstance3D:
+		write_mesh(node, file)
+	elif node is Camera3D:
+		write_camera(node, file)
+	for child in node.get_children():
+		write_entities(child, file)
 
-	for anim_name in node.get_animation_list():
-		if anim_name == "RESET":
+func write_mesh(node: MeshInstance3D, file: FileAccess) -> void:
+	file.store_string("# %s\n" % entity_id(node))
+	file.store_string(transform_line(node.global_transform))
+	var mesh_path := ""
+	if node.mesh and node.mesh.resource_path.get_extension() == "obj":
+		mesh_path = PROJECT_OFFSET_FROM_SRC + node.mesh.resource_path.trim_prefix("res://")
+	file.store_string("M%s\n\n" % (" " + mesh_path if not mesh_path.is_empty() else ""))
+
+func write_camera(node: Camera3D, file: FileAccess) -> void:
+	file.store_string("# %s\n" % entity_id(node))
+	file.store_string(transform_line(node.global_transform))
+	file.store_string("C\n\n")
+
+func transform_line(transform: Transform3D) -> String:
+	var position := transform.origin
+	var rotation := transform.basis.get_rotation_quaternion()
+	var scale := transform.basis.get_scale()
+	return "T %f %f %f %f %f %f %f %f %f %f\n" % [position.x, position.y, position.z, rotation.w, rotation.x, rotation.y, rotation.z, scale.x, scale.y, scale.z]
+
+func write_animations(root: Node, file: FileAccess) -> void:
+	var player := find_animation_player(root)
+	if not player:
+		push_warning("No AnimationPlayer found; no animations exported.")
+		return
+	var animation_root := player.get_node_or_null(player.root_node)
+	if not animation_root:
+		push_error("Could not resolve AnimationPlayer.root_node.")
+		return
+
+	for name in player.get_animation_list():
+		var animation := player.get_animation(name)
+		# Only AutoAnimator's per-Path3D clips belong in the runtime world. This
+		# excludes the source progress tracks and legacy combined baked clips.
+		if not animation.has_meta("route_animation"):
 			continue
-		var anim: Animation = node.get_animation(anim_name)
-		out += ANIMATION_PREFIX + " " + anim_name + " %f %d\n" % [anim.length, anim.loop_mode]
+		write_animation(animation, name, animation_root, file)
 
-		for track_idx in range(anim.get_track_count()):
-			var track_type = anim.track_get_type(track_idx)
-			var track_path = anim.track_get_path(track_idx)
-			var track_type_str = ""
+func write_animation(animation: Animation, name: String, animation_root: Node, file: FileAccess) -> void:
+	var tracks := ""
+	for track_index in animation.get_track_count():
+		var track_path := animation.track_get_path(track_index)
+		var track_path_str := String(track_path)
+		var is_transparency := false
+		if track_path_str.ends_with(":transparency"):
+			track_path_str = track_path_str.split(":")[0]
+			is_transparency = true
+		
+		var type_name := ""
+		if is_transparency:
+			type_name = "OPA"
+		else:
+			type_name = track_type_name(animation.track_get_type(track_index))
+		
+		if type_name.is_empty():
+			continue
+			
+		var target = animation_root.get_node_or_null(NodePath(track_path_str))
+		if not (target is MeshInstance3D):
+			push_warning("Skipping non-mesh animation target: " + track_path_str)
+			continue
+			
+		tracks += "Z %s %s %d " % [entity_id(target), type_name, animation.track_get_key_count(track_index)]
+		for key_index in animation.track_get_key_count(track_index):
+			tracks += key_string(type_name, animation.track_get_key_time(track_index, key_index), animation.track_get_key_value(track_index, key_index))
+	if not tracks.is_empty():
+		file.store_string("A %s %f %d %s\n" % [name, animation.length, animation.loop_mode, tracks])
 
-			if track_type == Animation.TYPE_POSITION_3D:
-				track_type_str = "POS"
-			elif track_type == Animation.TYPE_ROTATION_3D:
-				track_type_str = "ROT"
-			elif track_type == Animation.TYPE_SCALE_3D:
-				track_type_str = "SCL"
-			elif track_type == Animation.TYPE_VALUE:
-				# Generic property track, e.g. "NodePath:position" -- this is
-				# what Godot creates when you keyframe a single Inspector
-				# field directly instead of using "Insert Transform Track".
-				var prop_name = String(track_path).get_slice(":", 1)
-				match prop_name:
-					"position": track_type_str = "POS"
-					"rotation": track_type_str = "ROT_EULER"
-					"quaternion": track_type_str = "ROT"
-					"scale": track_type_str = "SCL"
-					"transparency": track_type_str = "OPACITY"
-					_:
-						continue  # not a property we handle
-			else:
-				continue
+func track_type_name(type: int) -> String:
+	match type:
+		Animation.TYPE_POSITION_3D: return "POS"
+		Animation.TYPE_ROTATION_3D: return "ROT"
+		Animation.TYPE_SCALE_3D: return "SCL"
+	return ""
 
-			var target_node = anim_root.get_node_or_null(track_path)
-			if not target_node:
-				print("Warning: could not resolve animation track target: ", track_path)
-				continue
+func key_string(type_name: String, time: float, value: Variant) -> String:
+	if type_name == "ROT":
+		return "K %f %f %f %f %f " % [time, value.w, value.x, value.y, value.z]
+	elif type_name == "OPA":
+		var opacity : float = 1.0 - (value as float)
+		return "K %f %f " % [time, opacity]
+	return "K %f %f %f %f " % [time, value.x, value.y, value.z]
 
-			out += TRACK_PREFIX + " " + target_node.name + " " + track_type_str + " %d\n" % anim.track_get_key_count(track_idx)
+func entity_id(node: Node) -> String:
+	# Use the scene-relative path. Animation tracks are resolved from the same
+	# scene root, so this string is also what World.cpp uses for the lookup key.
+	var id := String(scene_root.get_path_to(node))
+	if id.contains(" ") or id.contains("\t"):
+		push_error("Node paths with whitespace cannot be exported: " + id)
+	return id
 
-			for key_idx in range(anim.track_get_key_count(track_idx)):
-				var time = anim.track_get_key_time(track_idx, key_idx)
-				var value = anim.track_get_key_value(track_idx, key_idx)
-				out += KEYFRAME_PREFIX + " " + format_key_value(track_type_str, time, value)
-
-	return out
-
-func format_key_value(track_type_str: String, time: float, value) -> String:
-	match track_type_str:
-		"POS", "SCL":
-			return "%f %f %f %f\n" % [time, value.x, value.y, value.z]
-		"ROT":
-			# Quaternion (from a dedicated ROTATION_3D track, or a Value
-			# track targeting the "quaternion" property)
-			return "%f %f %f %f %f\n" % [time, value.w, value.x, value.y, value.z]
-		"ROT_EULER":
-			# Euler angles in radians (from a Value track targeting
-			# "rotation" directly) -- C++ side should convert to quaternion
-			# on load if it needs to combine with other rotation data.
-			return "%f %f %f %f\n" % [time, value.x, value.y, value.z]
-		"OPACITY":
-			# Single float, 0 = fully opaque, 1 = fully invisible
-			# (GeometryInstance3D.transparency)
-			return "%f %f\n" % [time, value]
-	return "%f\n" % time
+func find_animation_player(node: Node) -> AnimationPlayer:
+	if node is AnimationPlayer:
+		return node
+	for child in node.get_children():
+		var result := find_animation_player(child)
+		if result:
+			return result
+	return null

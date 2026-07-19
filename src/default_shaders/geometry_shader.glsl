@@ -8,6 +8,7 @@ in vec3 worldPos[];
 
 out vec3 faceNormal;
 out vec2 geoTexCoord;
+out vec3 fragWorldPos;
 
 void main() {
     // Compute flat normal in world space
@@ -15,19 +16,19 @@ void main() {
     vec3 e2 = worldPos[2] - worldPos[0];
     faceNormal = normalize(cross(e1, e2));
 
-    // If you want smooth normals instead, comment above and use:
-    // faceNormal = normalize(vertNormal[0] + vertNormal[1] + vertNormal[2]);
-
     gl_Position = gl_in[0].gl_Position;
     geoTexCoord = fragTexCoord[0];
+    fragWorldPos = worldPos[0];
     EmitVertex();
 
     gl_Position = gl_in[1].gl_Position;
     geoTexCoord = fragTexCoord[1];
+    fragWorldPos = worldPos[1];
     EmitVertex();
 
     gl_Position = gl_in[2].gl_Position;
     geoTexCoord = fragTexCoord[2];
+    fragWorldPos = worldPos[2];
     EmitVertex();
 
     EndPrimitive();

@@ -25,8 +25,8 @@ const std::string SKYBOX_VERTEX_SHADER_SRC_PATH = "default_shaders/skybox_vertex
 
 const glm::vec3 DEFAULT_BG = glm::vec3(0.2, 0.2, 0.2);
 
-typedef std::pair<Camera, Transform> CameraTransformData;
-typedef std::pair<Model, Transform> ModelTransformData;
+typedef std::pair<Camera*, Transform*> CameraTransformData;
+typedef std::pair<Model*, Transform*> ModelTransformData;
 
 
 void APIENTRY openGLDebugCallback(GLenum source, GLenum type, GLuint id,
@@ -233,8 +233,77 @@ void RenderSystem::initializeComponents(World& world) {
 
     // Assume only 1 exists
     Camera* cam = &world.cameraList[0];
+    cam->aspectRatio = (float)windowCallbackData.viewportWidth / (float)windowCallbackData.viewportHeight;
     cam->projectionMatrix = glm::perspective(glm::radians(cam->fov), cam->aspectRatio, cam->nearPlane, cam->farPlane);
+
+    // Initialize skybox
+    float skyboxVertices[] = {
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
+    };
+
+    glGenVertexArrays(1, &world.skybox.VAO);
+    glGenBuffers(1, &world.skybox.VBO);
+    glBindVertexArray(world.skybox.VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, world.skybox.VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glBindVertexArray(0);
+
+    std::vector<std::string> faces = {
+        "3DScene/LarpCombat/skybox_left.png",
+        "3DScene/LarpCombat/skybox_right.png",
+        "3DScene/LarpCombat/skybox_top.png",
+        "3DScene/LarpCombat/skybox_bottom.png",
+        "3DScene/LarpCombat/skybox_back.png",
+        "3DScene/LarpCombat/skybox_front.png"
+    };
+    world.skybox.textureID = loadCubemap(faces);
+    world.skybox.shader.vertexShaderSrcPath = SKYBOX_VERTEX_SHADER_SRC_PATH;
+    world.skybox.shader.fragmentShaderSrcPath = SKYBOX_FRAGMENT_SHADER_SRC_PATH;
+    shader_utils::initializeShader(world.skybox.shader);
 }
+
 
 RenderSystem::RenderSystem(World& world, unsigned int initialWindowWidth, unsigned int initialWindowHeight) {
      // By default already set to screen size, but useful if we resize the windows later
@@ -259,6 +328,8 @@ RenderSystem::RenderSystem(World& world, unsigned int initialWindowWidth, unsign
 
     // OpenGL Functions to enable
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     #ifdef ENABLE_OPENGL_DEBUG
     // Debugging
@@ -311,27 +382,21 @@ static void renderObj(
     const CameraTransformData& camData,
     const World& world
 ) {
+    shader_utils::setMat4(modelData.first->shader, "model", modelData.second->matrix);
+    shader_utils::setFloat(modelData.first->shader, "opacity", modelData.second->opacity);
 
-    glUseProgram(modelData.first.shader.programID);
+    bool isGrass = modelData.first->srcPath == "3DScene/LarpCombat/grass_texture.jpg";
+    shader_utils::setBool(modelData.first->shader, "isGrass", isGrass);
 
-    for (const Mesh& mesh : modelData.first.meshes) {
-        shader_utils::setMat4(modelData.first.shader, "model", modelData.second.matrix);
-        shader_utils::setMat4(modelData.first.shader, "view", camData.second.invMatrix);
-        shader_utils::setMat4(modelData.first.shader, "projection", camData.first.projectionMatrix);
-
-        shader_utils::setVec3(modelData.first.shader, "matColor", mesh.material.color);
-
-        shader_utils::setVec3(modelData.first.shader, "ambientLightColor", world.ambientLight.color);
-
-        shader_utils::setVec3(modelData.first.shader, "sunLightColor", world.sunlight.color);
-        shader_utils::setVec3(modelData.first.shader, "sunLightDir", world.sunlight.direction);
+    for (const Mesh& mesh : modelData.first->meshes) {
+        shader_utils::setVec3(modelData.first->shader, "matColor", mesh.material.color);
 
         bool hasTexture = mesh.material.textureID != 0;
-        shader_utils::setBool(modelData.first.shader, "hasTexture", hasTexture);
+        shader_utils::setBool(modelData.first->shader, "hasTexture", hasTexture);
         if (hasTexture) {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, mesh.material.textureID);
-            shader_utils::setInt(modelData.first.shader, "diffuseTexture", 0);
+            shader_utils::setInt(modelData.first->shader, "diffuseTexture", 0);
         }
 
         glBindVertexArray(mesh.VAO);
@@ -360,24 +425,51 @@ void RenderSystem::render(World& world) {
         if (transformSearch == world.transformIndex.end())
             continue;
 
-        camObjectData.first = world.cameraList[camSearch->second];
-        camObjectData.second = world.transformList[transformSearch->second];
+        camObjectData.first = &world.cameraList[camSearch->second];
+        camObjectData.second = &world.transformList[transformSearch->second];
         break;
     }
 
+    // Render skybox
+    if (world.skybox.textureID != 0) {
+        glDepthMask(GL_FALSE);
+        glDepthFunc(GL_LEQUAL);
+        glUseProgram(world.skybox.shader.programID);
+
+        // Remove translation from view matrix
+        glm::mat4 view = glm::mat4(glm::mat3(camObjectData.second->invMatrix));
+        shader_utils::setMat4(world.skybox.shader, "view", view);
+        shader_utils::setMat4(world.skybox.shader, "projection", camObjectData.first->projectionMatrix);
+
+        glBindVertexArray(world.skybox.VAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, world.skybox.textureID);
+        shader_utils::setInt(world.skybox.shader, "skybox", 0);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glDepthMask(GL_TRUE);
+        glDepthFunc(GL_LESS);
+    }
+
+    // Since all model uses same shader
+    // gonna hack this to use the same shader as well
+    Shader& shader = world.modelList[0].shader;
+    glUseProgram(shader.programID);
+    shader_utils::setMat4(shader, "view", camObjectData.second->invMatrix);
+    shader_utils::setMat4(shader, "projection", camObjectData.first->projectionMatrix);
+    shader_utils::setVec3(shader, "viewPos", camObjectData.second->position);
+
+    shader_utils::setVec3(shader, "ambientLightColor", world.ambientLight.color);
+
+    shader_utils::setVec3(shader, "sunLightColor", world.sunlight.color);
+    shader_utils::setVec3(shader, "sunLightDir", world.sunlight.direction);
+
     // Iterate thru all entity, since we need multiple components from each entity
     ModelTransformData modelObjectData;
-    for (int e = 0; e < world.totalEntity; e++) {
-        auto modelSearch = world.modelIndex.find(e);
-        if (modelSearch == world.modelIndex.end())
-            continue;
 
-        auto transformSearch = world.transformIndex.find(e);
-        if (transformSearch == world.transformIndex.end())
-            continue;
-
-        modelObjectData.first = world.modelList[modelSearch->second];
-        modelObjectData.second = world.transformList[transformSearch->second];
+    for (const auto& modelIndices : world.modelIndex) {
+        modelObjectData.first = &world.modelList[modelIndices.second];
+        modelObjectData.second = &world.transformList[world.transformIndex.at(modelIndices.first)];
 
         renderObj(modelObjectData, camObjectData, world);
     }
